@@ -32,6 +32,7 @@ const toApi = (d) => ({
   date_inscription: d.dateInscription,
   date_expiration:  d.dateExpiration,
   photo_base64:     d.photoBase64 || null,
+  password:         d.password || null,
 });
 const fromApiP = (p) => ({
   id:         p.id,

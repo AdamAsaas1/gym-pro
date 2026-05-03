@@ -14,6 +14,7 @@ import Abonnements from './pages/Abonnements';
 import Coaches     from './pages/Coaches';
 import Paiements   from './pages/Paiements';
 import Permissions from './pages/Permissions';
+import AdminNotifications from './pages/AdminNotifications';
 
 function RequireAuth({ children }) {
   const { isAuthenticated, loadingAuth } = useAuth();
@@ -53,6 +54,7 @@ function Layout() {
             <Route path="/activites" element={<ProtectedPage page="/activites"><Activites /></ProtectedPage>} />
             <Route path="/abonnements" element={<ProtectedPage page="/abonnements"><Abonnements /></ProtectedPage>} />
             <Route path="/coaches" element={<ProtectedPage page="/coaches"><Coaches /></ProtectedPage>} />
+            <Route path="/notifications" element={<ProtectedPage page="/notifications"><AdminNotifications /></ProtectedPage>} />
             <Route path="/permissions" element={<ProtectedPage page="/permissions"><Permissions /></ProtectedPage>} />
             <Route path="*"            element={<Navigate to="/" />} />
           </Routes>

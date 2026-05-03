@@ -194,4 +194,8 @@ export const telechargerRecu = async (id) => {
   }
 }
 
+// ─── Notifications ─────────────────────────────────────────────────────────────
+export const getNotifications = () => api.get('/notifications').then((r) => r.data)
+export const createNotification = (data) => api.post('/notifications', data).then((r) => r.data)
+
 export default api

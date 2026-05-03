@@ -17,6 +17,7 @@ const EMPTY_FORM = {
   dateNaissance: '', dateInscription: new Date().toISOString().split('T')[0],
   dateExpiration: '',
   photoBase64: '',
+  password: '',
 };
 
 function computeExpiration(dateInscription, abonnement, durations) {
@@ -82,6 +83,7 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
     if (!form.prenom.trim())    e.prenom = 'Prénom obligatoire';
     if (!form.telephone.trim()) e.telephone = 'Téléphone obligatoire';
     if (!form.dateNaissance)    e.dateNaissance = 'Date de naissance obligatoire';
+    if (!initial?.id && !form.password) e.password = 'Mot de passe obligatoire pour les nouveaux membres';
     return e;
   };
 
@@ -209,6 +211,18 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
       <div className="form-group">
         <label>Date d'expiration (calculée)</label>
         <input type="date" value={form.dateExpiration} readOnly className="input--readonly" />
+      </div>
+      
+      <div className="form-group">
+        <label>{initial?.id ? 'Nouveau mot de passe (laisser vide pour ne pas changer)' : 'Mot de passe initial *'}</label>
+        <input 
+          type="password" 
+          value={form.password} 
+          onChange={(e) => set('password', e.target.value)} 
+          placeholder="••••••••" 
+          autoComplete="new-password"
+        />
+        {errors.password && <span className="form-error">{errors.password}</span>}
       </div>
 
       <div className="form-group">
