@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Bell, Plus, Send, Info, AlertTriangle, Clock, Users, X, CheckCircle, Eye, Search, Dumbbell, Target, Zap, Shield, Calendar } from 'lucide-react';
-import { getNotifications, createNotification, getMembres, getNotificationRecipients } from '../api/client';
+import { Bell, Plus, Send, Info, AlertTriangle, Clock, Users, X, CheckCircle, Eye, Search, Dumbbell, Target, Zap, Shield, Calendar, Trash2, AlertCircle } from 'lucide-react';
+import { getNotifications, createNotification, getMembres, getNotificationRecipients, deleteNotification } from '../api/client';
 import './AdminNotifications.css';
 
 const ACTIVITIES = [
@@ -16,18 +16,18 @@ export default function AdminNotifications() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [showRecipientsModal, setShowRecipientsModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [notifToDelete, setNotifToDelete] = useState(null);
+  
   const [selectedNotif, setSelectedNotif] = useState(null);
   const [recipients, setRecipients] = useState([]);
   const [loadingRecipients, setLoadingRecipients] = useState(false);
   const [memberSearch, setMemberSearch] = useState('');
   
-  // Selection states
-  const [targetType, setTargetType] = useState('all'); // 'all', 'activity', 'member'
+  const [targetType, setTargetType] = useState('all'); 
   const [selectedActivities, setSelectedActivities] = useState([]);
   const [selectedMemberIds, setSelectedMemberIds] = useState([]);
-  
-  // Reminder states
-  const [scheduleDays, setScheduleDays] = useState([]); // [3, 2, 1]
+  const [scheduleDays, setScheduleDays] = useState([]);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -60,15 +60,12 @@ export default function AdminNotifications() {
     e.preventDefault();
     try {
       setSubmitting(true);
-      
       let finalMemberIds = null;
       let scheduleStr = null;
 
       if (formData.type === 'reminder') {
-        // Scheduled reminder logic
         scheduleStr = scheduleDays.sort((a,b) => b-a).join(',');
       } else {
-        // Direct notification logic
         if (targetType === 'member') {
           finalMemberIds = selectedMemberIds;
         } else if (targetType === 'activity') {
@@ -90,6 +87,26 @@ export default function AdminNotifications() {
       fetchData();
     } catch (error) {
       console.error('Error creating notification:', error);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const confirmDelete = (id) => {
+    setNotifToDelete(id);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDelete = async () => {
+    if (!notifToDelete) return;
+    try {
+      setSubmitting(true);
+      await deleteNotification(notifToDelete);
+      setShowDeleteConfirm(false);
+      setNotifToDelete(null);
+      fetchData();
+    } catch (error) {
+      console.error('Error deleting notification:', error);
     } finally {
       setSubmitting(false);
     }
@@ -122,20 +139,6 @@ export default function AdminNotifications() {
     );
   };
 
-  const filteredMembers = members.filter(m => 
-    `${m.nom} ${m.prenom}`.toLowerCase().includes(memberSearch.toLowerCase()) ||
-    m.email.toLowerCase().includes(memberSearch.toLowerCase())
-  );
-
-  const getIcon = (type, isScheduled) => {
-    if (isScheduled) return <Calendar size={16} className="text-gold" />;
-    switch (type) {
-      case 'reminder': return <Clock size={16} className="text-yellow" />;
-      case 'reclamation': return <AlertTriangle size={16} className="text-red" />;
-      default: return <Info size={16} className="text-blue" />;
-    }
-  };
-
   const handleShowRecipients = async (notif) => {
     setSelectedNotif(notif);
     setShowRecipientsModal(true);
@@ -147,6 +150,15 @@ export default function AdminNotifications() {
       console.error('Error fetching recipients:', error);
     } finally {
       setLoadingRecipients(false);
+    }
+  };
+
+  const getIcon = (type, isScheduled) => {
+    if (isScheduled) return <Calendar size={16} className="text-gold" />;
+    switch (type) {
+      case 'reminder': return <Clock size={16} className="text-yellow" />;
+      case 'reclamation': return <AlertTriangle size={16} className="text-red" />;
+      default: return <Info size={16} className="text-blue" />;
     }
   };
 
@@ -188,58 +200,75 @@ export default function AdminNotifications() {
       </div>
 
       <div className="notifs-content card">
-        <table className="notifs-table">
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Titre</th>
-              <th>Message</th>
-              <th>Cible / Planning</th>
-              <th>Statut Global</th>
-              <th>Date Création</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan="6" className="text-center">Chargement...</td></tr>
-            ) : notifications.length === 0 ? (
-              <tr><td colSpan="6" className="text-center">Aucune notification trouvée</td></tr>
-            ) : (
-              notifications.map((notif) => (
-                <tr key={notif.id}>
-                  <td>
-                    <div className={`notif-type-badge ${notif.type}`}>
-                      {getIcon(notif.type, !!notif.schedule_days_before)}
-                      <span>{notif.type === 'reminder' && notif.schedule_days_before ? 'Automatique' : notif.type}</span>
-                    </div>
-                  </td>
-                  <td className="font-semibold">{notif.title}</td>
-                  <td className="notif-desc">{notif.description}</td>
-                  <td>
-                    <button className="btn-dest" onClick={() => handleShowRecipients(notif)}>
-                      {notif.schedule_days_before ? <Clock size={14} /> : <Users size={14} />}
-                      <span>{notif.total_recipients} Membre(s)</span>
-                    </button>
-                    {notif.schedule_days_before && (
-                      <div className="text-muted" style={{ fontSize: '0.7rem', marginTop: '4px', paddingLeft: '8px' }}>
-                         Automatique (J-{notif.schedule_days_before})
+        <div className="notifs-table-wrapper">
+          <table className="notifs-table">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Titre</th>
+                <th>Message</th>
+                <th>Cible / Planning</th>
+                <th>Vus</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr><td colSpan="6" className="text-center">Chargement...</td></tr>
+              ) : notifications.length === 0 ? (
+                <tr><td colSpan="6" className="text-center">Aucune notification trouvée</td></tr>
+              ) : (
+                notifications.map((notif) => (
+                  <tr key={notif.id}>
+                    <td>
+                      <div className={`notif-type-badge ${notif.type}`}>
+                        {getIcon(notif.type, !!notif.schedule_days_before)}
+                        <span>{notif.type === 'reminder' && notif.schedule_days_before ? 'Automatique' : notif.type}</span>
                       </div>
-                    )}
-                  </td>
-                  <td>
-                    <div className="statut-summary">
-                      <Eye size={14} className="text-gold" />
-                      <span>{notif.total_seen} vus</span>
-                    </div>
-                  </td>
-                  <td className="text-muted">
-                    {new Date(notif.created_at).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+                    </td>
+                    <td className="font-semibold">{notif.title}</td>
+                    <td className="notif-desc">{notif.description}</td>
+                    <td>
+                      <button className="btn-dest" onClick={() => handleShowRecipients(notif)}>
+                        {notif.schedule_days_before ? <Clock size={14} /> : <Users size={14} />}
+                        <span>{notif.total_recipients} Membre(s)</span>
+                      </button>
+                      {notif.schedule_days_before && (
+                        <div className="text-muted" style={{ fontSize: '0.7rem', marginTop: '4px', paddingLeft: '8px' }}>
+                          Automatique (J-{notif.schedule_days_before})
+                        </div>
+                      )}
+                    </td>
+                    <td>
+                      <div className="statut-summary">
+                        <Eye size={14} className="text-gold" />
+                        <span>{notif.total_seen}</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="notif-actions">
+                        {notifToDelete === notif.id ? (
+                          <div className="inline-confirm">
+                            <button className="btn-confirm-yes" onClick={handleDelete} disabled={submitting}>
+                              {submitting ? '...' : 'Supprimer'}
+                            </button>
+                            <button className="btn-confirm-no" onClick={() => setNotifToDelete(null)}>
+                              <X size={14} />
+                            </button>
+                          </div>
+                        ) : (
+                          <button className="btn-icon-danger" onClick={() => setNotifToDelete(notif.id)}>
+                            <Trash2 size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {showModal && (
@@ -289,9 +318,6 @@ export default function AdminNotifications() {
                         </div>
                       ))}
                     </div>
-                    <p className="text-muted" style={{ marginTop: '1rem', fontSize: '0.8rem' }}>
-                      Cette notification sera envoyée automatiquement à tout membre dont l'abonnement expire dans les délais choisis.
-                    </p>
                   </div>
                 ) : (
                   <div className="form-group">
@@ -307,7 +333,6 @@ export default function AdminNotifications() {
                         <Users size={16} /> Membre
                       </button>
                     </div>
-
                     {targetType === 'activity' && (
                       <div className="activities-grid">
                         {ACTIVITIES.map(activity => (
@@ -321,15 +346,26 @@ export default function AdminNotifications() {
 
                     {targetType === 'member' && (
                       <div className="members-selection-list">
-                        {filteredMembers.map(m => (
-                          <div key={m.id} className={`member-checkbox-item ${selectedMemberIds.includes(m.id) ? 'selected' : ''}`} onClick={() => toggleMemberSelection(m.id)}>
-                            <input type="checkbox" checked={selectedMemberIds.includes(m.id)} onChange={() => {}} />
-                            <div className="member-info-row">
-                              <span className="member-name-text">{m.nom} {m.prenom}</span>
-                              <span className="member-sub-text">{m.email}</span>
+                        <div className="search-box-mini">
+                          <Search size={14} />
+                          <input 
+                            type="text" 
+                            placeholder="Rechercher un membre..." 
+                            value={memberSearch}
+                            onChange={e => setMemberSearch(e.target.value)}
+                          />
+                        </div>
+                        <div className="members-scroll">
+                          {filteredMembers.map(m => (
+                            <div key={m.id} className={`member-checkbox-item ${selectedMemberIds.includes(m.id) ? 'selected' : ''}`} onClick={() => toggleMemberSelection(m.id)}>
+                              <input type="checkbox" checked={selectedMemberIds.includes(m.id)} readOnly />
+                              <div className="member-info-row">
+                                <span className="member-name-text">{m.nom} {m.prenom}</span>
+                                <span className="member-sub-text">{m.email}</span>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -357,6 +393,7 @@ export default function AdminNotifications() {
           </div>
         </div>
       )}
+
 
       {/* Recipients Modal */}
       {showRecipientsModal && (
