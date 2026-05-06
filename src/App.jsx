@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { GymProvider } from './context/GymContext';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { GymProvider, useGym } from './context/GymContext';
 import { PermissionProvider, usePermissions } from './context/PermissionContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import PermissionRender from './components/PermissionRender';
@@ -15,6 +15,7 @@ import Coaches     from './pages/Coaches';
 import Paiements   from './pages/Paiements';
 import Permissions from './pages/Permissions';
 import AdminNotifications from './pages/AdminNotifications';
+import Settings from './pages/Settings';
 
 function RequireAuth({ children }) {
   const { isAuthenticated, loadingAuth } = useAuth();
@@ -39,6 +40,23 @@ function ProtectedPage({ page, children }) {
   );
 }
 
+function ForceSettingsRedirect({ children }) {
+  const { user } = useAuth();
+  const { activites, loading } = useGym();
+  const location = useLocation();
+
+  if (loading) return null;
+
+  // If no activities exist and user is superadmin, force them to settings
+  const needsSetup = activites.length === 0 && user?.role === 'superadmin';
+  
+  if (needsSetup && location.pathname !== '/settings') {
+    return <Navigate to="/settings" replace />;
+  }
+
+  return children;
+}
+
 function Layout() {
   return (
     <div className="app-layout">
@@ -56,6 +74,7 @@ function Layout() {
             <Route path="/coaches" element={<ProtectedPage page="/coaches"><Coaches /></ProtectedPage>} />
             <Route path="/notifications" element={<ProtectedPage page="/notifications"><AdminNotifications /></ProtectedPage>} />
             <Route path="/permissions" element={<ProtectedPage page="/permissions"><Permissions /></ProtectedPage>} />
+            <Route path="/settings"    element={<ProtectedPage page="/settings"><Settings /></ProtectedPage>} />
             <Route path="*"            element={<Navigate to="/" />} />
           </Routes>
         </main>
@@ -76,7 +95,9 @@ export default function App() {
                 path="*"
                 element={(
                   <RequireAuth>
-                    <Layout />
+                    <ForceSettingsRedirect>
+                      <Layout />
+                    </ForceSettingsRedirect>
                   </RequireAuth>
                 )}
               />

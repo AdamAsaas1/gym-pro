@@ -1,4 +1,4 @@
-﻿@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap');
 
 /* =============================================================
    GymPro - Design System
@@ -3032,6 +3032,146 @@ input, select, button, textarea { font-family: inherit; }
   transition: transform 0.15s, box-shadow 0.15s;
 }
 .btn-pay:hover { transform: translateY(-1px); box-shadow: 0 8px 24px rgba(57,255,20,0.45); }
+/* === Activites Grid & Cards === */
+.activites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 24px;
+  margin-top: 20px;
+}
 
+.act-card {
+  background: rgba(12, 17, 20, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 28px;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s, box-shadow 0.3s;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
+.act-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  border-color: var(--tc);
+}
 
+.act-card::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle at top right, var(--bg), transparent 70%);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.act-card__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.act-card__icon-wrap {
+  width: 54px; height: 54px;
+  background: var(--bg);
+  border: 1px solid var(--tc);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.act-card__emoji {
+  font-size: 1.75rem;
+}
+
+.act-card__genre {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--tc);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 2px;
+}
+
+.act-card__name {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.act-card__desc {
+  font-size: 0.875rem;
+  color: var(--clr-muted);
+  line-height: 1.6;
+  min-height: 48px;
+}
+
+.act-card__stats {
+  display: flex;
+  gap: 20px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+}
+
+.act-stat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #94a3b8;
+}
+
+.act-stat__val {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.act-stat__lbl {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.act-card__tarifs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tarif-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.tarif-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+.tarif-row strong {
+  color: var(--tc);
+}
+
+.act-card__coach {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #64748b;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
