@@ -71,6 +71,7 @@ export function GymProvider({ children }) {
   const [membres,   setMembres]   = useState([]);
   const [paiements, setPaiements] = useState([]);
   const [activites, setActivites] = useState([]);
+  const [gymSettings, setGymSettings] = useState(null);
   const [abonnementDurations, setAbonnementDurations] = useState({});
   const [configFallback, setConfigFallback] = useState(false);
   const [readIds, setReadIds] = useState(new Set());
@@ -96,10 +97,12 @@ export function GymProvider({ children }) {
 
       if (!ignore) setLoading(true);
       try {
-        const [msRes, psRes, cfgRes] = await Promise.allSettled([
+        const [msRes, psRes, cfgRes, settingsRes, actsRes] = await Promise.allSettled([
           apiClient.getMembres(),
           apiClient.getPaiements(),
           apiClient.getConfig(),
+          apiClient.getSettings(),
+          apiClient.getActivities(),
         ]);
         if (ignore) return;
 
@@ -111,13 +114,36 @@ export function GymProvider({ children }) {
         const cfg = cfgRes.status === 'fulfilled' ? cfgRes.value : null;
         setConfigFallback(cfgRes.status !== 'fulfilled');
         const durations = cfg?.abonnement_durations || FALLBACK_DURATIONS;
-        const prixMap = cfg?.activite_prix || FALLBACK_PRIX;
         setAbonnementDurations(durations);
-        const merged = BASE_ACTIVITES.map((a) => ({
-          ...a,
-          prix: prixMap[a.id] || FALLBACK_PRIX[a.id] || { mensuel: 0, trimestriel: 0, annuel: 0 },
-        }));
-        setActivites(merged);
+
+        if (settingsRes.status === 'fulfilled') setGymSettings(settingsRes.value);
+        
+        if (actsRes.status === 'fulfilled' && actsRes.value.length > 0) {
+          // Map dynamic activities to UI format
+          const mapped = actsRes.value.map(a => ({
+            id: a.id,
+            nom: a.name,
+            prix: { 
+              mensuel: Number(a.price_month), 
+              trimestriel: Number(a.price_month) * 3 * 0.9, // Mock for now or add field
+              annuel: Number(a.price_year) 
+            },
+            inscription_fees: Number(a.inscription_fees),
+            assurance_first: Number(a.assurance_first_year),
+            assurance_next: Number(a.assurance_next_years),
+            max_capacity: a.max_capacity,
+            genre: a.genre || 'homme',
+            description: a.description || '',
+            coachNom: a.coach_name || 'À définir',
+            icon: a.icon || '🏋️', 
+            bg: a.color ? `${a.color}15` : 'rgba(99, 102, 241, 0.1)', 
+            couleur: a.color || '#6366f1'
+          }));
+          setActivites(mapped);
+        } else {
+          setActivites([]);
+        }
+
         const hasNetworkFailure = [msRes, psRes].every(isNetworkFailure);
         setApiError(hasNetworkFailure);
       } finally {
@@ -184,6 +210,60 @@ export function GymProvider({ children }) {
     setMembres(ms.map(fromApi));
     setPaiements(prev => [fromApiP(res.paiement), ...prev]);
     return res;
+  };
+
+  /* ── Settings & Activities Actions ── */
+  const updateSettings = async (data) => {
+    const s = await apiClient.updateSettings(data);
+    setGymSettings(s);
+    return s;
+  };
+
+  const addActivity = async (data) => {
+    const a = await apiClient.createActivity(data);
+    // Refresh activities
+    const acts = await apiClient.getActivities();
+    setActivites(acts.map(ac => ({
+      id: ac.id,
+      nom: ac.name,
+      prix: { mensuel: Number(ac.price_month), annuel: Number(ac.price_year) },
+      inscription_fees: Number(ac.inscription_fees),
+      assurance_first: Number(ac.assurance_first_year),
+      assurance_next: Number(ac.assurance_next_years),
+      max_capacity: ac.max_capacity,
+      genre: ac.genre || 'homme',
+      description: ac.description || '',
+      coachNom: ac.coach_name || '',
+      icon: ac.icon || '🏋️', 
+      bg: ac.color ? `${ac.color}15` : 'rgba(99, 102, 241, 0.1)', 
+      couleur: ac.color || '#6366f1'
+    })));
+    return a;
+  };
+
+  const updateActivity = async (id, data) => {
+    await apiClient.updateActivity(id, data);
+    const acts = await apiClient.getActivities();
+    setActivites(acts.map(ac => ({
+      id: ac.id,
+      nom: ac.name,
+      prix: { mensuel: Number(ac.price_month), annuel: Number(ac.price_year) },
+      inscription_fees: Number(ac.inscription_fees),
+      assurance_first: Number(ac.assurance_first_year),
+      assurance_next: Number(ac.assurance_next_years),
+      max_capacity: ac.max_capacity,
+      genre: ac.genre || 'homme',
+      description: ac.description || '',
+      coachNom: ac.coach_name || '',
+      icon: ac.icon || '🏋️', 
+      bg: ac.color ? `${ac.color}15` : 'rgba(99, 102, 241, 0.1)', 
+      couleur: ac.color || '#6366f1'
+    })));
+  };
+
+  const deleteActivity = async (id) => {
+    await apiClient.deleteActivity(id);
+    setActivites(prev => prev.filter(a => a.id !== id));
   };
   const stats = useMemo(() => {
     const actifs       = membres.filter((m) => m.statut === 'actif');
@@ -258,7 +338,7 @@ export function GymProvider({ children }) {
   }, [membres, paiements]);
 
   return (
-    <GymContext.Provider value={{ membres, paiements, coaches: COACHES, activites, planning: PLANNING, abonnementDurations, configFallback, stats, statsP, notifications, readIds, markRead, clearAll, unreadCount, loading, apiError, addMembre, updateMembre, deleteMembre, toggleStatut, enregistrerPaiement, enregistrerPaiementWorkflow }}>
+    <GymContext.Provider value={{ membres, paiements, coaches: COACHES, activites, gymSettings, planning: PLANNING, abonnementDurations, configFallback, stats, statsP, notifications, readIds, markRead, clearAll, unreadCount, loading, apiError, addMembre, updateMembre, deleteMembre, toggleStatut, enregistrerPaiement, enregistrerPaiementWorkflow, updateSettings, addActivity, updateActivity, deleteActivity }}>
       {loading && isAuthenticated ? (
         <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', background:'#0f172a', color:'#94a3b8', fontSize:'1.1rem', gap:'12px' }}>
           <div style={{ width:28, height:28, border:'3px solid #334155', borderTop:'3px solid #6366f1', borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />

@@ -45,10 +45,10 @@ const SECTION_LABELS = {
 export default function Header() {
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const { notifications, readIds, markRead, clearAll, unreadCount, configFallback } = useGym();
+  const { notifications, readIds, markRead, clearAll, unreadCount, configFallback, gymSettings } = useGym();
   const { currentRole, hasPageAccess } = usePermissions();
   const { logout } = useAuth();
-  const title = TITLES[pathname] ?? 'ASAAS GYM';
+  const title = TITLES[pathname] ?? (gymSettings?.name || 'ASAAS GYM');
   const [open, setOpen]     = useState(false);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');

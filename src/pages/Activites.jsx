@@ -1,7 +1,12 @@
 import { Users, TrendingUp, UserCheck } from 'lucide-react';
 import { useGym } from '../context/GymContext';
 
-const GENRE_LABEL = { homme: 'Section Hommes', femme: 'Section Femmes', enfant: 'Section Enfants' };
+const GENRE_LABEL = { 
+  homme: 'Section Hommes', 
+  femme: 'Section Femmes', 
+  enfant: 'Section Enfants',
+  universel: 'Section Mixte (Universel)'
+};
 
 export default function Activites() {
   const { membres, activites } = useGym();

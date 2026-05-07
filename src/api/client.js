@@ -170,6 +170,15 @@ export const exportMembresPDF = async () => {
 // ─── Config ───────────────────────────────────────────────────────────────────
 export const getConfig     = ()      => api.get('/config').then(r => r.data)
 
+// ─── Settings & Activities ───────────────────────────────────────────────────
+export const getSettings    = ()      => api.get('/settings').then(r => r.data)
+export const updateSettings = (data)  => api.put('/settings', data).then(r => r.data)
+
+export const getActivities  = ()      => api.get('/settings/activities').then(r => r.data)
+export const createActivity = (data)  => api.post('/settings/activities', data).then(r => r.data)
+export const updateActivity = (id, d) => api.put(`/settings/activities/${id}`, d).then(r => r.data)
+export const deleteActivity = (id)    => api.delete(`/settings/activities/${id}`).then(r => r.data)
+
 // ─── Paiements ────────────────────────────────────────────────────────────────
 export const getPaiements = () => requestWithFallback([
   () => api.get('/paiements/'),
