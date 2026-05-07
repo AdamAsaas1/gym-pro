@@ -1,0 +1,439 @@
+{
+  "header": {
+    "role": "Rol",
+    "logout": "Cerrar sesión",
+    "searchPlaceholder": "Buscar un miembro, pago...",
+    "newMember": "Nuevo miembro",
+    "cashIn": "Cobrar",
+    "defaultConfig": "Configuración predeterminada usada",
+    "notifications": "Notificaciones",
+    "markAllRead": "Marcar todo como leído",
+    "emptyNotifications": "No hay alertas en esta categoría",
+    "manageSubscriptions": "Gestionar todas las suscripciones"
+  },
+  "titles": {
+    "dashboard": "Panel de Control",
+    "members": "Gestión de Miembros",
+    "planning": "Planificación de Horarios",
+    "activities": "Actividades y Disciplinas",
+    "subscriptions": "Suscripciones",
+    "coaches": "Equipo de Entrenadores",
+    "permissions": "Gestión de Permisos",
+    "payments": "Pagos",
+    "settings": "Ajustes",
+    "notifications": "Notificaciones"
+  },
+  "sidebar": {
+    "collapse": "Ocultar",
+    "tagline": "Tu gimnasio, tu rendimiento",
+    "section": "Gestión",
+    "activeMembers": "miembros activos",
+    "performance": "Rendimiento",
+    "active": "Activos",
+    "toPay": "Por pagar"
+  },
+  "subscriptions": {
+    "monthly": "Mensual",
+    "1month": "1 mes",
+    "quarterly": "Trimestral",
+    "3months": "3 meses",
+    "yearly": "Anual",
+    "12months": "12 meses",
+    "estimatedRevenue": "Ingresos mensuales estimados (miembros activos)",
+    "memberCount": "miembro",
+    "revActivations": "ingresos / activaciones",
+    "expiring30Days": "Suscripciones que caducan en los próximos 30 días",
+    "noExpiring": "Ninguna suscripción caduca en los próximos 30 días. ✅",
+    "table": {
+      "member": "Miembro",
+      "section": "Sección",
+      "activity": "Actividad",
+      "subscription": "Suscripción",
+      "expiration": "Caducidad",
+      "daysLeft": "Días restantes"
+    },
+    "days": "días"
+  },
+  "activities": {
+    "menSection": "Sección Hombres",
+    "womenSection": "Sección Mujeres",
+    "childrenSection": "Sección Niños",
+    "mixedSection": "Sección Mixta (Universal)",
+    "description": "Nuestro gimnasio no es mixto. Cada sección tiene su propio espacio, horarios y entrenador especializado.",
+    "registered": "Inscritos",
+    "active": "Activos",
+    "rates": "Tarifas",
+    "monthly": "Mensual",
+    "quarterly": "Trimestral",
+    "yearly": "Anual",
+    "coach": "Entrenador"
+  },
+  "notifications": {
+    "title": "Notificaciones de Administrador",
+    "createBtn": "Crear una notificación",
+    "stats": {
+      "totalSent": "Total Enviadas",
+      "autoReminders": "Recordatorios Automáticos",
+      "complaints": "Reclamaciones"
+    },
+    "table": {
+      "type": "Tipo",
+      "title": "Título",
+      "message": "Mensaje",
+      "target": "Destino / Horario",
+      "seen": "Vistos",
+      "actions": "Acciones",
+      "loading": "Cargando...",
+      "noNotifications": "No se encontraron notificaciones",
+      "typeAuto": "Automático",
+      "members": "Miembro(s)",
+      "autoDays": "Automático (D-{{days}})",
+      "delete": "Eliminar"
+    },
+    "modal": {
+      "newNotification": "Nueva Notificación",
+      "type": "Tipo de notificación",
+      "typeNormal": "Mensaje Directo",
+      "typeReminder": "Recordatorio de Pago (Auto)",
+      "typeReclamation": "Reclamación / Emergencia",
+      "notifTitle": "Título",
+      "placeholderReminder": "Ej: Renovación de su suscripción",
+      "placeholderTitle": "Título del mensaje",
+      "scheduleLabel": "Programación (¿Enviar cuántos días antes?)",
+      "daysBefore": "Días antes",
+      "recipients": "Destinatarios",
+      "targetAll": "Todos",
+      "targetActivity": "Actividad",
+      "targetMember": "Miembro",
+      "searchMember": "Buscar un miembro...",
+      "messageBody": "Mensaje",
+      "messagePlaceholder": "Contenido de la notificación...",
+      "cancel": "Cancelar",
+      "saving": "Guardando...",
+      "activateReminder": "Activar recordatorio",
+      "sendNow": "Enviar ahora"
+    },
+    "recipients": {
+      "title": "Seguimiento de Destinatarios",
+      "loading": "Cargando...",
+      "member": "Miembro",
+      "status": "Estado",
+      "seenAt": "Visto el",
+      "seen": "Visto",
+      "sent": "Enviado"
+    }
+  },
+  "coaches": {
+    "description": "Nuestro equipo de entrenadores calificados asegura un asesoramiento profesional y personalizado para cada sección."
+  },
+  "dashboard": {
+    "performance": "Rendimiento",
+    "title": "Gestión ASAAS GYM",
+    "subtitle": "Visión general de los miembros activos, ingresos y alertas para procesar. Análisis rápido y acciones inmediatas.",
+    "activityRate": "Tasa de actividad",
+    "healthScore": "Puntuación de salud",
+    "alerts7Days": "Alertas de 7 días",
+    "viewMembers": "Ver los miembros",
+    "cashIn": "Cobrar un pago",
+    "generating": "Generando...",
+    "exportPDF": "Exportar PDF",
+    "cards": {
+      "today": "Hoy",
+      "distribution": {
+        "title": "Distribución por sección",
+        "subtitle": "Distribución de miembros activos por categoría."
+      },
+      "detail": "Detalle",
+      "activities": {
+        "title": "Actividades prioritarias",
+        "subtitle": "Top 4 por volumen de inscripción."
+      },
+      "risk": {
+        "title": "Suscripciones en riesgo",
+        "subtitle": "Caducan en los próximos 7 días.",
+        "empty": "No hay suscripciones críticas por el momento."
+      },
+      "daysAbbr": "d",
+      "recent": {
+        "title": "Últimas inscripciones",
+        "subtitle": "Nuevos miembros registrados."
+      }
+    },
+    "status": {
+      "inactive": "Inactivo",
+      "late": "Atrasado",
+      "soon": "Pronto caduca",
+      "active": "Activo"
+    },
+    "chart": {
+      "men": "Hombres",
+      "women": "Mujeres",
+      "children": "Niños"
+    },
+    "stats": {
+      "totalMembers": "Total de miembros",
+      "activeMembers": "Miembros activos",
+      "inactive": "inactivos",
+      "monthlyRevenue": "Ingresos mensuales",
+      "alert7Days": "Alerta 7 días"
+    },
+    "panel": {
+      "priorities": "Prioridades inmediatas",
+      "expirations7days": "Caducidades en 7 días",
+      "inactiveMembers": "Miembros inactivos",
+      "estimatedRevenue": "Ingresos estimados"
+    }
+  },
+  "login": {
+    "system": "ASAAS PRO SYSTEM",
+    "title": "Gestiona tu gimnasio con facilidad.",
+    "subtitle": "Acceso rápido, limpio y seguro.",
+    "secureConnection": "Conexión segura",
+    "welcome": "Bienvenido",
+    "instruction": "Inicia sesión para acceder al panel."
+  },
+  "members": {
+    "form": {
+      "errNom": "El apellido es obligatorio",
+      "errPrenom": "El nombre es obligatorio",
+      "errTel": "El teléfono es obligatorio",
+      "errDateNaissance": "La fecha de nacimiento es obligatoria",
+      "errPassword": "La contraseña es obligatoria para los nuevos miembros",
+      "lastName": "Apellido",
+      "phLastName": "APELLIDO",
+      "firstName": "Nombre",
+      "phFirstName": "Nombre",
+      "section": "Sección",
+      "secMen": "Hombres (Adultos)",
+      "secWomen": "Mujeres (Adultos)",
+      "secChildren": "Niños (6–14 años)",
+      "activity": "Actividad",
+      "noActivity": "No hay actividad disponible",
+      "createActivityWarning": "Por favor, crea una actividad para esta sección en la configuración.",
+      "subscription": "Suscripción",
+      "subMonthly": "Mensual (1 mes)",
+      "subQuarterly": "Trimestral (3 meses)",
+      "subYearly": "Anual (12 meses)",
+      "status": "Estado",
+      "statusActive": "Activo",
+      "statusInactive": "Inactivo",
+      "phone": "Teléfono",
+      "email": "Email",
+      "birthDate": "Fecha de nacimiento",
+      "registrationDate": "Fecha de inscripción",
+      "calculatedExpiration": "Fecha de caducidad (calculada)",
+      "newPassword": "Nueva contraseña (dejar vacío para no cambiar)",
+      "initialPassword": "Contraseña inicial *",
+      "photo": "Foto del miembro",
+      "photoAlt": "Foto de miembro",
+      "noPhoto": "Sin foto",
+      "openCamera": "Abrir cámara",
+      "takePhoto": "Tomar foto",
+      "closeCamera": "Cerrar",
+      "removePhoto": "Quitar foto",
+      "amountToCollect": "Cantidad a cobrar :",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "registerMember": "Inscribir Miembro"
+    },
+    "delete": {
+      "confirmMessage": "¿Desea eliminar permanentemente :",
+      "cancel": "Cancelar",
+      "confirm": "Eliminar"
+    },
+    "details": {
+      "activity": "Actividad",
+      "subscription": "Suscripción",
+      "registration": "Inscripción",
+      "expiration": "Caducidad",
+      "gender": "Género",
+      "birthDate": "Fecha de nacimiento",
+      "manualStatus": "Estado manual",
+      "totalPaid": "Total pagado",
+      "paymentDay": "Día de pago",
+      "setPaymentDate": "Fijar fecha de pago (este miembro)",
+      "nextPaymentDate": "Próxima fecha de pago:",
+      "paymentHistory": "Historial de pagos",
+      "paymentItem": "pago",
+      "close": "Cerrar",
+      "noPaymentRecorded": "Ningún pago registrado.",
+      "paymentMode": "Modo:",
+      "downloadReceipt": "Descargar recibo"
+    },
+    "title": "Miembros",
+    "management": "Gestión de los miembros",
+    "subtitle": "Controle las inscripciones, estados y actividades desde un panel claro y rápido.",
+    "newMember": "Nuevo miembro",
+    "totalMembers": "Total de miembros",
+    "activeMembers": "Miembros activos",
+    "inactiveMembers": "Miembros inactivos",
+    "expirations7Days": "Caducidades de 7 días",
+    "filters": {
+      "searchPlaceholder": "Buscar por apellido, nombre, teléfono, email, actividad...",
+      "allSections": "Todas las secciones",
+      "men": "Hombres",
+      "women": "Mujeres",
+      "children": "Niños",
+      "allActivities": "Todas las actividades",
+      "allStatuses": "Todos los estados",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "reset": "Restablecer"
+    },
+    "tableMember": "Miembro",
+    "tableSection": "Sección",
+    "tableActivity": "Actividad",
+    "tableSubscription": "Suscripción",
+    "tableExpiration": "Caducidad",
+    "tableStatus": "Estado",
+    "tableActions": "Acciones",
+    "list": {
+      "noMembersFound": "No se encontraron miembros.",
+      "viewPhotoAria": "Ver la foto de {{prenom}} {{nom}}",
+      "toggleStatus": "Alternar estado",
+      "viewProfile": "Ver perfil",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    },
+    "pagination": {
+      "prev": "Ant.",
+      "next": "Sig."
+    },
+    "modals": {
+      "addMember": "Inscribir a un nuevo miembro",
+      "editMember": "Editar miembro",
+      "confirmDeleteTitle": "Confirmar Eliminación",
+      "viewMemberTitle": "Perfil del miembro",
+      "photoTitle": "Foto del miembro"
+    }
+  },
+  "payments": {
+    "modal": {
+      "subType": "Tipo de suscripción",
+      "amountToCollect": "Cantidad cobrada (MAD)",
+      "paymentMode": "Modo de pago",
+      "newExpiration": "Nueva fecha de caducidad",
+      "duration": "Duración",
+      "days": "días",
+      "totalToCollect": "Total a cobrar",
+      "sendReceiptReminders": "Enviar recibo + recordatorios",
+      "remindersActive": "Recordatorios activos",
+      "daysBeforeExp": "Días antes de caducidad",
+      "cancel": "Cancelar",
+      "fullWorkflow": "Flujo completo",
+      "confirmPayment": "Confirmar pago"
+    },
+    "title": "Pagos",
+    "management": "Gestión de cobros",
+    "subtitle": "Haga un seguimiento de los pagos, verifique los accesos y desencadene un cobro en segundos.",
+    "tabMembers": "Miembros y accesos",
+    "tabHistory": "Historial de pagos",
+    "collectedThisMonth": "Cobrado este mes",
+    "membersGoodStanding": "Miembros al día",
+    "toRenew": "Para renovar",
+    "paymentsThisMonth": "Pagos este mes",
+    "table": {
+      "noMembers": "No se encontraron miembros",
+      "member": "Miembro",
+      "activity": "Actividad",
+      "subscription": "Suscripción",
+      "expiration": "Caducidad",
+      "access": "Acceso al Gimnasio",
+      "amount": "Cantidad",
+      "action": "Acción",
+      "btnCollect": "Cobrar",
+      "btnRenew": "Renovar"
+    },
+    "histo": {
+      "showAll": "Mostrar todo",
+      "thisMonth": "Este mes",
+      "totalLabel": "Total :",
+      "paymentItem": "pago",
+      "noPaymentFound": "Ningún pago registrado",
+      "emptyStateHelp": "Los pagos aparecerán aquí después del cobro",
+      "table": {
+        "member": "Miembro",
+        "activity": "Actividad",
+        "subscription": "Suscripción",
+        "mode": "Modo",
+        "date": "Fecha",
+        "amount": "Cantidad",
+        "receipt": "Recibo",
+        "downloadPdfTitle": "Descargar el recibo en PDF"
+      }
+    }
+  },
+  "permissions": {
+    "security": "Seguridad",
+    "management": "Gestión de permisos",
+    "subtitle": "Superadmin tiene todos los accesos. Configure aquí los permisos para las páginas del menú.",
+    "accessControl": "Control de acceso por página",
+    "roleToConfigure": "Rol a configurar",
+    "resetRole": "Restablecer este rol",
+    "noCustomRoles": "No se encontraron roles personalizables para esta cuenta.",
+    "superadminNote": "Superadmin siempre está autorizado en todas las páginas, incluida esta página de gestión."
+  },
+  "planning": {
+    "men": "♂ Hombres",
+    "women": "♀ Mujeres",
+    "children": "👶 Niños"
+  },
+  "settings": {
+    "success": {
+      "gymSaved": "¡Ajustes del gimnasio guardados con éxito!",
+      "activityUpdated": "La actividad \"{{name}}\" ha sido actualizada.",
+      "activityCreated": "La actividad \"{{name}}\" fue creada con éxito.",
+      "title": "¡Éxito!",
+      "continue": "Continuar"
+    },
+    "error": {
+      "gymSave": "Error al guardar.",
+      "activitySave": "Error al guardar la actividad.",
+      "deleteActivity": "Error durante la eliminación."
+    },
+    "confirm": {
+      "deleteActivity": "¿Estás seguro de que quieres eliminar esta actividad?"
+    },
+    "title": "Configuración del Gimnasio",
+    "subtitle": "Configure la identidad visual y la tabla de precios de su gimnasio.",
+    "identity": {
+      "title": "Identidad del Gimnasio",
+      "logo": "Logo del gimnasio",
+      "logoPlaceholder": "Logo",
+      "chooseFile": "Elegir un archivo",
+      "gymName": "Nombre del Gimnasio",
+      "saving": "Guardando...",
+      "save": "Guardar"
+    },
+    "activities": {
+      "title": "Actividades y Tarifas",
+      "new": "Nuevo",
+      "edit": "Editar",
+      "delete": "Eliminar",
+      "noActivities": "Ninguna actividad configurada."
+    },
+    "modal": {
+      "editActivity": "Editar actividad",
+      "newActivity": "Nueva actividad",
+      "activityName": "Nombre de la actividad",
+      "activityNamePlaceholder": "Ej: Musculación, Karate...",
+      "priceMonth": "Precio Mensual (MAD)",
+      "priceYear": "Precio Anual (MAD)",
+      "assuranceFirst": "Seguro (1er año)",
+      "assuranceNext": "Seguro (Renovación)",
+      "inscriptionFees": "Cuotas de inscripción (MAD)",
+      "maxCapacity": "Capacidad Máxima",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Breve descripción de la actividad...",
+      "section": "Sección (Género)",
+      "sectionMen": "Hombres",
+      "sectionWomen": "Mujeres",
+      "sectionChildren": "Niños",
+      "sectionUniversal": "Universal",
+      "coachName": "Nombre del Entrenador",
+      "iconColor": "Icono y Color",
+      "saveBtn": "Guardar",
+      "cancelBtn": "Cancelar"
+    }
+  }
+}

@@ -1,0 +1,439 @@
+{
+  "header": {
+    "role": "Role",
+    "logout": "Logout",
+    "searchPlaceholder": "Search a member, payment...",
+    "newMember": "New member",
+    "cashIn": "Cash In",
+    "defaultConfig": "Default config used",
+    "notifications": "Notifications",
+    "markAllRead": "Mark all as read",
+    "emptyNotifications": "No alerts in this category",
+    "manageSubscriptions": "Manage all subscriptions"
+  },
+  "titles": {
+    "dashboard": "Dashboard",
+    "members": "Members Management",
+    "planning": "Schedule Planning",
+    "activities": "Activities & Disciplines",
+    "subscriptions": "Subscriptions",
+    "coaches": "Coaching Team",
+    "permissions": "Permissions Management",
+    "payments": "Payments",
+    "settings": "Settings",
+    "notifications": "Notifications"
+  },
+  "sidebar": {
+    "collapse": "Collapse",
+    "tagline": "Your gym, your performance",
+    "section": "Management",
+    "activeMembers": "active members",
+    "performance": "Performance",
+    "active": "Active",
+    "toPay": "To pay"
+  },
+  "subscriptions": {
+    "monthly": "Monthly",
+    "1month": "1 month",
+    "quarterly": "Quarterly",
+    "3months": "3 months",
+    "yearly": "Yearly",
+    "12months": "12 months",
+    "estimatedRevenue": "Estimated monthly revenue (active members)",
+    "memberCount": "member",
+    "revActivations": "revenue / activations",
+    "expiring30Days": "Subscriptions expiring in the next 30 days",
+    "noExpiring": "No subscriptions expiring in the next 30 days. ✅",
+    "table": {
+      "member": "Member",
+      "section": "Section",
+      "activity": "Activity",
+      "subscription": "Subscription",
+      "expiration": "Expiration",
+      "daysLeft": "Days Left"
+    },
+    "days": "days"
+  },
+  "activities": {
+    "menSection": "Men's Section",
+    "womenSection": "Women's Section",
+    "childrenSection": "Children's Section",
+    "mixedSection": "Mixed Section (Universal)",
+    "description": "Our gym is separated. Each section has its own space, schedule, and specialized coach.",
+    "registered": "Registered",
+    "active": "Active",
+    "rates": "Rates",
+    "monthly": "Monthly",
+    "quarterly": "Quarterly",
+    "yearly": "Yearly",
+    "coach": "Coach"
+  },
+  "notifications": {
+    "title": "Admin Notifications",
+    "createBtn": "Create a notification",
+    "stats": {
+      "totalSent": "Total Sent",
+      "autoReminders": "Auto Reminders",
+      "complaints": "Complaints"
+    },
+    "table": {
+      "type": "Type",
+      "title": "Title",
+      "message": "Message",
+      "target": "Target / Schedule",
+      "seen": "Seen",
+      "actions": "Actions",
+      "loading": "Loading...",
+      "noNotifications": "No notifications found",
+      "typeAuto": "Automatic",
+      "members": "Member(s)",
+      "autoDays": "Automatic (D-{{days}})",
+      "delete": "Delete"
+    },
+    "modal": {
+      "newNotification": "New Notification",
+      "type": "Notification Type",
+      "typeNormal": "Direct Message",
+      "typeReminder": "Payment Reminder (Auto)",
+      "typeReclamation": "Complaint / Emergency",
+      "notifTitle": "Title",
+      "placeholderReminder": "Ex: Subscription renewal",
+      "placeholderTitle": "Message title",
+      "scheduleLabel": "Schedule (Send how many days before?)",
+      "daysBefore": "Days before",
+      "recipients": "Recipients",
+      "targetAll": "All",
+      "targetActivity": "Activity",
+      "targetMember": "Member",
+      "searchMember": "Search a member...",
+      "messageBody": "Message",
+      "messagePlaceholder": "Notification content...",
+      "cancel": "Cancel",
+      "saving": "Saving...",
+      "activateReminder": "Activate reminder",
+      "sendNow": "Send now"
+    },
+    "recipients": {
+      "title": "Recipients Tracking",
+      "loading": "Loading...",
+      "member": "Member",
+      "status": "Status",
+      "seenAt": "Seen at",
+      "seen": "Seen",
+      "sent": "Sent"
+    }
+  },
+  "coaches": {
+    "description": "Our team of qualified coaches ensures professional and personalized coaching for every section."
+  },
+  "dashboard": {
+    "performance": "Performance",
+    "title": "ASAAS GYM Management",
+    "subtitle": "Overview of active members, revenue, and alerts to handle. Quick analysis and immediate actions.",
+    "activityRate": "Activity rate",
+    "healthScore": "Health score",
+    "alerts7Days": "7-day Alerts",
+    "viewMembers": "View members",
+    "cashIn": "Collect a payment",
+    "generating": "Generating...",
+    "exportPDF": "Export PDF",
+    "cards": {
+      "today": "Today",
+      "distribution": {
+        "title": "Distribution by section",
+        "subtitle": "Distribution of active members by category."
+      },
+      "detail": "Detail",
+      "activities": {
+        "title": "Top Activities",
+        "subtitle": "Top 4 by enrollment volume."
+      },
+      "risk": {
+        "title": "At-Risk Subscriptions",
+        "subtitle": "Expiring in the next 7 days.",
+        "empty": "No critical subscriptions at the moment."
+      },
+      "daysAbbr": "d",
+      "recent": {
+        "title": "Latest Registrations",
+        "subtitle": "New members registered."
+      }
+    },
+    "status": {
+      "inactive": "Inactive",
+      "late": "Late",
+      "soon": "Expiring soon",
+      "active": "Active"
+    },
+    "chart": {
+      "men": "Men",
+      "women": "Women",
+      "children": "Children"
+    },
+    "stats": {
+      "totalMembers": "Total members",
+      "activeMembers": "Active members",
+      "inactive": "inactive",
+      "monthlyRevenue": "Monthly revenue",
+      "alert7Days": "7-day Alert"
+    },
+    "panel": {
+      "priorities": "Immediate priorities",
+      "expirations7days": "7-day expirations",
+      "inactiveMembers": "Inactive members",
+      "estimatedRevenue": "Estimated revenue"
+    }
+  },
+  "login": {
+    "system": "ASAAS PRO SYSTEM",
+    "title": "Manage your gym with ease.",
+    "subtitle": "Fast, clean, and secure access.",
+    "secureConnection": "Secure connection",
+    "welcome": "Welcome",
+    "instruction": "Log in to access the dashboard."
+  },
+  "members": {
+    "form": {
+      "errNom": "Last name is required",
+      "errPrenom": "First name is required",
+      "errTel": "Phone is required",
+      "errDateNaissance": "Birth date is required",
+      "errPassword": "Password is required for new members",
+      "lastName": "Last Name",
+      "phLastName": "LAST NAME",
+      "firstName": "First Name",
+      "phFirstName": "First Name",
+      "section": "Section",
+      "secMen": "Men (Adults)",
+      "secWomen": "Women (Adults)",
+      "secChildren": "Children (6–14 years)",
+      "activity": "Activity",
+      "noActivity": "No activity available",
+      "createActivityWarning": "Please create an activity for this section in the settings.",
+      "subscription": "Subscription",
+      "subMonthly": "Monthly (1 month)",
+      "subQuarterly": "Quarterly (3 months)",
+      "subYearly": "Yearly (12 months)",
+      "status": "Status",
+      "statusActive": "Active",
+      "statusInactive": "Inactive",
+      "phone": "Phone",
+      "email": "Email",
+      "birthDate": "Birth Date",
+      "registrationDate": "Registration Date",
+      "calculatedExpiration": "Expiration Date (calculated)",
+      "newPassword": "New password (leave empty to keep unchanged)",
+      "initialPassword": "Initial password *",
+      "photo": "Member photo",
+      "photoAlt": "Member photo",
+      "noPhoto": "No photo",
+      "openCamera": "Open camera",
+      "takePhoto": "Take photo",
+      "closeCamera": "Close",
+      "removePhoto": "Remove photo",
+      "amountToCollect": "Amount to collect:",
+      "cancel": "Cancel",
+      "save": "Save",
+      "registerMember": "Register Member"
+    },
+    "delete": {
+      "confirmMessage": "Do you want to permanently delete:",
+      "cancel": "Cancel",
+      "confirm": "Delete"
+    },
+    "details": {
+      "activity": "Activity",
+      "subscription": "Subscription",
+      "registration": "Registration",
+      "expiration": "Expiration",
+      "gender": "Gender",
+      "birthDate": "Birth date",
+      "manualStatus": "Manual status",
+      "totalPaid": "Total paid",
+      "paymentDay": "Payment day",
+      "setPaymentDate": "Set payment date (this member)",
+      "nextPaymentDate": "Next payment date:",
+      "paymentHistory": "Payment history",
+      "paymentItem": "payment",
+      "close": "Close",
+      "noPaymentRecorded": "No payment recorded.",
+      "paymentMode": "Mode:",
+      "downloadReceipt": "Download receipt"
+    },
+    "title": "Members",
+    "management": "Members management",
+    "subtitle": "Control registrations, statuses, and activities from a clear and fast panel.",
+    "newMember": "New member",
+    "totalMembers": "Total members",
+    "activeMembers": "Active members",
+    "inactiveMembers": "Inactive members",
+    "expirations7Days": "7-day expirations",
+    "filters": {
+      "searchPlaceholder": "Search by last name, first name, phone, email, activity...",
+      "allSections": "All sections",
+      "men": "Men",
+      "women": "Women",
+      "children": "Children",
+      "allActivities": "All activities",
+      "allStatuses": "All statuses",
+      "active": "Active",
+      "inactive": "Inactive",
+      "reset": "Reset"
+    },
+    "tableMember": "Member",
+    "tableSection": "Section",
+    "tableActivity": "Activity",
+    "tableSubscription": "Subscription",
+    "tableExpiration": "Expiration",
+    "tableStatus": "Status",
+    "tableActions": "Actions",
+    "list": {
+      "noMembersFound": "No members found.",
+      "viewPhotoAria": "View photo of {{prenom}} {{nom}}",
+      "toggleStatus": "Toggle status",
+      "viewProfile": "View profile",
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "pagination": {
+      "prev": "Prev",
+      "next": "Next"
+    },
+    "modals": {
+      "addMember": "Register a new member",
+      "editMember": "Edit member",
+      "confirmDeleteTitle": "Confirm Deletion",
+      "viewMemberTitle": "Member profile",
+      "photoTitle": "Member photo"
+    }
+  },
+  "payments": {
+    "modal": {
+      "subType": "Subscription type",
+      "amountToCollect": "Amount collected (MAD)",
+      "paymentMode": "Payment mode",
+      "newExpiration": "New expiration date",
+      "duration": "Duration",
+      "days": "days",
+      "totalToCollect": "Total to collect",
+      "sendReceiptReminders": "Send receipt + reminders",
+      "remindersActive": "Reminders active",
+      "daysBeforeExp": "Days before expiration",
+      "cancel": "Cancel",
+      "fullWorkflow": "Full workflow",
+      "confirmPayment": "Confirm payment"
+    },
+    "title": "Payments",
+    "management": "Collections management",
+    "subtitle": "Track payments, verify access, and trigger a collection in seconds.",
+    "tabMembers": "Members & access",
+    "tabHistory": "Payment history",
+    "collectedThisMonth": "Collected this month",
+    "membersGoodStanding": "Members in good standing",
+    "toRenew": "To renew",
+    "paymentsThisMonth": "Payments this month",
+    "table": {
+      "noMembers": "No members found",
+      "member": "Member",
+      "activity": "Activity",
+      "subscription": "Subscription",
+      "expiration": "Expiration",
+      "access": "Gym Access",
+      "amount": "Amount",
+      "action": "Action",
+      "btnCollect": "Collect",
+      "btnRenew": "Renew"
+    },
+    "histo": {
+      "showAll": "Show all",
+      "thisMonth": "This month",
+      "totalLabel": "Total :",
+      "paymentItem": "payment",
+      "noPaymentFound": "No payment recorded",
+      "emptyStateHelp": "Payments will appear here after collection",
+      "table": {
+        "member": "Member",
+        "activity": "Activity",
+        "subscription": "Subscription",
+        "mode": "Mode",
+        "date": "Date",
+        "amount": "Amount",
+        "receipt": "Receipt",
+        "downloadPdfTitle": "Download PDF receipt"
+      }
+    }
+  },
+  "permissions": {
+    "security": "Security",
+    "management": "Permissions management",
+    "subtitle": "Superadmin has all access. Configure permissions for other roles for menu pages here.",
+    "accessControl": "Page-level access control",
+    "roleToConfigure": "Role to configure",
+    "resetRole": "Reset this role",
+    "noCustomRoles": "No custom roles found for this account.",
+    "superadminNote": "Superadmin is always authorized on all pages, including this management page."
+  },
+  "planning": {
+    "men": "♂ Men",
+    "women": "♀ Women",
+    "children": "👶 Children"
+  },
+  "settings": {
+    "success": {
+      "gymSaved": "Gym settings saved successfully!",
+      "activityUpdated": "Activity \"{{name}}\" updated.",
+      "activityCreated": "Activity \"{{name}}\" created successfully.",
+      "title": "Success!",
+      "continue": "Continue"
+    },
+    "error": {
+      "gymSave": "Error saving settings.",
+      "activitySave": "Error saving activity.",
+      "deleteActivity": "Error during deletion."
+    },
+    "confirm": {
+      "deleteActivity": "Are you sure you want to delete this activity?"
+    },
+    "title": "Gym Settings",
+    "subtitle": "Configure the visual identity and pricing table of your gym.",
+    "identity": {
+      "title": "Gym Identity",
+      "logo": "Gym Logo",
+      "logoPlaceholder": "Logo",
+      "chooseFile": "Choose a file",
+      "gymName": "Gym Name",
+      "saving": "Saving...",
+      "save": "Save"
+    },
+    "activities": {
+      "title": "Activities & Rates",
+      "new": "New",
+      "edit": "Edit",
+      "delete": "Delete",
+      "noActivities": "No activity configured."
+    },
+    "modal": {
+      "editActivity": "Edit activity",
+      "newActivity": "New activity",
+      "activityName": "Activity Name",
+      "activityNamePlaceholder": "Ex: Bodybuilding, Karate...",
+      "priceMonth": "Monthly Price (MAD)",
+      "priceYear": "Yearly Price (MAD)",
+      "assuranceFirst": "Insurance (1st year)",
+      "assuranceNext": "Insurance (Renewal)",
+      "inscriptionFees": "Registration Fees (MAD)",
+      "maxCapacity": "Max Capacity",
+      "description": "Description",
+      "descriptionPlaceholder": "Brief description of the activity...",
+      "section": "Section (Gender)",
+      "sectionMen": "Men",
+      "sectionWomen": "Women",
+      "sectionChildren": "Children",
+      "sectionUniversal": "Universal",
+      "coachName": "Coach Name",
+      "iconColor": "Icon & Color",
+      "saveBtn": "Save",
+      "cancelBtn": "Cancel"
+    }
+  }
+}

@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { GymProvider, useGym } from './context/GymContext';
 import { PermissionProvider, usePermissions } from './context/PermissionContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -86,6 +88,13 @@ function Layout() {
 }
 
 export default function App() {
+  const { i18n } = useTranslation();
+
+  useEffect(() => {
+    document.documentElement.dir = i18n.dir();
+    document.documentElement.lang = i18n.language;
+  }, [i18n, i18n.language]);
+
   return (
     <AuthProvider>
       <PermissionProvider>

@@ -5,7 +5,8 @@ import { useGym } from '../context/GymContext';
 import PermissionRender from './PermissionRender';
 import { usePermissions } from '../context/PermissionContext';
 import { useAuth } from '../context/AuthContext';
-
+import { useTranslation } from 'react-i18next';
+import { Globe } from 'lucide-react';
 const TITLES = {
   '/':            'Tableau de Bord',
   '/acces':       'Gestion d\'Accès',
@@ -49,19 +50,25 @@ export default function Header() {
   const { notifications, readIds, markRead, clearAll, unreadCount, configFallback, gymSettings } = useGym();
   const { currentRole, hasPageAccess } = usePermissions();
   const { logout } = useAuth();
-  const title = TITLES[pathname] ?? (gymSettings?.name || 'ASAAS GYM');
+  const { t, i18n } = useTranslation();
+  
+  const title = t(`titles.${pathname.replace('/', '') || 'dashboard'}`, TITLES[pathname] ?? (gymSettings?.name || 'ASAAS GYM'));
+  
   const [open, setOpen]     = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
   const wrapRef = useRef(null);
+  const langWrapRef = useRef(null);
 
-  const dateStr = new Date().toLocaleDateString('fr-FR', {
+  const dateStr = new Date().toLocaleDateString(i18n.language === 'ar' ? 'ar-MA' : 'fr-FR', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
 
   useEffect(() => {
     const handler = (e) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+      if (langWrapRef.current && !langWrapRef.current.contains(e.target)) setLangOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -112,25 +119,59 @@ export default function Header() {
       <div className="app-header__actions">
         <div className="header-search">
           <input
-            placeholder="Rechercher un membre, paiement..."
+            placeholder={t('header.searchPlaceholder', 'Rechercher un membre, paiement...')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <PermissionRender page="/membres">
-          <Link to="/membres" className="header-action header-action--ghost">Nouveau membre</Link>
+          <Link to="/membres" className="header-action header-action--ghost">{t('header.newMember', 'Nouveau membre')}</Link>
         </PermissionRender>
         <PermissionRender page="/paiements">
-          <Link to="/paiements" className="header-action header-action--primary">Encaisser</Link>
+          <Link to="/paiements" className="header-action header-action--primary">{t('header.cashIn', 'Encaisser')}</Link>
         </PermissionRender>
       </div>
 
       <div className="app-header__right">
         <div className="header-role">
-          <label>Role</label>
+          <label>{t('header.role', 'Role')}</label>
           <div className="header-role__pill">{ROLE_LABELS[currentRole] || currentRole}</div>
         </div>
-        <button className="header-action header-action--ghost" onClick={logout}>Deconnexion</button>
+        <button className="header-action header-action--ghost" onClick={logout}>{t('header.logout', 'Deconnexion')}</button>
+
+        {/* ── Language Switcher ── */}
+        <div className="notif-wrap" ref={langWrapRef}>
+          <button
+            className="notif-btn"
+            onClick={() => setLangOpen((o) => !o)}
+            title="Language"
+          >
+            {i18n.language === 'en' && <span className="fi fi-gb"></span>}
+            {i18n.language === 'fr' && <span className="fi fi-fr"></span>}
+            {i18n.language === 'es' && <span className="fi fi-es"></span>}
+            {i18n.language === 'ar' && <span className="fi fi-ma"></span>}
+            {(!i18n.language || !['en', 'fr', 'es', 'ar'].includes(i18n.language)) && <Globe size={18} />}
+          </button>
+          
+          {langOpen && (
+            <div className="notif-panel lang-panel" style={{ width: '150px' }}>
+              <div className="notif-list">
+                <button className="notif-item" onClick={() => { i18n.changeLanguage('en'); setLangOpen(false); }}>
+                  <span className="fi fi-gb" style={{ marginRight: '10px' }}></span> English
+                </button>
+                <button className="notif-item" onClick={() => { i18n.changeLanguage('fr'); setLangOpen(false); }}>
+                  <span className="fi fi-fr" style={{ marginRight: '10px' }}></span> Français
+                </button>
+                <button className="notif-item" onClick={() => { i18n.changeLanguage('es'); setLangOpen(false); }}>
+                  <span className="fi fi-es" style={{ marginRight: '10px' }}></span> Español
+                </button>
+                <button className="notif-item" onClick={() => { i18n.changeLanguage('ar'); setLangOpen(false); }}>
+                  <span className="fi fi-ma" style={{ marginRight: '10px' }}></span> العربية
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* ── Notification Bell ── */}
         <div className="notif-wrap" ref={wrapRef}>

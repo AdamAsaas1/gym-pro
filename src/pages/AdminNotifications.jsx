@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Bell, Plus, Send, Info, AlertTriangle, Clock, Users, X, CheckCircle, Eye, Search, Dumbbell, Target, Zap, Shield, Calendar, Trash2, AlertCircle } from 'lucide-react';
 import { getNotifications, createNotification, getMembres, getNotificationRecipients, deleteNotification } from '../api/client';
+import { useTranslation } from 'react-i18next';
 import './AdminNotifications.css';
 
 const ACTIVITIES = [
@@ -11,6 +12,7 @@ const ACTIVITIES = [
 ];
 
 export default function AdminNotifications() {
+  const { t } = useTranslation();
   const [notifications, setNotifications] = useState([]);
   const [members, setMembers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -167,11 +169,11 @@ export default function AdminNotifications() {
       <div className="notifs-header">
         <div className="notifs-title">
           <Bell className="notifs-title-icon" />
-          <h1>Notifications Administrateur</h1>
+          <h1>{t('notifications.title', 'Notifications Administrateur')}</h1>
         </div>
         <button className="btn-primary" onClick={() => setShowModal(true)}>
           <Plus size={18} />
-          Créer une notification
+          {t('notifications.createBtn', 'Créer une notification')}
         </button>
       </div>
 
@@ -179,21 +181,21 @@ export default function AdminNotifications() {
         <div className="notif-stat-card">
           <div className="notif-stat-icon blue"><Send size={20} /></div>
           <div className="notif-stat-info">
-            <span className="notif-stat-label">Total Envoyées</span>
+            <span className="notif-stat-label">{t('notifications.stats.totalSent', 'Total Envoyées')}</span>
             <span className="notif-stat-value">{notifications.filter(n => !n.schedule_days_before).length}</span>
           </div>
         </div>
         <div className="notif-stat-card">
           <div className="notif-stat-icon yellow"><Calendar size={20} /></div>
           <div className="notif-stat-info">
-            <span className="notif-stat-label">Rappels Automatiques</span>
+            <span className="notif-stat-label">{t('notifications.stats.autoReminders', 'Rappels Automatiques')}</span>
             <span className="notif-stat-value">{notifications.filter(n => n.schedule_days_before).length}</span>
           </div>
         </div>
         <div className="notif-stat-card">
           <div className="notif-stat-icon red"><AlertTriangle size={20} /></div>
           <div className="notif-stat-info">
-            <span className="notif-stat-label">Réclamations</span>
+            <span className="notif-stat-label">{t('notifications.stats.complaints', 'Réclamations')}</span>
             <span className="notif-stat-value">{notifications.filter(n => n.type === 'reclamation').length}</span>
           </div>
         </div>
@@ -204,26 +206,26 @@ export default function AdminNotifications() {
           <table className="notifs-table">
             <thead>
               <tr>
-                <th>Type</th>
-                <th>Titre</th>
-                <th>Message</th>
-                <th>Cible / Planning</th>
-                <th>Vus</th>
-                <th>Actions</th>
+                <th>{t('notifications.table.type', 'Type')}</th>
+                <th>{t('notifications.table.title', 'Titre')}</th>
+                <th>{t('notifications.table.message', 'Message')}</th>
+                <th>{t('notifications.table.target', 'Cible / Planning')}</th>
+                <th>{t('notifications.table.seen', 'Vus')}</th>
+                <th>{t('notifications.table.actions', 'Actions')}</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan="6" className="text-center">Chargement...</td></tr>
+                <tr><td colSpan="6" className="text-center">{t('notifications.table.loading', 'Chargement...')}</td></tr>
               ) : notifications.length === 0 ? (
-                <tr><td colSpan="6" className="text-center">Aucune notification trouvée</td></tr>
+                <tr><td colSpan="6" className="text-center">{t('notifications.table.noNotifications', 'Aucune notification trouvée')}</td></tr>
               ) : (
                 notifications.map((notif) => (
                   <tr key={notif.id}>
                     <td>
                       <div className={`notif-type-badge ${notif.type}`}>
                         {getIcon(notif.type, !!notif.schedule_days_before)}
-                        <span>{notif.type === 'reminder' && notif.schedule_days_before ? 'Automatique' : notif.type}</span>
+                        <span>{notif.type === 'reminder' && notif.schedule_days_before ? t('notifications.table.typeAuto', 'Automatique') : t(`notifications.table.type_${notif.type}`, notif.type)}</span>
                       </div>
                     </td>
                     <td className="font-semibold">{notif.title}</td>
@@ -231,11 +233,11 @@ export default function AdminNotifications() {
                     <td>
                       <button className="btn-dest" onClick={() => handleShowRecipients(notif)}>
                         {notif.schedule_days_before ? <Clock size={14} /> : <Users size={14} />}
-                        <span>{notif.total_recipients} Membre(s)</span>
+                        <span>{notif.total_recipients} {t('notifications.table.members', 'Membre(s)')}</span>
                       </button>
                       {notif.schedule_days_before && (
                         <div className="text-muted" style={{ fontSize: '0.7rem', marginTop: '4px', paddingLeft: '8px' }}>
-                          Automatique (J-{notif.schedule_days_before})
+                          {t('notifications.table.autoDays', 'Automatique (J-{{days}})', { days: notif.schedule_days_before })}
                         </div>
                       )}
                     </td>
@@ -250,7 +252,7 @@ export default function AdminNotifications() {
                         {notifToDelete === notif.id ? (
                           <div className="inline-confirm">
                             <button className="btn-confirm-yes" onClick={handleDelete} disabled={submitting}>
-                              {submitting ? '...' : 'Supprimer'}
+                              {submitting ? '...' : t('notifications.table.delete', 'Supprimer')}
                             </button>
                             <button className="btn-confirm-no" onClick={() => setNotifToDelete(null)}>
                               <X size={14} />
@@ -275,28 +277,28 @@ export default function AdminNotifications() {
         <div className="modal-overlay">
           <div className="modal-card">
             <div className="modal-header">
-              <h2>Nouvelle Notification</h2>
+              <h2>{t('notifications.modal.newNotification', 'Nouvelle Notification')}</h2>
               <button className="modal-close" onClick={() => setShowModal(false)}><X /></button>
             </div>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
               <div className="modal-form">
                 <div className="form-group">
-                  <label>Type de notification</label>
+                  <label>{t('notifications.modal.type', 'Type de notification')}</label>
                   <select 
                     value={formData.type}
                     onChange={e => setFormData({...formData, type: e.target.value})}
                   >
-                    <option value="normal">Message Direct</option>
-                    <option value="reminder">Rappel de Payement (Auto)</option>
-                    <option value="reclamation">Réclamation / Urgence</option>
+                    <option value="normal">{t('notifications.modal.typeNormal', 'Message Direct')}</option>
+                    <option value="reminder">{t('notifications.modal.typeReminder', 'Rappel de Payement (Auto)')}</option>
+                    <option value="reclamation">{t('notifications.modal.typeReclamation', 'Réclamation / Urgence')}</option>
                   </select>
                 </div>
 
                 <div className="form-group">
-                  <label>Titre</label>
+                  <label>{t('notifications.modal.notifTitle', 'Titre')}</label>
                   <input 
                     type="text" 
-                    placeholder={formData.type === 'reminder' ? "Ex: Renouvellement de votre abonnement" : "Titre du message"} 
+                    placeholder={formData.type === 'reminder' ? t('notifications.modal.placeholderReminder', "Ex: Renouvellement de votre abonnement") : t('notifications.modal.placeholderTitle', "Titre du message")} 
                     value={formData.title}
                     onChange={e => setFormData({...formData, title: e.target.value})}
                     required
@@ -305,7 +307,7 @@ export default function AdminNotifications() {
 
                 {formData.type === 'reminder' ? (
                   <div className="form-group">
-                    <label>Programmation (Envoyer combien de jours avant ?)</label>
+                    <label>{t('notifications.modal.scheduleLabel', 'Programmation (Envoyer combien de jours avant ?)')}</label>
                     <div className="days-choice-grid">
                       {[3, 2, 1].map(day => (
                         <div 
@@ -314,23 +316,23 @@ export default function AdminNotifications() {
                           onClick={() => toggleDay(day)}
                         >
                           <span className="day-number">{day}</span>
-                          <span className="day-label">Jours avant</span>
+                          <span className="day-label">{t('notifications.modal.daysBefore', 'Jours avant')}</span>
                         </div>
                       ))}
                     </div>
                   </div>
                 ) : (
                   <div className="form-group">
-                    <label>Destinataires</label>
+                    <label>{t('notifications.modal.recipients', 'Destinataires')}</label>
                     <div className="target-type-selector">
                       <button type="button" className={`target-type-btn ${targetType === 'all' ? 'active' : ''}`} onClick={() => setTargetType('all')}>
-                        <Users size={16} /> Tous
+                        <Users size={16} /> {t('notifications.modal.targetAll', 'Tous')}
                       </button>
                       <button type="button" className={`target-type-btn ${targetType === 'activity' ? 'active' : ''}`} onClick={() => setTargetType('activity')}>
-                        <Dumbbell size={16} /> Activité
+                        <Dumbbell size={16} /> {t('notifications.modal.targetActivity', 'Activité')}
                       </button>
                       <button type="button" className={`target-type-btn ${targetType === 'member' ? 'active' : ''}`} onClick={() => setTargetType('member')}>
-                        <Users size={16} /> Membre
+                        <Users size={16} /> {t('notifications.modal.targetMember', 'Membre')}
                       </button>
                     </div>
                     {targetType === 'activity' && (
@@ -338,7 +340,7 @@ export default function AdminNotifications() {
                         {ACTIVITIES.map(activity => (
                           <div key={activity.id} className={`activity-item ${selectedActivities.includes(activity.id) ? 'selected' : ''}`} onClick={() => toggleActivitySelection(activity.id)}>
                             <div className="activity-icon-wrapper">{activity.icon}</div>
-                            <span className="activity-name">{activity.label}</span>
+                            <span className="activity-name">{t(activity.label, activity.label)}</span>
                           </div>
                         ))}
                       </div>
@@ -350,13 +352,13 @@ export default function AdminNotifications() {
                           <Search size={14} />
                           <input 
                             type="text" 
-                            placeholder="Rechercher un membre..." 
+                            placeholder={t('notifications.modal.searchMember', 'Rechercher un membre...')} 
                             value={memberSearch}
                             onChange={e => setMemberSearch(e.target.value)}
                           />
                         </div>
                         <div className="members-scroll">
-                          {filteredMembers.map(m => (
+                          {members.filter(m => !memberSearch || `${m.nom} ${m.prenom}`.toLowerCase().includes(memberSearch.toLowerCase())).map(m => (
                             <div key={m.id} className={`member-checkbox-item ${selectedMemberIds.includes(m.id) ? 'selected' : ''}`} onClick={() => toggleMemberSelection(m.id)}>
                               <input type="checkbox" checked={selectedMemberIds.includes(m.id)} readOnly />
                               <div className="member-info-row">
@@ -372,10 +374,10 @@ export default function AdminNotifications() {
                 )}
 
                 <div className="form-group">
-                  <label>Message</label>
+                  <label>{t('notifications.modal.messageBody', 'Message')}</label>
                   <textarea 
                     rows="4" 
-                    placeholder="Contenu de la notification..."
+                    placeholder={t('notifications.modal.messagePlaceholder', 'Contenu de la notification...')}
                     value={formData.description}
                     onChange={e => setFormData({...formData, description: e.target.value})}
                     required
@@ -383,9 +385,9 @@ export default function AdminNotifications() {
                 </div>
               </div>
               <div className="modal-footer">
-                <button type="button" className="btn-secondary" onClick={() => setShowModal(false)}>Annuler</button>
+                <button type="button" className="btn-secondary" onClick={() => setShowModal(false)}>{t('notifications.modal.cancel', 'Annuler')}</button>
                 <button type="submit" className="btn-primary" disabled={submitting}>
-                  {submitting ? 'Enregistrement...' : formData.type === 'reminder' ? 'Activer le rappel' : 'Envoyer maintenant'}
+                  {submitting ? t('notifications.modal.saving', 'Enregistrement...') : formData.type === 'reminder' ? t('notifications.modal.activateReminder', 'Activer le rappel') : t('notifications.modal.sendNow', 'Envoyer maintenant')}
                   <Send size={16} />
                 </button>
               </div>
@@ -401,24 +403,24 @@ export default function AdminNotifications() {
           <div className="modal-card modal-large">
             <div className="modal-header">
               <div>
-                <h2>Suivi des Destinataires</h2>
+                <h2>{t('notifications.recipients.title', 'Suivi des Destinataires')}</h2>
                 <p className="text-muted">{selectedNotif?.title}</p>
               </div>
               <button className="modal-close" onClick={() => setShowRecipientsModal(false)}><X /></button>
             </div>
             <div className="recipients-list">
               {loadingRecipients ? (
-                <div className="text-center py-8">Chargement...</div>
+                <div className="text-center py-8">{t('notifications.recipients.loading', 'Chargement...')}</div>
               ) : (
                 <table className="recipients-table">
                   <thead>
-                    <tr><th>Membre</th><th>Statut</th><th>Vu le</th></tr>
+                    <tr><th>{t('notifications.recipients.member', 'Membre')}</th><th>{t('notifications.recipients.status', 'Statut')}</th><th>{t('notifications.recipients.seenAt', 'Vu le')}</th></tr>
                   </thead>
                   <tbody>
                     {recipients.map(r => (
                       <tr key={r.member_id}>
                         <td className="font-medium">{r.nom} {r.prenom}</td>
-                        <td>{r.is_read ? <span className="badge-seen">Vu</span> : <span className="badge-sended">Envoyé</span>}</td>
+                        <td>{r.is_read ? <span className="badge-seen">{t('notifications.recipients.seen', 'Vu')}</span> : <span className="badge-sended">{t('notifications.recipients.sent', 'Envoyé')}</span>}</td>
                         <td className="text-muted">{r.read_at ? new Date(r.read_at).toLocaleString() : '-'}</td>
                       </tr>
                     ))}
