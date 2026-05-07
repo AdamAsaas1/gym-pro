@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Shield, RotateCcw } from 'lucide-react';
 import { usePermissions } from '../context/PermissionContext';
+import { useTranslation } from 'react-i18next';
 
 const ROLE_LABELS = {
   superadmin: 'Super Admin',
@@ -15,6 +16,7 @@ export default function Permissions() {
     togglePagePermission,
     resetRolePermissions,
   } = usePermissions();
+  const { t } = useTranslation();
 
   const editableRoles = useMemo(() => roles.filter((r) => r !== 'superadmin'), [roles]);
   const [selectedRole, setSelectedRole] = useState(editableRoles[0] || 'admin');
@@ -26,29 +28,29 @@ export default function Permissions() {
     <div className="page permissions-page fade-in">
       <section className="permissions-hero card">
         <div>
-          <div className="permissions-hero__eyebrow">Securite</div>
-          <h2 className="permissions-hero__title">Gestion des permissions</h2>
+          <div className="permissions-hero__eyebrow">{t('permissions.security', 'Securite')}</div>
+          <h2 className="permissions-hero__title">{t('permissions.management', 'Gestion des permissions')}</h2>
           <p className="permissions-hero__subtitle">
-            Superadmin possede tous les acces. Configurez ici les permissions des autres roles pour les pages du menu.
+            {t('permissions.subtitle', 'Superadmin possede tous les acces. Configurez ici les permissions des autres roles pour les pages du menu.')}
           </p>
         </div>
         <div className="permissions-badge">
           <Shield size={18} />
-          <span>Page-level access control</span>
+          <span>{t('permissions.accessControl', 'Page-level access control')}</span>
         </div>
       </section>
 
       <section className="card permissions-panel">
         {!canEdit && (
           <div className="permissions-note">
-            Aucun role personnalisable trouve pour ce compte.
+            {t('permissions.noCustomRoles', 'Aucun role personnalisable trouve pour ce compte.')}
           </div>
         )}
 
         {canEdit && (
           <>
         <div className="permissions-panel__head">
-          <label htmlFor="roleSelect">Role a configurer</label>
+          <label htmlFor="roleSelect">{t('permissions.roleToConfigure', 'Role a configurer')}</label>
           <div className="permissions-panel__controls">
             <select id="roleSelect" value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
               {editableRoles.map((r) => (
@@ -60,7 +62,7 @@ export default function Permissions() {
               className="btn btn--ghost btn--sm"
               onClick={() => resetRolePermissions(selectedRole)}
             >
-              <RotateCcw size={14} /> Reinitialiser ce role
+              <RotateCcw size={14} /> {t('permissions.resetRole', 'Reinitialiser ce role')}
             </button>
           </div>
         </div>
@@ -87,7 +89,7 @@ export default function Permissions() {
         </div>
 
         <div className="permissions-note">
-          Superadmin est toujours autorise sur toutes les pages, y compris cette page de gestion.
+          {t('permissions.superadminNote', 'Superadmin est toujours autorise sur toutes les pages, y compris cette page de gestion.')}
         </div>
           </>
         )}

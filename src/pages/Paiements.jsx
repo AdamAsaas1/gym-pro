@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useGym } from '../context/GymContext';
 import { telechargerRecu } from '../api/client';
+import { useTranslation } from 'react-i18next';
 
 const ABO_LABELS = { mensuel: 'Mensuel', trimestriel: 'Trimestriel', annuel: 'Annuel' };
 const MODE_OPTS  = ['Espèces', 'Virement', 'Chèque'];
@@ -43,6 +44,7 @@ function getPrix(activites, activite, abonnement) {
 
 /* ── Modal paiement ── */
 function ModalPaiement({ membre, onClose, onConfirm, activites, abonnementDurations }) {
+  const { t } = useTranslation();
   const [abo,    setAbo]    = useState(membre.abonnement);
   const [mode,   setMode]   = useState('Espèces');
   const [montant, setMontant] = useState(() => getPrix(activites, membre.activite, membre.abonnement));
@@ -85,7 +87,7 @@ function ModalPaiement({ membre, onClose, onConfirm, activites, abonnementDurati
 
           {/* Type abonnement */}
           <div className="pay-field">
-            <label>Type d'abonnement</label>
+            <label>{t('payments.modal.subType', "Type d'abonnement")}</label>
             <div className="pay-abo-btns">
               {Object.entries(ABO_LABELS).map(([k, label]) => (
                 <button
@@ -93,7 +95,7 @@ function ModalPaiement({ membre, onClose, onConfirm, activites, abonnementDurati
                   className={`pay-abo-btn${abo === k ? ' pay-abo-btn--active' : ''}`}
                   onClick={() => handleAbo(k)}
                 >
-                  <span>{label}</span>
+                  <span>{t(`payments.modal.abo_${k}`, label)}</span>
                   <span className="pay-abo-price">{getPrix(activites, membre.activite, k).toLocaleString('fr-FR')} DH</span>
                 </button>
               ))}
@@ -102,7 +104,7 @@ function ModalPaiement({ membre, onClose, onConfirm, activites, abonnementDurati
 
           {/* Montant */}
           <div className="pay-field">
-            <label>Montant encaissé (DH)</label>
+            <label>{t('payments.modal.amountToCollect', 'Montant encaissé (DH)')}</label>
             <div className="pay-amount-wrap">
               <Banknote size={18} />
               <input
@@ -117,7 +119,7 @@ function ModalPaiement({ membre, onClose, onConfirm, activites, abonnementDurati
 
           {/* Mode paiement */}
           <div className="pay-field">
-            <label>Mode de paiement</label>
+            <label>{t('payments.modal.paymentMode', 'Mode de paiement')}</label>
             <div className="pay-mode-btns">
               {MODE_OPTS.map((m) => (
                 <button
@@ -125,7 +127,7 @@ function ModalPaiement({ membre, onClose, onConfirm, activites, abonnementDurati
                   className={`pay-mode-btn${mode === m ? ' pay-mode-btn--active' : ''}`}
                   onClick={() => setMode(m)}
                 >
-                  {m}
+                  {t(`payments.modal.mode_${m.toLowerCase()}`, m)}
                 </button>
               ))}
             </div>
@@ -134,15 +136,15 @@ function ModalPaiement({ membre, onClose, onConfirm, activites, abonnementDurati
           {/* Récapitulatif */}
           <div className="pay-recap">
             <div className="pay-recap__row">
-              <span>Nouvelle échéance</span>
+              <span>{t('payments.modal.newExpiration', 'Nouvelle échéance')}</span>
               <strong>{newExp()}</strong>
             </div>
             <div className="pay-recap__row">
-              <span>Durée</span>
-              <strong>{abonnementDurations[abo] ?? 0} jours</strong>
+              <span>{t('payments.modal.duration', 'Durée')}</span>
+              <strong>{abonnementDurations[abo] ?? 0} {t('payments.modal.days', 'jours')}</strong>
             </div>
             <div className="pay-recap__row pay-recap__row--total">
-              <span>Total à encaisser</span>
+              <span>{t('payments.modal.totalToCollect', 'Total à encaisser')}</span>
               <strong>{montant.toLocaleString('fr-FR')} DH</strong>
             </div>
           </div>
@@ -156,7 +158,7 @@ function ModalPaiement({ membre, onClose, onConfirm, activites, abonnementDurati
                 checked={workflowOn}
                 onChange={(e) => setWorkflowOn(e.target.checked)}
               />
-              <span>Envoyer recu + rappels</span>
+              <span>{t('payments.modal.sendReceiptReminders', 'Envoyer recu + rappels')}</span>
             </label>
             {workflowOn && (
               <div className="pay-workflow__options">
@@ -166,10 +168,10 @@ function ModalPaiement({ membre, onClose, onConfirm, activites, abonnementDurati
                     checked={sendReminders}
                     onChange={(e) => setSendReminders(e.target.checked)}
                   />
-                  <span>Rappels actifs</span>
+                  <span>{t('payments.modal.remindersActive', 'Rappels actifs')}</span>
                 </label>
                 <label className="pay-workflow__row">
-                  <span>Jours avant expiration</span>
+                  <span>{t('payments.modal.daysBeforeExp', 'Jours avant expiration')}</span>
                   <input
                     type="number"
                     min={0}
@@ -185,7 +187,7 @@ function ModalPaiement({ membre, onClose, onConfirm, activites, abonnementDurati
 
         {/* Actions */}
         <div className="paiement-modal__footer">
-          <button className="btn-ghost" onClick={onClose}>Annuler</button>
+          <button className="btn-ghost" onClick={onClose}>{t('payments.modal.cancel', 'Annuler')}</button>
           <button
             className="btn-pay"
             onClick={() => {
@@ -193,7 +195,7 @@ function ModalPaiement({ membre, onClose, onConfirm, activites, abonnementDurati
               onClose();
             }}
           >
-            <ReceiptText size={16} /> {workflowOn ? 'Workflow complet' : 'Confirmer le paiement'}
+            <ReceiptText size={16} /> {workflowOn ? t('payments.modal.fullWorkflow', 'Workflow complet') : t('payments.modal.confirmPayment', 'Confirmer le paiement')}
           </button>
         </div>
       </div>
@@ -220,6 +222,7 @@ export default function Paiements() {
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
   const [yearCursor, setYearCursor] = useState(() => new Date().getFullYear());
   const monthPickerRef = useRef(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const parsed = parseMonthValue(moisHisto);
@@ -308,15 +311,15 @@ export default function Paiements() {
     <div className="page pay-page fade-in">
       <section className="pay-hero">
         <div>
-          <span className="pay-hero__eyebrow">Paiements</span>
-          <h2 className="pay-hero__title">Pilotage des encaissements</h2>
+          <span className="pay-hero__eyebrow">{t('payments.title', 'Paiements')}</span>
+          <h2 className="pay-hero__title">{t('payments.management', 'Pilotage des encaissements')}</h2>
           <p className="pay-hero__subtitle">
-            Suivez les paiements, verifiez les acces et declenchez un encaissement en quelques secondes.
+            {t('payments.subtitle', 'Suivez les paiements, verifiez les acces et declenchez un encaissement en quelques secondes.')}
           </p>
         </div>
         <div className="pay-hero__actions">
-          <button className="btn btn--ghost" onClick={() => setTab('membres')}>Membres & acces</button>
-          <button className="btn btn--primary" onClick={() => setTab('historique')}>Historique paiements</button>
+          <button className="btn btn--ghost" onClick={() => setTab('membres')}>{t('payments.tabMembers', 'Membres & acces')}</button>
+          <button className="btn btn--primary" onClick={() => setTab('historique')}>{t('payments.tabHistory', 'Historique paiements')}</button>
         </div>
       </section>
 
@@ -325,28 +328,28 @@ export default function Paiements() {
           <TrendingUp size={20} />
           <div>
             <div className="pay-stat-val">{statsP.totalMois.toLocaleString('fr-FR')} DH</div>
-            <div className="pay-stat-lbl">Encaisse ce mois</div>
+            <div className="pay-stat-lbl">{t('payments.collectedThisMonth', 'Encaisse ce mois')}</div>
           </div>
         </div>
         <div className="pay-kpi">
           <Users size={20} />
           <div>
             <div className="pay-stat-val">{statsP.enRegle}</div>
-            <div className="pay-stat-lbl">Membres en regle</div>
+            <div className="pay-stat-lbl">{t('payments.membersGoodStanding', 'Membres en regle')}</div>
           </div>
         </div>
         <div className="pay-kpi pay-kpi--alert">
           <AlertCircle size={20} />
           <div>
             <div className="pay-stat-val">{statsP.aRegler}</div>
-            <div className="pay-stat-lbl">A renouveler</div>
+            <div className="pay-stat-lbl">{t('payments.toRenew', 'A renouveler')}</div>
           </div>
         </div>
         <div className="pay-kpi">
           <ReceiptText size={20} />
           <div>
             <div className="pay-stat-val">{statsP.paiementsMois}</div>
-            <div className="pay-stat-lbl">Paiements ce mois</div>
+            <div className="pay-stat-lbl">{t('payments.paymentsThisMonth', 'Paiements ce mois')}</div>
           </div>
         </div>
       </section>
@@ -398,19 +401,19 @@ export default function Paiements() {
             {liste.length === 0 ? (
               <div className="notif-empty">
                 <Users size={32} style={{ opacity: 0.2 }} />
-                <span>Aucun membre trouvé</span>
+                <span>{t('payments.table.noMembers', 'Aucun membre trouvé')}</span>
               </div>
             ) : (
               <table className="pay-table">
                 <thead>
                   <tr>
-                    <th>Membre</th>
-                    <th>Activité</th>
-                    <th>Abonnement</th>
-                    <th>Échéance</th>
-                    <th>Accès Salle</th>
-                    <th>Montant</th>
-                    <th>Action</th>
+                    <th>{t('payments.table.member', 'Membre')}</th>
+                    <th>{t('payments.table.activity', 'Activité')}</th>
+                    <th>{t('payments.table.subscription', 'Abonnement')}</th>
+                    <th>{t('payments.table.expiration', 'Échéance')}</th>
+                    <th>{t('payments.table.access', 'Accès Salle')}</th>
+                    <th>{t('payments.table.amount', 'Montant')}</th>
+                    <th>{t('payments.table.action', 'Action')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -461,7 +464,7 @@ export default function Paiements() {
                             onClick={() => handlePay(m)}
                           >
                             <Banknote size={14} />
-                            {needPay ? 'Encaisser' : 'Renouveler'}
+                            {needPay ? t('payments.table.btnCollect', 'Encaisser') : t('payments.table.btnRenew', 'Renouveler')}
                           </button>
                         </td>
                       </tr>
@@ -518,7 +521,7 @@ export default function Paiements() {
                           setMonthPickerOpen(false);
                         }}
                       >
-                        Tout afficher
+                        {t('payments.histo.showAll', 'Tout afficher')}
                       </button>
                       <button
                         className="month-picker__now"
@@ -529,7 +532,7 @@ export default function Paiements() {
                           setMonthPickerOpen(false);
                         }}
                       >
-                        Ce mois
+                        {t('payments.histo.thisMonth', 'Ce mois')}
                       </button>
                     </div>
                   </div>
@@ -537,8 +540,8 @@ export default function Paiements() {
               </div>
               {historiqueFiltre.length > 0 && (
                 <div className="pay-histo-total">
-                  Total : <strong>{totalHisto.toLocaleString('fr-FR')} DH</strong>
-                  &nbsp;·&nbsp; {historiqueFiltre.length} paiement{historiqueFiltre.length > 1 ? 's' : ''}
+                  {t('payments.histo.totalLabel', 'Total :')} <strong>{totalHisto.toLocaleString('fr-FR')} DH</strong>
+                  &nbsp;·&nbsp; {historiqueFiltre.length} {t('payments.histo.paymentItem', 'paiement')}{historiqueFiltre.length > 1 ? 's' : ''}
                 </div>
               )}
             </div>
@@ -548,9 +551,9 @@ export default function Paiements() {
             {historiqueFiltre.length === 0 ? (
               <div className="notif-empty">
                 <ReceiptText size={32} style={{ opacity: 0.2 }} />
-                <span>Aucun paiement enregistré</span>
+                <span>{t('payments.histo.noPaymentFound', 'Aucun paiement enregistré')}</span>
                 <span style={{ fontSize: '0.78rem', marginTop: 4 }}>
-                  Les paiements apparaîtront ici après encaissement
+                  {t('payments.histo.emptyStateHelp', 'Les paiements apparaîtront ici après encaissement')}
                 </span>
               </div>
             ) : (
@@ -558,13 +561,13 @@ export default function Paiements() {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Membre</th>
-                    <th>Activité</th>
-                    <th>Abonnement</th>
-                    <th>Mode</th>
-                    <th>Date</th>
-                    <th>Montant</th>
-                    <th>Reçu</th>
+                    <th>{t('payments.histo.table.member', 'Membre')}</th>
+                    <th>{t('payments.histo.table.activity', 'Activité')}</th>
+                    <th>{t('payments.histo.table.subscription', 'Abonnement')}</th>
+                    <th>{t('payments.histo.table.mode', 'Mode')}</th>
+                    <th>{t('payments.histo.table.date', 'Date')}</th>
+                    <th>{t('payments.histo.table.amount', 'Montant')}</th>
+                    <th>{t('payments.histo.table.receipt', 'Reçu')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -602,7 +605,7 @@ export default function Paiements() {
                         <td>
                           <button
                             className="pay-recu-btn"
-                            title="Télécharger le reçu PDF"
+                            title={t('payments.histo.table.downloadPdfTitle', 'Télécharger le reçu PDF')}
                             onClick={() => handleDownloadRecu(p.id, m)}
                           >
                             <Download size={14} /> PDF

@@ -4,16 +4,17 @@ import { Link } from 'react-router-dom';
 import { useGym } from '../context/GymContext';
 import { exportMembresPDF } from '../api/client';
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, Legend, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { useTranslation } from 'react-i18next';
 
 const GENRE_COLORS = { homme: '#39ff14', femme: '#1fdf8f', enfant: '#15c47e' };
 const GENRE_LABELS = { homme: 'Hommes', femme: 'Femmes', enfant: 'Enfants' };
 
-function getSubscriptionBadge(m) {
-  if (m.statut === 'inactif') return { key: 'inactive', label: 'Inactif' };
+function getSubscriptionBadge(m, t) {
+  if (m.statut === 'inactif') return { key: 'inactive', label: t('dashboard.status.inactive', 'Inactif') };
   const days = Math.ceil((new Date(m.dateExpiration) - new Date()) / 86400000);
-  if (days < 0) return { key: 'late', label: 'En retard' };
-  if (days <= 7) return { key: 'soon', label: 'Bientot expire' };
-  return { key: 'ok', label: 'Actif' };
+  if (days < 0) return { key: 'late', label: t('dashboard.status.late', 'En retard') };
+  if (days <= 7) return { key: 'soon', label: t('dashboard.status.soon', 'Bientot expire') };
+  return { key: 'ok', label: t('dashboard.status.active', 'Actif') };
 }
 
 function StatCard({ icon: StatIcon, label, value, sub, color, to, variant }) {
@@ -32,6 +33,7 @@ function StatCard({ icon: StatIcon, label, value, sub, color, to, variant }) {
 
 export default function Dashboard() {
   const { membres, stats, activites } = useGym();
+  const { t } = useTranslation();
   const [exporting, setExporting] = useState(false);
   const pctActifs = stats.total ? Math.round((stats.actifs / stats.total) * 100) : 0;
   const expSoon = stats.expiringSoon.length;
@@ -50,9 +52,9 @@ export default function Dashboard() {
   const topActivities = [...actCount].sort((a, b) => b.count - a.count).slice(0, 4);
 
   const genreData = [
-    { name: 'Hommes', value: stats.hommes, color: '#39ff14' },
-    { name: 'Femmes', value: stats.femmes, color: '#1fdf8f' },
-    { name: 'Enfants', value: stats.enfants, color: '#15c47e' },
+    { name: t('dashboard.chart.men', 'Hommes'), value: stats.hommes, color: '#39ff14' },
+    { name: t('dashboard.chart.women', 'Femmes'), value: stats.femmes, color: '#1fdf8f' },
+    { name: t('dashboard.chart.children', 'Enfants'), value: stats.enfants, color: '#15c47e' },
   ].filter(d => d.value > 0);
 
   const handleExport = async () => {
@@ -77,53 +79,53 @@ export default function Dashboard() {
     <div className="page dashboard fade-in">
       <section className="dash-hero">
         <div className="dash-hero__left">
-          <span className="dash-hero__eyebrow">Performance</span>
-          <h2 className="dash-hero__title">Pilotage ASAAS GYM</h2>
+          <span className="dash-hero__eyebrow">{t('dashboard.performance', 'Performance')}</span>
+          <h2 className="dash-hero__title">{t('dashboard.title', 'Pilotage ASAAS GYM')}</h2>
           <p className="dash-hero__subtitle">
-            Vue d'ensemble des membres actifs, revenus et alertes a traiter. Analyse rapide et actions immediates.
+            {t('dashboard.subtitle', 'Vue d\'ensemble des membres actifs, revenus et alertes a traiter. Analyse rapide et actions immediates.')}
           </p>
           <div className="dash-hero__meta">
             <div className="dash-meta">
-              <span className="dash-meta__label">Taux d'activite</span>
+              <span className="dash-meta__label">{t('dashboard.activityRate', 'Taux d\'activite')}</span>
               <strong className="dash-meta__value">{pctActifs}%</strong>
             </div>
             <div className="dash-meta">
-              <span className="dash-meta__label">Indice de sante</span>
+              <span className="dash-meta__label">{t('dashboard.healthScore', 'Indice de sante')}</span>
               <strong className="dash-meta__value">{healthScore}%</strong>
             </div>
             <div className="dash-meta">
-              <span className="dash-meta__label">Alertes 7 jours</span>
+              <span className="dash-meta__label">{t('dashboard.alerts7Days', 'Alertes 7 jours')}</span>
               <strong className="dash-meta__value">{expSoon}</strong>
             </div>
           </div>
           <div className="dash-hero__actions">
-            <Link className="btn btn--primary" to="/membres">Voir les membres</Link>
-            <Link className="btn btn--ghost" to="/paiements">Encaisser un paiement</Link>
+            <Link className="btn btn--primary" to="/membres">{t('dashboard.viewMembers', 'Voir les membres')}</Link>
+            <Link className="btn btn--ghost" to="/paiements">{t('dashboard.cashIn', 'Encaisser un paiement')}</Link>
             <button className="btn btn--ghost" onClick={handleExport} disabled={exporting}>
-              <Download size={16} style={{ marginRight: 8 }} /> {exporting ? 'Génération...' : 'Exporter PDF'}
+              <Download size={16} style={{ marginRight: 8 }} /> {exporting ? t('dashboard.generating', 'Génération...') : t('dashboard.exportPDF', 'Exporter PDF')}
             </button>
           </div>
         </div>
 
         <div className="dash-hero__right">
           <div className="kpi-grid kpi-grid--hero">
-            <StatCard icon={Users} label="Total membres" value={stats.total} color="#39ff14" to="/membres" variant="hero" />
-            <StatCard icon={UserCheck} label="Membres actifs" value={stats.actifs} sub={`${stats.inactifs} inactifs`} color="#22c55e" to="/membres" variant="hero" />
-            <StatCard icon={TrendingUp} label="Revenus mensuels" value={`${stats.revenue.toLocaleString('fr-FR')} DH`} color="#10b981" variant="hero" />
-            <StatCard icon={AlertTriangle} label="Alerte 7 jours" value={expSoon} color="#16a34a" to="/abonnements" variant="hero" />
+            <StatCard icon={Users} label={t('dashboard.stats.totalMembers', 'Total membres')} value={stats.total} color="#39ff14" to="/membres" variant="hero" />
+            <StatCard icon={UserCheck} label={t('dashboard.stats.activeMembers', 'Membres actifs')} value={stats.actifs} sub={`${stats.inactifs} ${t('dashboard.stats.inactive', 'inactifs')}`} color="#22c55e" to="/membres" variant="hero" />
+            <StatCard icon={TrendingUp} label={t('dashboard.stats.monthlyRevenue', 'Revenus mensuels')} value={`${stats.revenue.toLocaleString('fr-FR')} DH`} color="#10b981" variant="hero" />
+            <StatCard icon={AlertTriangle} label={t('dashboard.stats.alert7Days', 'Alerte 7 jours')} value={expSoon} color="#16a34a" to="/abonnements" variant="hero" />
           </div>
           <div className="dash-hero__panel">
-            <div className="dash-hero__panel-title">Priorites immediates</div>
+            <div className="dash-hero__panel-title">{t('dashboard.panel.priorities', 'Priorites immediates')}</div>
             <div className="dash-hero__panel-row">
-              <span>Expirations 7 jours</span>
+              <span>{t('dashboard.panel.expirations7days', 'Expirations 7 jours')}</span>
               <strong>{expSoon}</strong>
             </div>
             <div className="dash-hero__panel-row">
-              <span>Membres inactifs</span>
+              <span>{t('dashboard.panel.inactiveMembers', 'Membres inactifs')}</span>
               <strong>{stats.inactifs}</strong>
             </div>
             <div className="dash-hero__panel-row">
-              <span>Revenus estimes</span>
+              <span>{t('dashboard.panel.estimatedRevenue', 'Revenus estimes')}</span>
               <strong>{stats.revenue.toLocaleString('fr-FR')} DH</strong>
             </div>
           </div>
@@ -135,11 +137,11 @@ export default function Dashboard() {
           <div className="card dash-card">
             <div className="dash-card__head">
               <div>
-                <h3 className="dash-card__title">Repartition par section</h3>
-                <p className="dash-card__sub">Distribution des membres actifs par categorie.</p>
+                <h3 className="dash-card__title">{t('dashboard.cards.distribution.title', 'Repartition par section')}</h3>
+                <p className="dash-card__sub">{t('dashboard.cards.distribution.subtitle', 'Distribution des membres actifs par categorie.')}</p>
               </div>
               <Link className="dash-link" to="/membres">
-                Detail <ArrowUpRight size={14} />
+                {t('dashboard.cards.detail', 'Detail')} <ArrowUpRight size={14} />
               </Link>
             </div>
             <div style={{ height: 220, width: '100%', marginTop: '16px' }}>
@@ -160,11 +162,11 @@ export default function Dashboard() {
           <div className="card dash-card">
             <div className="dash-card__head">
               <div>
-                <h3 className="dash-card__title">Activites prioritaires</h3>
-                <p className="dash-card__sub">Top 4 par volume d'adhesion.</p>
+                <h3 className="dash-card__title">{t('dashboard.cards.activities.title', 'Activites prioritaires')}</h3>
+                <p className="dash-card__sub">{t('dashboard.cards.activities.subtitle', "Top 4 par volume d'adhesion.")}</p>
               </div>
               <Link className="dash-link" to="/activites">
-                Detail <ArrowUpRight size={14} />
+                {t('dashboard.cards.detail', 'Detail')} <ArrowUpRight size={14} />
               </Link>
             </div>
             <div style={{ height: 220, width: '100%', marginTop: '16px' }}>
@@ -189,15 +191,15 @@ export default function Dashboard() {
           <div className="card dash-card">
             <div className="dash-card__head">
               <div>
-                <h3 className="dash-card__title">Abonnements a risque</h3>
-                <p className="dash-card__sub">Expire dans les 7 prochains jours.</p>
+                <h3 className="dash-card__title">{t('dashboard.cards.risk.title', 'Abonnements a risque')}</h3>
+                <p className="dash-card__sub">{t('dashboard.cards.risk.subtitle', 'Expire dans les 7 prochains jours.')}</p>
               </div>
               <Link className="dash-link" to="/abonnements">
-                Detail <ArrowUpRight size={14} />
+                {t('dashboard.cards.detail', 'Detail')} <ArrowUpRight size={14} />
               </Link>
             </div>
             {stats.expiringSoon.length === 0 ? (
-              <p className="empty-msg">Aucun abonnement critique pour le moment.</p>
+              <p className="empty-msg">{t('dashboard.cards.risk.empty', 'Aucun abonnement critique pour le moment.')}</p>
             ) : (
               <div className="expire-list">
                 {stats.expiringSoon.slice(0, 5).map((m) => {
@@ -210,10 +212,10 @@ export default function Dashboard() {
                       </div>
                       <div className="expire-item__info">
                         <div className="expire-item__name">{m.prenom} {m.nom}</div>
-                        <div className="expire-item__act">{act?.nom}</div>
+                        <div className="expire-item__act">{t(act?.nom, act?.nom)}</div>
                       </div>
                       <div className={`expire-badge${days <= 2 ? ' expire-badge--urgent' : ''}`}>
-                        {days === 0 ? 'Auj.' : `${days}j`}
+                        {days === 0 ? t('dashboard.cards.today', 'Auj.') : `${days}${t('dashboard.cards.daysAbbr', 'j')}`}
                       </div>
                     </div>
                   );
@@ -225,17 +227,17 @@ export default function Dashboard() {
           <div className="card dash-card">
             <div className="dash-card__head">
               <div>
-                <h3 className="dash-card__title">Dernieres inscriptions</h3>
-                <p className="dash-card__sub">Nouveaux membres enregistres.</p>
+                <h3 className="dash-card__title">{t('dashboard.cards.recent.title', 'Dernieres inscriptions')}</h3>
+                <p className="dash-card__sub">{t('dashboard.cards.recent.subtitle', 'Nouveaux membres enregistres.')}</p>
               </div>
               <Link className="dash-link" to="/membres">
-                Detail <ArrowUpRight size={14} />
+                {t('dashboard.cards.detail', 'Detail')} <ArrowUpRight size={14} />
               </Link>
             </div>
             <div className="recent-list">
               {recent.map((m) => {
                 const act = activites.find((a) => a.id === m.activite);
-                const badge = getSubscriptionBadge(m);
+                const badge = getSubscriptionBadge(m, t);
                 return (
                   <div key={m.id} className="recent-item">
                     <div className="recent-item__avatar" style={{ background: act?.couleur + '22', color: act?.couleur }}>
@@ -245,7 +247,7 @@ export default function Dashboard() {
                       <div className="recent-item__name">{m.prenom} {m.nom}</div>
                       <div className="recent-item__meta">
                         <span className="dash-chip" style={{ '--chip': act?.couleur }}>{act?.icon}</span>
-                        <span className="dash-chip__label">{act?.nom}</span>
+                        <span className="dash-chip__label">{t(act?.nom, act?.nom)}</span>
                         <span className="dash-chip__date">{m.dateInscription}</span>
                       </div>
                     </div>

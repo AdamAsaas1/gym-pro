@@ -1,0 +1,439 @@
+{
+  "header": {
+    "role": "Role",
+    "logout": "Deconnexion",
+    "searchPlaceholder": "Rechercher un membre, paiement...",
+    "newMember": "Nouveau membre",
+    "cashIn": "Encaisser",
+    "defaultConfig": "Config par defaut utilisee",
+    "notifications": "Notifications",
+    "markAllRead": "Tout lire",
+    "emptyNotifications": "Aucune alerte dans cette catégorie",
+    "manageSubscriptions": "Gérer tous les abonnements"
+  },
+  "titles": {
+    "dashboard": "Tableau de Bord",
+    "members": "Gestion des Membres",
+    "planning": "Planning des Séances",
+    "activities": "Activités & Disciplines",
+    "subscriptions": "Abonnements",
+    "coaches": "Équipe Encadrante",
+    "permissions": "Gestion des Permissions",
+    "payments": "Paiements",
+    "settings": "Paramètres",
+    "notifications": "Notifications"
+  },
+  "sidebar": {
+    "collapse": "Réduire",
+    "tagline": "Votre salle, votre performance",
+    "section": "Pilotage",
+    "activeMembers": "membres actifs",
+    "performance": "Performance",
+    "active": "Actifs",
+    "toPay": "A regler"
+  },
+  "subscriptions": {
+    "monthly": "Mensuel",
+    "1month": "1 mois",
+    "quarterly": "Trimestriel",
+    "3months": "3 mois",
+    "yearly": "Annuel",
+    "12months": "12 mois",
+    "estimatedRevenue": "Revenus mensuels estimés (membres actifs)",
+    "memberCount": "membre",
+    "revActivations": "revenus / activations",
+    "expiring30Days": "Abonnements expirant dans les 30 prochains jours",
+    "noExpiring": "Aucun abonnement n'expire dans les 30 prochains jours. ✅",
+    "table": {
+      "member": "Membre",
+      "section": "Section",
+      "activity": "Activité",
+      "subscription": "Abonnement",
+      "expiration": "Expiration",
+      "daysLeft": "Jours restants"
+    },
+    "days": "jours"
+  },
+  "activities": {
+    "menSection": "Section Hommes",
+    "womenSection": "Section Femmes",
+    "childrenSection": "Section Enfants",
+    "mixedSection": "Section Mixte (Universel)",
+    "description": "Notre salle est non mixte. Chaque section dispose de son propre espace, ses horaires et son coach spécialisé.",
+    "registered": "Inscrits",
+    "active": "Actifs",
+    "rates": "Tarifs",
+    "monthly": "Mensuel",
+    "quarterly": "Trimestriel",
+    "yearly": "Annuel",
+    "coach": "Coach"
+  },
+  "notifications": {
+    "title": "Notifications Administrateur",
+    "createBtn": "Créer une notification",
+    "stats": {
+      "totalSent": "Total Envoyées",
+      "autoReminders": "Rappels Automatiques",
+      "complaints": "Réclamations"
+    },
+    "table": {
+      "type": "Type",
+      "title": "Titre",
+      "message": "Message",
+      "target": "Cible / Planning",
+      "seen": "Vus",
+      "actions": "Actions",
+      "loading": "Chargement...",
+      "noNotifications": "Aucune notification trouvée",
+      "typeAuto": "Automatique",
+      "members": "Membre(s)",
+      "autoDays": "Automatique (J-{{days}})",
+      "delete": "Supprimer"
+    },
+    "modal": {
+      "newNotification": "Nouvelle Notification",
+      "type": "Type de notification",
+      "typeNormal": "Message Direct",
+      "typeReminder": "Rappel de Payement (Auto)",
+      "typeReclamation": "Réclamation / Urgence",
+      "notifTitle": "Titre",
+      "placeholderReminder": "Ex: Renouvellement de votre abonnement",
+      "placeholderTitle": "Titre du message",
+      "scheduleLabel": "Programmation (Envoyer combien de jours avant ?)",
+      "daysBefore": "Jours avant",
+      "recipients": "Destinataires",
+      "targetAll": "Tous",
+      "targetActivity": "Activité",
+      "targetMember": "Membre",
+      "searchMember": "Rechercher un membre...",
+      "messageBody": "Message",
+      "messagePlaceholder": "Contenu de la notification...",
+      "cancel": "Annuler",
+      "saving": "Enregistrement...",
+      "activateReminder": "Activer le rappel",
+      "sendNow": "Envoyer maintenant"
+    },
+    "recipients": {
+      "title": "Suivi des Destinataires",
+      "loading": "Chargement...",
+      "member": "Membre",
+      "status": "Statut",
+      "seenAt": "Vu le",
+      "seen": "Vu",
+      "sent": "Envoyé"
+    }
+  },
+  "coaches": {
+    "description": "Notre équipe de coachs qualifiés assure un encadrement professionnel et personnalisé pour chaque section de la salle."
+  },
+  "dashboard": {
+    "performance": "Performance",
+    "title": "Pilotage ASAAS GYM",
+    "subtitle": "Vue d\\'ensemble des membres actifs, revenus et alertes a traiter. Analyse rapide et actions immediates.",
+    "activityRate": "Taux d\\'activite",
+    "healthScore": "Indice de sante",
+    "alerts7Days": "Alertes 7 jours",
+    "viewMembers": "Voir les membres",
+    "cashIn": "Encaisser un paiement",
+    "generating": "Génération...",
+    "exportPDF": "Exporter PDF",
+    "cards": {
+      "today": "Aujourd'hui",
+      "distribution": {
+        "title": "Repartition par section",
+        "subtitle": "Distribution des membres actifs par categorie."
+      },
+      "detail": "Detail",
+      "activities": {
+        "title": "Activites prioritaires",
+        "subtitle": "Top 4 par volume d'adhesion."
+      },
+      "risk": {
+        "title": "Abonnements a risque",
+        "subtitle": "Expire dans les 7 prochains jours.",
+        "empty": "Aucun abonnement critique pour le moment."
+      },
+      "daysAbbr": "j",
+      "recent": {
+        "title": "Dernieres inscriptions",
+        "subtitle": "Nouveaux membres enregistres."
+      }
+    },
+    "status": {
+      "inactive": "Inactif",
+      "late": "En retard",
+      "soon": "Bientot expire",
+      "active": "Actif"
+    },
+    "chart": {
+      "men": "Hommes",
+      "women": "Femmes",
+      "children": "Enfants"
+    },
+    "stats": {
+      "totalMembers": "Total membres",
+      "activeMembers": "Membres actifs",
+      "inactive": "inactifs",
+      "monthlyRevenue": "Revenus mensuels",
+      "alert7Days": "Alerte 7 jours"
+    },
+    "panel": {
+      "priorities": "Priorites immediates",
+      "expirations7days": "Expirations 7 jours",
+      "inactiveMembers": "Membres inactifs",
+      "estimatedRevenue": "Revenus estimes"
+    }
+  },
+  "login": {
+    "system": "ASAAS PRO SYSTEM",
+    "title": "Pilotez votre salle en toute simplicite.",
+    "subtitle": "Acces rapide, propre et securise.",
+    "secureConnection": "Connexion securisee",
+    "welcome": "Bienvenue",
+    "instruction": "Connecte-toi pour acceder au tableau de bord."
+  },
+  "members": {
+    "form": {
+      "errNom": "Nom obligatoire",
+      "errPrenom": "Prénom obligatoire",
+      "errTel": "Téléphone obligatoire",
+      "errDateNaissance": "Date de naissance obligatoire",
+      "errPassword": "Mot de passe obligatoire pour les nouveaux membres",
+      "lastName": "Nom",
+      "phLastName": "NOM",
+      "firstName": "Prénom",
+      "phFirstName": "Prénom",
+      "section": "Section",
+      "secMen": "Hommes (Adultes)",
+      "secWomen": "Femmes (Adultes)",
+      "secChildren": "Enfants (6–14 ans)",
+      "activity": "Activité",
+      "noActivity": "Aucune activité disponible",
+      "createActivityWarning": "Veuillez créer une activité pour cette section dans les paramètres.",
+      "subscription": "Abonnement",
+      "subMonthly": "Mensuel (1 mois)",
+      "subQuarterly": "Trimestriel (3 mois)",
+      "subYearly": "Annuel (12 mois)",
+      "status": "Statut",
+      "statusActive": "Actif",
+      "statusInactive": "Inactif",
+      "phone": "Téléphone",
+      "email": "Email",
+      "birthDate": "Date de naissance",
+      "registrationDate": "Date d'inscription",
+      "calculatedExpiration": "Date d'expiration (calculée)",
+      "newPassword": "Nouveau mot de passe (laisser vide pour ne pas changer)",
+      "initialPassword": "Mot de passe initial *",
+      "photo": "Photo du membre",
+      "photoAlt": "Photo membre",
+      "noPhoto": "Aucune photo",
+      "openCamera": "Ouvrir la camera",
+      "takePhoto": "Prendre la photo",
+      "closeCamera": "Fermer",
+      "removePhoto": "Retirer la photo",
+      "amountToCollect": "Montant a encaisser :",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "registerMember": "Inscrire le Membre"
+    },
+    "delete": {
+      "confirmMessage": "Voulez-vous supprimer definitivement :",
+      "cancel": "Annuler",
+      "confirm": "Supprimer"
+    },
+    "details": {
+      "activity": "Activite",
+      "subscription": "Abonnement",
+      "registration": "Inscription",
+      "expiration": "Expiration",
+      "gender": "Genre",
+      "birthDate": "Date de naissance",
+      "manualStatus": "Statut manuel",
+      "totalPaid": "Total paye",
+      "paymentDay": "Jour de paiement",
+      "setPaymentDate": "Fixer la date de paiement (ce membre)",
+      "nextPaymentDate": "Prochaine date de paiement:",
+      "paymentHistory": "Historique paiements",
+      "paymentItem": "paiement",
+      "close": "Fermer",
+      "noPaymentRecorded": "Aucun paiement enregistre.",
+      "paymentMode": "Mode:",
+      "downloadReceipt": "Telecharger recu"
+    },
+    "title": "Membres",
+    "management": "Gestion des membres",
+    "subtitle": "Controlez les inscriptions, statuts et activites depuis un panneau clair et rapide.",
+    "newMember": "Nouveau membre",
+    "totalMembers": "Total membres",
+    "activeMembers": "Membres actifs",
+    "inactiveMembers": "Membres inactifs",
+    "expirations7Days": "Expirations 7 jours",
+    "filters": {
+      "searchPlaceholder": "Rechercher par nom, prenom, telephone, email, activite...",
+      "allSections": "Toutes sections",
+      "men": "Hommes",
+      "women": "Femmes",
+      "children": "Enfants",
+      "allActivities": "Toutes activites",
+      "allStatuses": "Tous statuts",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "reset": "Reinitialiser"
+    },
+    "tableMember": "Membre",
+    "tableSection": "Section",
+    "tableActivity": "Activité",
+    "tableSubscription": "Abonnement",
+    "tableExpiration": "Expiration",
+    "tableStatus": "Statut",
+    "tableActions": "Actions",
+    "list": {
+      "noMembersFound": "Aucun membre trouvé.",
+      "viewPhotoAria": "Voir la photo de {{prenom}} {{nom}}",
+      "toggleStatus": "Basculer statut",
+      "viewProfile": "Voir fiche",
+      "edit": "Modifier",
+      "delete": "Supprimer"
+    },
+    "pagination": {
+      "prev": "Préc.",
+      "next": "Suiv."
+    },
+    "modals": {
+      "addMember": "Inscrire un nouveau membre",
+      "editMember": "Modifier le membre",
+      "confirmDeleteTitle": "Confirmer la Suppression",
+      "viewMemberTitle": "Fiche membre",
+      "photoTitle": "Photo du membre"
+    }
+  },
+  "payments": {
+    "modal": {
+      "subType": "Type d'abonnement",
+      "amountToCollect": "Montant encaissé (DH)",
+      "paymentMode": "Mode de paiement",
+      "newExpiration": "Nouvelle échéance",
+      "duration": "Durée",
+      "days": "jours",
+      "totalToCollect": "Total à encaisser",
+      "sendReceiptReminders": "Envoyer recu + rappels",
+      "remindersActive": "Rappels actifs",
+      "daysBeforeExp": "Jours avant expiration",
+      "cancel": "Annuler",
+      "fullWorkflow": "Workflow complet",
+      "confirmPayment": "Confirmer le paiement"
+    },
+    "title": "Paiements",
+    "management": "Pilotage des encaissements",
+    "subtitle": "Suivez les paiements, verifiez les acces et declenchez un encaissement en quelques secondes.",
+    "tabMembers": "Membres & acces",
+    "tabHistory": "Historique paiements",
+    "collectedThisMonth": "Encaisse ce mois",
+    "membersGoodStanding": "Membres en regle",
+    "toRenew": "A renouveler",
+    "paymentsThisMonth": "Paiements ce mois",
+    "table": {
+      "noMembers": "Aucun membre trouvé",
+      "member": "Membre",
+      "activity": "Activité",
+      "subscription": "Abonnement",
+      "expiration": "Échéance",
+      "access": "Accès Salle",
+      "amount": "Montant",
+      "action": "Action",
+      "btnCollect": "Encaisser",
+      "btnRenew": "Renouveler"
+    },
+    "histo": {
+      "showAll": "Tout afficher",
+      "thisMonth": "Ce mois",
+      "totalLabel": "Total :",
+      "paymentItem": "paiement",
+      "noPaymentFound": "Aucun paiement enregistré",
+      "emptyStateHelp": "Les paiements apparaîtront ici après encaissement",
+      "table": {
+        "member": "Membre",
+        "activity": "Activité",
+        "subscription": "Abonnement",
+        "mode": "Mode",
+        "date": "Date",
+        "amount": "Montant",
+        "receipt": "Reçu",
+        "downloadPdfTitle": "Télécharger le reçu PDF"
+      }
+    }
+  },
+  "permissions": {
+    "security": "Securite",
+    "management": "Gestion des permissions",
+    "subtitle": "Superadmin possede tous les acces. Configurez ici les permissions des autres roles pour les pages du menu.",
+    "accessControl": "Page-level access control",
+    "roleToConfigure": "Role a configurer",
+    "resetRole": "Reinitialiser ce role",
+    "noCustomRoles": "Aucun role personnalisable trouve pour ce compte.",
+    "superadminNote": "Superadmin est toujours autorise sur toutes les pages, y compris cette page de gestion."
+  },
+  "planning": {
+    "men": "♂ Hommes",
+    "women": "♀ Femmes",
+    "children": "👶 Enfants"
+  },
+  "settings": {
+    "success": {
+      "gymSaved": "Paramètres du Gym enregistrés avec succès !",
+      "activityUpdated": "L'activité \\\"{{name}}\\\" a été mise à jour.",
+      "activityCreated": "L'activité \\\"{{name}}\\\" a été créée avec succès.",
+      "title": "Succès !",
+      "continue": "Continuer"
+    },
+    "error": {
+      "gymSave": "Erreur lors de l'enregistrement.",
+      "activitySave": "Erreur lors de l'enregistrement de l'activité.",
+      "deleteActivity": "Erreur lors de la suppression."
+    },
+    "confirm": {
+      "deleteActivity": "Êtes-vous sûr de vouloir supprimer cette activité ?"
+    },
+    "title": "Paramètres du Gym",
+    "subtitle": "Configurez l'identité visuelle et la grille tarifaire de votre salle.",
+    "identity": {
+      "title": "Identité du Gym",
+      "logo": "Logo de la salle",
+      "logoPlaceholder": "Logo",
+      "chooseFile": "Choisir un fichier",
+      "gymName": "Nom du Gym",
+      "saving": "Enregistrement...",
+      "save": "Enregistrer"
+    },
+    "activities": {
+      "title": "Activités & Tarifs",
+      "new": "Nouveau",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "noActivities": "Aucune activité configurée."
+    },
+    "modal": {
+      "editActivity": "Modifier l'activité",
+      "newActivity": "Nouvelle activité",
+      "activityName": "Nom de l'activité",
+      "activityNamePlaceholder": "Ex: Musculation, Karaté...",
+      "priceMonth": "Prix Mensuel (DH)",
+      "priceYear": "Prix Annuel (DH)",
+      "assuranceFirst": "Assurance (1ère année)",
+      "assuranceNext": "Assurance (Renouvellement)",
+      "inscriptionFees": "Frais d'inscription (DH)",
+      "maxCapacity": "Capacité Max",
+      "description": "Description",
+      "descriptionPlaceholder": "Bref descriptif de l'activité...",
+      "section": "Section (Genre)",
+      "sectionMen": "Hommes",
+      "sectionWomen": "Femmes",
+      "sectionChildren": "Enfants",
+      "sectionUniversal": "Universel",
+      "coachName": "Nom du Coach",
+      "iconColor": "Icone & Couleur",
+      "saveBtn": "Enregistrer",
+      "cancelBtn": "Annuler"
+    }
+  }
+}
