@@ -93,6 +93,22 @@
   overflow-y: auto;
   max-height: calc(100vh - 350px);
   min-height: 400px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(57, 255, 20, 0.2) transparent;
+}
+
+.notifs-table-wrapper::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.notifs-table-wrapper::-webkit-scrollbar-thumb {
+  background: rgba(57, 255, 20, 0.2);
+  border-radius: 99px;
+}
+
+.notifs-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: rgba(57, 255, 20, 0.4);
 }
 
 .notifs-table {
