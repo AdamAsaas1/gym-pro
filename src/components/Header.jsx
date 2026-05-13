@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 
 const TITLES = {
   '/':            'Tableau de Bord',
+  '/acces':       'Gestion d\'Accès',
   '/membres':     'Gestion des Membres',
   '/planning':    'Planning des Séances',
   '/activites':   'Activités & Disciplines',

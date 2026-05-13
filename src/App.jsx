@@ -15,6 +15,7 @@ import Coaches     from './pages/Coaches';
 import Paiements   from './pages/Paiements';
 import Permissions from './pages/Permissions';
 import AdminNotifications from './pages/AdminNotifications';
+import GestionAcces from './pages/GestionAcces';
 
 function RequireAuth({ children }) {
   const { isAuthenticated, loadingAuth } = useAuth();
@@ -48,6 +49,7 @@ function Layout() {
         <main className="app-content">
           <Routes>
             <Route path="/" element={<ProtectedPage page="/"><Dashboard /></ProtectedPage>} />
+            <Route path="/acces" element={<ProtectedPage page="/acces"><GestionAcces /></ProtectedPage>} />
             <Route path="/membres" element={<ProtectedPage page="/membres"><Membres /></ProtectedPage>} />
             <Route path="/paiements" element={<ProtectedPage page="/paiements"><Paiements /></ProtectedPage>} />
             <Route path="/planning" element={<ProtectedPage page="/planning"><Planning /></ProtectedPage>} />
