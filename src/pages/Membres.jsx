@@ -382,13 +382,8 @@ function MemberDetails({ membre, activites, paiements, onClose, onSetEcheanceDay
       <div className="member-details__info">
         <div className="member-profile">
           <div className="member-profile__avatar" style={{ background: act?.couleur ? `${act.couleur}22` : 'rgba(255, 255, 255, 0.1)', color: act?.couleur || 'var(--clr-muted)' }}>
-<<<<<<< HEAD
             {membre.photoBase64 ? (
               <img src={getPhotoSrc(membre.photoBase64)} alt="Photo membre" />
-=======
-            {membre.photoBase64 && membre.photoBase64.startsWith('data:image') ? (
-              <img src={membre.photoBase64} alt="Photo membre" />
->>>>>>> 6f1292589edbeb8b77fbaf7e4467b9a1c89fb61c
             ) : (
               <User size={32} />
             )}
