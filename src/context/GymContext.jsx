@@ -27,7 +27,7 @@ const toApi = (d) => ({
   abonnement:       d.abonnement,
   statut:           d.statut || 'actif',
   telephone:        d.telephone,
-  email:            d.email || '',
+  email:            d.email || null,
   date_naissance:   d.dateNaissance || null,
   date_inscription: d.dateInscription,
   date_expiration:  d.dateExpiration,

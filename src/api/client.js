@@ -209,4 +209,9 @@ export const createNotification = (data) => api.post('/notifications', data).the
 export const deleteNotification = (id) => api.delete(`/notifications/${id}`).then((r) => r.data)
 export const getNotificationRecipients = (id) => api.get(`/notifications/${id}/recipients`).then((r) => r.data)
 
+// ─── Access Control ──────────────────────────────────────────────────────────
+export const checkAccess = (imageBase64) => api.post('/access-control/check', { image_base64: imageBase64 }).then(r => r.data)
+export const getAccessHistory = (limit = 50) => api.get('/access-control/history', { params: { limit } }).then(r => r.data)
+export const enrollMember = (membreId, imageBase64) => api.post(`/access-control/enroll/${membreId}`, { image_base64: imageBase64 }).then(r => r.data)
+
 export default api
