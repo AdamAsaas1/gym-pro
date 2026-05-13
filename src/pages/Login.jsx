@@ -23,7 +23,7 @@ export default function Login() {
       navigate('/', { replace: true })
     } catch (err) {
       const apiMessage = err?.response?.data?.detail?.message
-      setError(apiMessage || 'Connexion impossible. Verifiez vos identifiants.')
+      setError(apiMessage || t('login.error.failed', 'Connexion impossible. Verifiez vos identifiants.'))
     } finally {
       setSubmitting(false)
     }
@@ -48,39 +48,39 @@ export default function Login() {
           </div>
 
           <form onSubmit={onSubmit} className="login-form">
-            <label htmlFor="username">Nom d'utilisateur</label>
+            <label htmlFor="username">{t('login.username', "Nom d'utilisateur")}</label>
             <input
               id="username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               autoComplete="username"
-              placeholder="Ex: admin"
+              placeholder={t('login.placeholder.username', 'Ex: admin')}
               required
             />
 
-            <label htmlFor="password">Mot de passe</label>
+            <label htmlFor="password">{t('login.password', 'Mot de passe')}</label>
             <input
               id="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
-              placeholder="Entrez votre mot de passe"
+              placeholder={t('login.placeholder.password', 'Entrez votre mot de passe')}
               required
             />
 
             <p className="login-footnote" style={{ marginTop: 4 }}>
-              Comptes de test: superadmin / superadmin123 ou admin / admin123
+              {t('login.testAccounts', 'Comptes de test: superadmin / superadmin123 ou admin / admin123')}
             </p>
 
             {error && <div className="login-error">{error}</div>}
 
             <button type="submit" disabled={submitting}>
-              {submitting ? 'Connexion...' : 'Se connecter'}
+              {submitting ? t('login.submitting', 'Connexion...') : t('login.submit', 'Se connecter')}
             </button>
           </form>
 
-          <p className="login-footnote">Acces reserve au personnel autorise.</p>
+          <p className="login-footnote">{t('login.restrictedAccess', 'Acces reserve au personnel autorise.')}</p>
         </section>
       </div>
     </div>

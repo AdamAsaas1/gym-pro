@@ -9,10 +9,22 @@
     "notifications": "Notifications",
     "markAllRead": "Mark all as read",
     "emptyNotifications": "No alerts in this category",
-    "manageSubscriptions": "Manage all subscriptions"
+    "manageSubscriptions": "Manage all subscriptions",
+    "filters": {
+      "all": "All",
+      "danger": "Urgent",
+      "warning": "Expiring Soon",
+      "info": "Inactive"
+    },
+    "sections": {
+      "danger": "Urgent expirations",
+      "warning": "Expirations soon",
+      "info": "Inactive members"
+    }
   },
   "titles": {
     "dashboard": "Dashboard",
+    "access": "Access Control",
     "members": "Members Management",
     "planning": "Schedule Planning",
     "activities": "Activities & Disciplines",
@@ -190,7 +202,20 @@
     "subtitle": "Fast, clean, and secure access.",
     "secureConnection": "Secure connection",
     "welcome": "Welcome",
-    "instruction": "Log in to access the dashboard."
+    "instruction": "Log in to access the dashboard.",
+    "error": {
+      "failed": "Login failed. Check your credentials."
+    },
+    "username": "Username",
+    "placeholder": {
+      "username": "Ex: admin",
+      "password": "Enter your password"
+    },
+    "password": "Password",
+    "testAccounts": "Test accounts: superadmin / superadmin123 or admin / admin123",
+    "submitting": "Connecting...",
+    "submit": "Log In",
+    "restrictedAccess": "Access restricted to authorized personnel."
   },
   "members": {
     "form": {
@@ -361,6 +386,36 @@
         "receipt": "Receipt",
         "downloadPdfTitle": "Download PDF receipt"
       }
+    },
+    "searchPlaceholder": "Search a member...",
+    "unknownMember": "Unknown"
+  },
+  "access": {
+    "title": "Access Control",
+    "subtitle": "Facial Recognition Control",
+    "modeVerification": "Verification Mode",
+    "modeEnrollment": "Enrollment Mode",
+    "selectMember": "Select a member to enroll...",
+    "captureAndEnroll": "Capture & Enroll",
+    "verifyAccess": "Verify Access",
+    "accessAuthorized": "Access Authorized",
+    "accessDenied": "Access Denied",
+    "recentHistory": "Recent History",
+    "noPassage": "No passage recorded",
+    "unknown": "Unknown",
+    "errSelectMember": "Please select a member",
+    "enrollSuccess": "Member enrolled successfully!",
+    "errorPrefix": "Error: ",
+    "reasons": {
+      "No face detected in the frame": "No face detected in the frame",
+      "Multiple faces detected": "Multiple faces detected",
+      "Could not analyze face": "Could not analyze face",
+      "No enrolled members found in database": "No enrolled members found in database",
+      "No valid encodings found in database": "No valid encodings found in database",
+      "Member status is inactive": "Member status is inactive",
+      "Subscription has expired": "Subscription has expired",
+      "Access Granted": "Access Granted",
+      "Face not recognized": "Face not recognized"
     }
   },
   "permissions": {

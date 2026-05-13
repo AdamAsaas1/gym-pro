@@ -9,10 +9,22 @@
     "notifications": "Notifications",
     "markAllRead": "Tout lire",
     "emptyNotifications": "Aucune alerte dans cette catégorie",
-    "manageSubscriptions": "Gérer tous les abonnements"
+    "manageSubscriptions": "Gérer tous les abonnements",
+    "filters": {
+      "all": "Tous",
+      "danger": "Urgents",
+      "warning": "Proches",
+      "info": "Inactifs"
+    },
+    "sections": {
+      "danger": "Expirations urgentes",
+      "warning": "Expirations proches",
+      "info": "Membres inactifs"
+    }
   },
   "titles": {
     "dashboard": "Tableau de Bord",
+    "access": "Gestion d'Accès",
     "members": "Gestion des Membres",
     "planning": "Planning des Séances",
     "activities": "Activités & Disciplines",
@@ -190,7 +202,20 @@
     "subtitle": "Acces rapide, propre et securise.",
     "secureConnection": "Connexion securisee",
     "welcome": "Bienvenue",
-    "instruction": "Connecte-toi pour acceder au tableau de bord."
+    "instruction": "Connecte-toi pour acceder au tableau de bord.",
+    "error": {
+      "failed": "Connexion impossible. Verifiez vos identifiants."
+    },
+    "username": "Nom d'utilisateur",
+    "placeholder": {
+      "username": "Ex: admin",
+      "password": "Entrez votre mot de passe"
+    },
+    "password": "Mot de passe",
+    "testAccounts": "Comptes de test: superadmin / superadmin123 ou admin / admin123",
+    "submitting": "Connexion...",
+    "submit": "Se connecter",
+    "restrictedAccess": "Acces reserve au personnel autorise."
   },
   "members": {
     "form": {
@@ -361,6 +386,36 @@
         "receipt": "Reçu",
         "downloadPdfTitle": "Télécharger le reçu PDF"
       }
+    },
+    "searchPlaceholder": "Rechercher un membre...",
+    "unknownMember": "Inconnu"
+  },
+  "access": {
+    "title": "Gestion d'Accès",
+    "subtitle": "Contrôle par reconnaissance faciale",
+    "modeVerification": "Mode Vérification",
+    "modeEnrollment": "Mode Enrôlement",
+    "selectMember": "Sélectionner un membre à enrôler...",
+    "captureAndEnroll": "Capturer & Enrôler",
+    "verifyAccess": "Vérifier l'Accès",
+    "accessAuthorized": "Accès Autorisé",
+    "accessDenied": "Accès Refusé",
+    "recentHistory": "Historique Récent",
+    "noPassage": "Aucun passage enregistré",
+    "unknown": "Inconnu",
+    "errSelectMember": "Veuillez sélectionner un membre",
+    "enrollSuccess": "Membre enrôlé avec succès !",
+    "errorPrefix": "Erreur: ",
+    "reasons": {
+      "No face detected in the frame": "Aucun visage détecté dans le cadre",
+      "Multiple faces detected": "Plusieurs visages détectés",
+      "Could not analyze face": "Impossible d'analyser le visage",
+      "No enrolled members found in database": "Aucun membre enrôlé trouvé dans la base",
+      "No valid encodings found in database": "Aucun encodage valide trouvé dans la base",
+      "Member status is inactive": "Le statut du membre est inactif",
+      "Subscription has expired": "L'abonnement a expiré",
+      "Access Granted": "Accès accordé",
+      "Face not recognized": "Visage non reconnu"
     }
   },
   "permissions": {

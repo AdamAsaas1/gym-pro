@@ -2,9 +2,11 @@ import React, { useRef, useState, useEffect, useCallback } from 'react';
 import Webcam from 'react-webcam';
 import { Camera, CheckCircle, XCircle, AlertCircle, History, UserPlus } from 'lucide-react';
 import { checkAccess, getAccessHistory, getMembres, enrollMember } from '../api/client';
+import { useTranslation } from 'react-i18next';
 import './GestionAcces.css';
 
 const GestionAcces = () => {
+  const { t } = useTranslation();
   const webcamRef = useRef(null);
   const [accessResult, setAccessResult] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -13,6 +15,7 @@ const GestionAcces = () => {
   const [selectedMembre, setSelectedMembre] = useState('');
   const [enrollMode, setEnrollMode] = useState(false);
   const [enrollMsg, setEnrollMsg] = useState('');
+  const [enrollStatus, setEnrollStatus] = useState(''); // 'success' | 'error'
 
   const fetchHistory = async () => {
     try {
@@ -64,7 +67,8 @@ const GestionAcces = () => {
 
   const handleEnroll = async () => {
     if (!selectedMembre) {
-      setEnrollMsg('Veuillez sélectionner un membre');
+      setEnrollStatus('error');
+      setEnrollMsg(t('access.errSelectMember', 'Veuillez sélectionner un membre'));
       return;
     }
     const imageSrc = capture();
@@ -72,13 +76,16 @@ const GestionAcces = () => {
 
     setIsProcessing(true);
     setEnrollMsg('');
+    setEnrollStatus('');
     try {
       await enrollMember(selectedMembre, imageSrc);
-      setEnrollMsg('Membre enrôlé avec succès !');
+      setEnrollStatus('success');
+      setEnrollMsg(t('access.enrollSuccess', 'Membre enrôlé avec succès !'));
       setTimeout(() => setEnrollMode(false), 2000);
     } catch (err) {
       const msg = err.response?.data?.detail || err.message;
-      setEnrollMsg('Erreur: ' + msg);
+      setEnrollStatus('error');
+      setEnrollMsg(t('access.errorPrefix', 'Erreur: ') + msg);
     } finally {
       setIsProcessing(false);
     }
@@ -88,15 +95,15 @@ const GestionAcces = () => {
     <div className="access-container">
       <div className="access-header">
         <div>
-          <h1 className="access-title">Gestion d'Accès</h1>
-          <p className="access-subtitle">Contrôle par reconnaissance faciale</p>
+          <h1 className="access-title">{t('access.title', "Gestion d'Accès")}</h1>
+          <p className="access-subtitle">{t('access.subtitle', 'Contrôle par reconnaissance faciale')}</p>
         </div>
         <button
-          onClick={() => { setEnrollMode(!enrollMode); setAccessResult(null); setEnrollMsg(''); }}
+          onClick={() => { setEnrollMode(!enrollMode); setAccessResult(null); setEnrollMsg(''); setEnrollStatus(''); }}
           className="access-btn"
         >
           <UserPlus size={18} />
-          {enrollMode ? "Mode Vérification" : "Mode Enrôlement"}
+          {enrollMode ? t('access.modeVerification', "Mode Vérification") : t('access.modeEnrollment', "Mode Enrôlement")}
         </button>
       </div>
 
@@ -127,7 +134,7 @@ const GestionAcces = () => {
                     onChange={(e) => setSelectedMembre(e.target.value)}
                     className="access-select"
                   >
-                    <option value="">Sélectionner un membre à enrôler...</option>
+                    <option value="">{t('access.selectMember', 'Sélectionner un membre à enrôler...')}</option>
                     {membres.map(m => (
                       <option key={m.id} value={m.id}>{m.prenom} {m.nom} - {m.email}</option>
                     ))}
@@ -138,10 +145,10 @@ const GestionAcces = () => {
                     className="access-btn-primary"
                   >
                     <Camera size={22} />
-                    Capturer & Enrôler
+                    {t('access.captureAndEnroll', 'Capturer & Enrôler')}
                   </button>
                   {enrollMsg && (
-                    <div className={`access-msg ${enrollMsg.includes('Erreur') ? 'error' : 'success'}`}>
+                    <div className={`access-msg ${enrollStatus === 'error' ? 'error' : 'success'}`}>
                       {enrollMsg}
                     </div>
                   )}
@@ -167,10 +174,10 @@ const GestionAcces = () => {
               </div>
               <div className="access-result-text">
                 <h3>
-                  {accessResult.status === 'authorized' ? 'Accès Autorisé' : 'Accès Refusé'}
+                  {accessResult.status === 'authorized' ? t('access.accessAuthorized', 'Accès Autorisé') : t('access.accessDenied', 'Accès Refusé')}
                 </h3>
                 <p>
-                  {accessResult.reason}
+                  {t(`access.reasons.${accessResult.reason}`, accessResult.reason)}
                 </p>
                 {accessResult.membre && (
                   <div className="membre-info">
@@ -186,13 +193,13 @@ const GestionAcces = () => {
         <div className="access-history-card">
           <div className="access-history-header">
             <History size={22} />
-            <h2>Historique Récent</h2>
+            <h2>{t('access.recentHistory', 'Historique Récent')}</h2>
           </div>
           <div className="access-history-list">
             {history.length === 0 ? (
               <div className="access-history-empty">
                 <AlertCircle size={40} />
-                <p>Aucun passage enregistré</p>
+                <p>{t('access.noPassage', 'Aucun passage enregistré')}</p>
               </div>
             ) : (
               history.map(item => (
@@ -200,9 +207,9 @@ const GestionAcces = () => {
                   <div className="access-history-info">
                     <div className="access-history-name">
                       <span className={`access-status-dot ${item.status === 'authorized' ? 'authorized' : 'denied'}`}></span>
-                      {item.membre ? `${item.membre.prenom} ${item.membre.nom}` : 'Inconnu'}
+                      {item.membre ? `${item.membre.prenom} ${item.membre.nom}` : t('access.unknown', 'Inconnu')}
                     </div>
-                    <p className="access-history-reason">{item.reason}</p>
+                    <p className="access-history-reason">{t(`access.reasons.${item.reason}`, item.reason)}</p>
                   </div>
                   <span className="access-history-time">
                     {new Date(item.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}

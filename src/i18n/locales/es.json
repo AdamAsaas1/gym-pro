@@ -9,10 +9,22 @@
     "notifications": "Notificaciones",
     "markAllRead": "Marcar todo como leído",
     "emptyNotifications": "No hay alertas en esta categoría",
-    "manageSubscriptions": "Gestionar todas las suscripciones"
+    "manageSubscriptions": "Gestionar todas las suscripciones",
+    "filters": {
+      "all": "Todos",
+      "danger": "Urgentes",
+      "warning": "Próximos",
+      "info": "Inactivos"
+    },
+    "sections": {
+      "danger": "Expiraciones urgentes",
+      "warning": "Expiraciones próximas",
+      "info": "Miembros inactivos"
+    }
   },
   "titles": {
     "dashboard": "Panel de Control",
+    "access": "Control de Acceso",
     "members": "Gestión de Miembros",
     "planning": "Planificación de Horarios",
     "activities": "Actividades y Disciplinas",
@@ -190,7 +202,20 @@
     "subtitle": "Acceso rápido, limpio y seguro.",
     "secureConnection": "Conexión segura",
     "welcome": "Bienvenido",
-    "instruction": "Inicia sesión para acceder al panel."
+    "instruction": "Inicia sesión para acceder al panel.",
+    "error": {
+      "failed": "Error de inicio de sesión. Verifique sus credenciales."
+    },
+    "username": "Nombre de usuario",
+    "placeholder": {
+      "username": "Ej: admin",
+      "password": "Ingrese su contraseña"
+    },
+    "password": "Contraseña",
+    "testAccounts": "Cuentas de prueba: superadmin / superadmin123 o admin / admin123",
+    "submitting": "Conectando...",
+    "submit": "Iniciar sesión",
+    "restrictedAccess": "Acceso restringido a personal autorizado."
   },
   "members": {
     "form": {
@@ -361,6 +386,36 @@
         "receipt": "Recibo",
         "downloadPdfTitle": "Descargar el recibo en PDF"
       }
+    },
+    "searchPlaceholder": "Buscar un miembro...",
+    "unknownMember": "Desconocido"
+  },
+  "access": {
+    "title": "Control de Acceso",
+    "subtitle": "Control por Reconocimiento Facial",
+    "modeVerification": "Modo de Verificación",
+    "modeEnrollment": "Modo de Inscripción",
+    "selectMember": "Seleccionar un miembro para inscribir...",
+    "captureAndEnroll": "Capturar e Inscribir",
+    "verifyAccess": "Verificar Acceso",
+    "accessAuthorized": "Acceso Autorizado",
+    "accessDenied": "Acceso Denegado",
+    "recentHistory": "Historial Reciente",
+    "noPassage": "Ningún paso registrado",
+    "unknown": "Desconocido",
+    "errSelectMember": "Por favor seleccione un miembro",
+    "enrollSuccess": "¡Miembro inscrito con éxito!",
+    "errorPrefix": "Error: ",
+    "reasons": {
+      "No face detected in the frame": "No se detectó ningún rostro en el marco",
+      "Multiple faces detected": "Se detectaron múltiples rostros",
+      "Could not analyze face": "No se pudo analizar el rostro",
+      "No enrolled members found in database": "No se encontraron miembros inscritos en la base de datos",
+      "No valid encodings found in database": "No se encontraron codificaciones válidas en la base de datos",
+      "Member status is inactive": "El estado del miembro está inactivo",
+      "Subscription has expired": "La suscripción ha expirado",
+      "Access Granted": "Acceso concedido",
+      "Face not recognized": "Rostro no reconocido"
     }
   },
   "permissions": {

@@ -356,10 +356,10 @@ export default function Paiements() {
 
       <div className="pay-tabs">
         <button className={`pay-tab${tab === 'membres' ? ' pay-tab--active' : ''}`} onClick={() => setTab('membres')}>
-          <Users size={15} /> Membres & acces
+          <Users size={15} /> {t('payments.tabMembers', 'Membres & acces')}
         </button>
         <button className={`pay-tab${tab === 'historique' ? ' pay-tab--active' : ''}`} onClick={() => setTab('historique')}>
-          <ReceiptText size={15} /> Historique des paiements
+          <ReceiptText size={15} /> {t('payments.tabHistory', 'Historique paiements')}
           {paiements.length > 0 && <span className="pay-tab__cnt">{paiements.length}</span>}
         </button>
       </div>
@@ -375,7 +375,7 @@ export default function Paiements() {
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Rechercher un membre..."
+                  placeholder={t('payments.searchPlaceholder', 'Rechercher un membre...')}
                 />
                 {search && <button onClick={() => setSearch('')}><X size={14} /></button>}
               </div>
@@ -585,7 +585,7 @@ export default function Paiements() {
                                 <div className="pay-member__tel">{m.telephone}</div>
                               </div>
                             </div>
-                          ) : <span style={{ color: 'var(--clr-muted)' }}>Inconnu</span>}
+                          ) : <span style={{ color: 'var(--clr-muted)' }}>{t('payments.unknownMember', 'Inconnu')}</span>}
                         </td>
                         <td>
                           {m && <span className="pay-act">{ACT_ICONS[m.activite]} {m.activite}</span>}

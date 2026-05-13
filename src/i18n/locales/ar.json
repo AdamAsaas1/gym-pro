@@ -9,10 +9,22 @@
     "notifications": "الإشعارات",
     "markAllRead": "تحديد الكل كمقروء",
     "emptyNotifications": "لا توجد تنبيهات في هذه الفئة",
-    "manageSubscriptions": "إدارة جميع الاشتراكات"
+    "manageSubscriptions": "إدارة جميع الاشتراكات",
+    "filters": {
+      "all": "الكل",
+      "danger": "عاجل",
+      "warning": "قريب",
+      "info": "غير نشط"
+    },
+    "sections": {
+      "danger": "انتهاء الصلاحية العاجل",
+      "warning": "انتهاء الصلاحية القريب",
+      "info": "الأعضاء غير النشطين"
+    }
   },
   "titles": {
     "dashboard": "لوحة القيادة",
+    "access": "إدارة الوصول",
     "members": "إدارة الأعضاء",
     "planning": "تخطيط الجلسات",
     "activities": "الأنشطة والتخصصات",
@@ -190,7 +202,20 @@
     "subtitle": "وصول سريع، نظيف وآمن.",
     "secureConnection": "اتصال آمن",
     "welcome": "مرحباً",
-    "instruction": "قم بتسجيل الدخول للوصول إلى لوحة القيادة."
+    "instruction": "قم بتسجيل الدخول للوصول إلى لوحة القيادة.",
+    "error": {
+      "failed": "فشل تسجيل الدخول. تحقق من بيانات الاعتماد الخاصة بك."
+    },
+    "username": "اسم المستخدم",
+    "placeholder": {
+      "username": "مثال: admin",
+      "password": "أدخل كلمة المرور"
+    },
+    "password": "كلمة المرور",
+    "testAccounts": "حسابات الاختبار: superadmin / superadmin123 أو admin / admin123",
+    "submitting": "جاري الاتصال...",
+    "submit": "تسجيل الدخول",
+    "restrictedAccess": "الوصول مقتصر على الموظفين المصرح لهم."
   },
   "members": {
     "form": {
@@ -361,6 +386,36 @@
         "receipt": "الإيصال",
         "downloadPdfTitle": "تنزيل الإيصال بصيغة PDF"
       }
+    },
+    "searchPlaceholder": "البحث عن عضو...",
+    "unknownMember": "غير معروف"
+  },
+  "access": {
+    "title": "إدارة الوصول",
+    "subtitle": "التحكم عن طريق التعرف على الوجه",
+    "modeVerification": "وضع التحقق",
+    "modeEnrollment": "وضع التسجيل",
+    "selectMember": "اختر عضواً لتسجيله...",
+    "captureAndEnroll": "التقاط وتسجيل",
+    "verifyAccess": "التحقق من الوصول",
+    "accessAuthorized": "تم السماح بالوصول",
+    "accessDenied": "تم رفض الوصول",
+    "recentHistory": "السجل الحديث",
+    "noPassage": "لم يتم تسجيل أي مرور",
+    "unknown": "غير معروف",
+    "errSelectMember": "يرجى اختيار عضو",
+    "enrollSuccess": "تم تسجيل العضو بنجاح!",
+    "errorPrefix": "خطأ: ",
+    "reasons": {
+      "No face detected in the frame": "لم يتم اكتشاف أي وجه في الإطار",
+      "Multiple faces detected": "تم اكتشاف وجوه متعددة",
+      "Could not analyze face": "تعذر تحليل الوجه",
+      "No enrolled members found in database": "لم يتم العثور على أعضاء مسجلين في قاعدة البيانات",
+      "No valid encodings found in database": "لم يتم العثور على ترميزات صالحة في قاعدة البيانات",
+      "Member status is inactive": "حالة العضو غير نشطة",
+      "Subscription has expired": "انتهت صلاحية الاشتراك",
+      "Access Granted": "تم منح الوصول",
+      "Face not recognized": "لم يتم التعرف على الوجه"
     }
   },
   "permissions": {

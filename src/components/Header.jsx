@@ -185,21 +185,21 @@ export default function Header() {
           </button>
 
           {open && (
-            <div className="notif-panel">
+            <div className={`notif-panel ${i18n.language === 'ar' ? 'notif-panel--rtl' : ''}`}>
 
               {/* Header */}
               <div className="notif-panel__head">
                 <div className="notif-panel__head-left">
                   <Bell size={15} />
-                  <span>Notifications</span>
+                  <span>{t('header.notifications', 'Notifications')}</span>
                   {notifications.length > 0 && (
                     <span className="notif-panel__total">{notifications.length}</span>
                   )}
                 </div>
                 <div className="notif-panel__head-right">
                   {unreadCount > 0 && (
-                    <button className="notif-markall" onClick={clearAll} title="Tout marquer comme lu">
-                      <CheckCheck size={14} /> Tout lire
+                    <button className="notif-markall" onClick={clearAll} title={t('header.markAllRead', 'Tout lire')}>
+                      <CheckCheck size={14} /> {t('header.markAllRead', 'Tout lire')}
                     </button>
                   )}
                   <button className="notif-panel__close" onClick={() => setOpen(false)}>
@@ -220,7 +220,7 @@ export default function Header() {
                       className={`notif-filter${filter === f.key ? ' notif-filter--active' : ''}`}
                       onClick={() => setFilter(f.key)}
                     >
-                      {f.label}
+                      {t(`header.filters.${f.key}`, f.label)}
                       {cnt > 0 && <span className="notif-filter__cnt">{cnt}</span>}
                     </button>
                   );
@@ -231,13 +231,13 @@ export default function Header() {
               {filtered.length === 0 ? (
                 <div className="notif-empty">
                   <Bell size={32} style={{ opacity: 0.2 }} />
-                  <span>Aucune alerte dans cette catégorie</span>
+                  <span>{t('header.emptyNotifications', 'Aucune alerte dans cette catégorie')}</span>
                 </div>
               ) : (
                 <div className="notif-list">
                   {grouped.map(({ type, items }) => (
                     <div key={type} className="notif-group">
-                      <div className="notif-group__label">{SECTION_LABELS[type]}</div>
+                      <div className="notif-group__label">{t(`header.sections.${type}`, SECTION_LABELS[type])}</div>
                       {items.map((n) => {
                         const cfg  = TYPE_CFG[n.type];
                         const Icon = cfg.Icon;
@@ -276,7 +276,7 @@ export default function Header() {
               {/* Footer */}
               <PermissionRender page="/abonnements">
                 <Link to="/abonnements" className="notif-footer" onClick={() => setOpen(false)}>
-                  <span>Gérer tous les abonnements</span>
+                  <span>{t('header.manageSubscriptions', 'Gérer tous les abonnements')}</span>
                   <ChevronRight size={14} />
                 </Link>
               </PermissionRender>

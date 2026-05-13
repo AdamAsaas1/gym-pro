@@ -28,6 +28,27 @@
   -webkit-font-smoothing: antialiased;
 }
 
+/* Global Scrollbar Styles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(57, 255, 20, 0.2) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(57, 255, 20, 0.2);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(57, 255, 20, 0.4);
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
 /* â”€â”€ Reset â”€â”€ */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
@@ -474,6 +495,10 @@ input, select, button, textarea { font-family: inherit; }
   z-index: 200;
   overflow: hidden;
   animation: notif-drop 0.2s cubic-bezier(0.16,1,0.3,1);
+}
+.notif-panel--rtl {
+  right: auto;
+  left: 0;
 }
 @keyframes notif-drop {
   from { opacity: 0; transform: translateY(-12px) scale(0.97); }
