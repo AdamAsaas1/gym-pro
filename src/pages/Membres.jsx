@@ -680,23 +680,14 @@ export default function Membres() {
                     <div className="td-member">
                       <button
                         type="button"
-<<<<<<< HEAD
                         className={`td-avatar${m.photoBase64 ? ' td-avatar--clickable' : ''}`}
-=======
-                        className={`td-avatar${m.photoBase64 && m.photoBase64.startsWith('data:image') ? ' td-avatar--clickable' : ''}`}
->>>>>>> 6f1292589edbeb8b77fbaf7e4467b9a1c89fb61c
                         style={{ background: act?.couleur ? `${act.couleur}22` : 'rgba(255, 255, 255, 0.1)', color: act?.couleur || 'var(--clr-muted)' }}
                         onClick={() => openPhoto(m)}
                         aria-label={t('members.list.viewPhotoAria', 'Voir la photo de {{prenom}} {{nom}}', { prenom: m.prenom, nom: m.nom })}
-                        disabled={!m.photoBase64 || !m.photoBase64.startsWith('data:image')}
+                        disabled={!m.photoBase64}
                       >
-<<<<<<< HEAD
                         {m.photoBase64 ? (
                           <img src={getPhotoSrc(m.photoBase64)} alt="Photo membre" />
-=======
-                        {m.photoBase64 && m.photoBase64.startsWith('data:image') ? (
-                          <img src={m.photoBase64} alt="Photo membre" />
->>>>>>> 6f1292589edbeb8b77fbaf7e4467b9a1c89fb61c
                         ) : (
                           <User size={20} />
                         )}
