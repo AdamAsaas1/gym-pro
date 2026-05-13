@@ -9,6 +9,7 @@
     "notifications": "Notificaciones",
     "markAllRead": "Marcar todo como leído",
     "emptyNotifications": "No hay alertas en esta categoría",
+<<<<<<< HEAD
     "manageSubscriptions": "Gestionar todas las suscripciones",
     "filters": {
       "all": "Todos",
@@ -25,6 +26,12 @@
   "titles": {
     "dashboard": "Panel de Control",
     "access": "Control de Acceso",
+=======
+    "manageSubscriptions": "Gestionar todas las suscripciones"
+  },
+  "titles": {
+    "dashboard": "Panel de Control",
+>>>>>>> 6f1292589edbeb8b77fbaf7e4467b9a1c89fb61c
     "members": "Gestión de Miembros",
     "planning": "Planificación de Horarios",
     "activities": "Actividades y Disciplinas",
@@ -202,6 +209,7 @@
     "subtitle": "Acceso rápido, limpio y seguro.",
     "secureConnection": "Conexión segura",
     "welcome": "Bienvenido",
+<<<<<<< HEAD
     "instruction": "Inicia sesión para acceder al panel.",
     "error": {
       "failed": "Error de inicio de sesión. Verifique sus credenciales."
@@ -216,6 +224,9 @@
     "submitting": "Conectando...",
     "submit": "Iniciar sesión",
     "restrictedAccess": "Acceso restringido a personal autorizado."
+=======
+    "instruction": "Inicia sesión para acceder al panel."
+>>>>>>> 6f1292589edbeb8b77fbaf7e4467b9a1c89fb61c
   },
   "members": {
     "form": {

@@ -9,6 +9,7 @@
     "notifications": "Notifications",
     "markAllRead": "Mark all as read",
     "emptyNotifications": "No alerts in this category",
+<<<<<<< HEAD
     "manageSubscriptions": "Manage all subscriptions",
     "filters": {
       "all": "All",
@@ -25,6 +26,12 @@
   "titles": {
     "dashboard": "Dashboard",
     "access": "Access Control",
+=======
+    "manageSubscriptions": "Manage all subscriptions"
+  },
+  "titles": {
+    "dashboard": "Dashboard",
+>>>>>>> 6f1292589edbeb8b77fbaf7e4467b9a1c89fb61c
     "members": "Members Management",
     "planning": "Schedule Planning",
     "activities": "Activities & Disciplines",
@@ -202,6 +209,7 @@
     "subtitle": "Fast, clean, and secure access.",
     "secureConnection": "Secure connection",
     "welcome": "Welcome",
+<<<<<<< HEAD
     "instruction": "Log in to access the dashboard.",
     "error": {
       "failed": "Login failed. Check your credentials."
@@ -216,6 +224,9 @@
     "submitting": "Connecting...",
     "submit": "Log In",
     "restrictedAccess": "Access restricted to authorized personnel."
+=======
+    "instruction": "Log in to access the dashboard."
+>>>>>>> 6f1292589edbeb8b77fbaf7e4467b9a1c89fb61c
   },
   "members": {
     "form": {

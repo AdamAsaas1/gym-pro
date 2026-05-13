@@ -9,6 +9,7 @@
     "notifications": "الإشعارات",
     "markAllRead": "تحديد الكل كمقروء",
     "emptyNotifications": "لا توجد تنبيهات في هذه الفئة",
+<<<<<<< HEAD
     "manageSubscriptions": "إدارة جميع الاشتراكات",
     "filters": {
       "all": "الكل",
@@ -25,6 +26,12 @@
   "titles": {
     "dashboard": "لوحة القيادة",
     "access": "إدارة الوصول",
+=======
+    "manageSubscriptions": "إدارة جميع الاشتراكات"
+  },
+  "titles": {
+    "dashboard": "لوحة القيادة",
+>>>>>>> 6f1292589edbeb8b77fbaf7e4467b9a1c89fb61c
     "members": "إدارة الأعضاء",
     "planning": "تخطيط الجلسات",
     "activities": "الأنشطة والتخصصات",
@@ -202,6 +209,7 @@
     "subtitle": "وصول سريع، نظيف وآمن.",
     "secureConnection": "اتصال آمن",
     "welcome": "مرحباً",
+<<<<<<< HEAD
     "instruction": "قم بتسجيل الدخول للوصول إلى لوحة القيادة.",
     "error": {
       "failed": "فشل تسجيل الدخول. تحقق من بيانات الاعتماد الخاصة بك."
@@ -216,6 +224,9 @@
     "submitting": "جاري الاتصال...",
     "submit": "تسجيل الدخول",
     "restrictedAccess": "الوصول مقتصر على الموظفين المصرح لهم."
+=======
+    "instruction": "قم بتسجيل الدخول للوصول إلى لوحة القيادة."
+>>>>>>> 6f1292589edbeb8b77fbaf7e4467b9a1c89fb61c
   },
   "members": {
     "form": {

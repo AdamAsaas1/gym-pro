@@ -9,6 +9,7 @@
     "notifications": "Notifications",
     "markAllRead": "Tout lire",
     "emptyNotifications": "Aucune alerte dans cette catégorie",
+<<<<<<< HEAD
     "manageSubscriptions": "Gérer tous les abonnements",
     "filters": {
       "all": "Tous",
@@ -25,6 +26,12 @@
   "titles": {
     "dashboard": "Tableau de Bord",
     "access": "Gestion d'Accès",
+=======
+    "manageSubscriptions": "Gérer tous les abonnements"
+  },
+  "titles": {
+    "dashboard": "Tableau de Bord",
+>>>>>>> 6f1292589edbeb8b77fbaf7e4467b9a1c89fb61c
     "members": "Gestion des Membres",
     "planning": "Planning des Séances",
     "activities": "Activités & Disciplines",
@@ -202,6 +209,7 @@
     "subtitle": "Acces rapide, propre et securise.",
     "secureConnection": "Connexion securisee",
     "welcome": "Bienvenue",
+<<<<<<< HEAD
     "instruction": "Connecte-toi pour acceder au tableau de bord.",
     "error": {
       "failed": "Connexion impossible. Verifiez vos identifiants."
@@ -216,6 +224,9 @@
     "submitting": "Connexion...",
     "submit": "Se connecter",
     "restrictedAccess": "Acces reserve au personnel autorise."
+=======
+    "instruction": "Connecte-toi pour acceder au tableau de bord."
+>>>>>>> 6f1292589edbeb8b77fbaf7e4467b9a1c89fb61c
   },
   "members": {
     "form": {

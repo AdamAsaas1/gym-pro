@@ -382,8 +382,13 @@ function MemberDetails({ membre, activites, paiements, onClose, onSetEcheanceDay
       <div className="member-details__info">
         <div className="member-profile">
           <div className="member-profile__avatar" style={{ background: act?.couleur ? `${act.couleur}22` : 'rgba(255, 255, 255, 0.1)', color: act?.couleur || 'var(--clr-muted)' }}>
+<<<<<<< HEAD
             {membre.photoBase64 ? (
               <img src={getPhotoSrc(membre.photoBase64)} alt="Photo membre" />
+=======
+            {membre.photoBase64 && membre.photoBase64.startsWith('data:image') ? (
+              <img src={membre.photoBase64} alt="Photo membre" />
+>>>>>>> 6f1292589edbeb8b77fbaf7e4467b9a1c89fb61c
             ) : (
               <User size={32} />
             )}
@@ -529,7 +534,7 @@ export default function Membres() {
   const openDelete = (m) => { setSelected(m); setModal('delete'); };
   const openView   = (m) => { setSelected(m); setModal('view');   };
   const openPhoto  = (m) => {
-    if (!m?.photoBase64) return;
+    if (!m?.photoBase64 || !m.photoBase64.startsWith('data:image')) return;
     setSelected(m);
     setModal('photo');
   };
@@ -675,14 +680,23 @@ export default function Membres() {
                     <div className="td-member">
                       <button
                         type="button"
+<<<<<<< HEAD
                         className={`td-avatar${m.photoBase64 ? ' td-avatar--clickable' : ''}`}
+=======
+                        className={`td-avatar${m.photoBase64 && m.photoBase64.startsWith('data:image') ? ' td-avatar--clickable' : ''}`}
+>>>>>>> 6f1292589edbeb8b77fbaf7e4467b9a1c89fb61c
                         style={{ background: act?.couleur ? `${act.couleur}22` : 'rgba(255, 255, 255, 0.1)', color: act?.couleur || 'var(--clr-muted)' }}
                         onClick={() => openPhoto(m)}
                         aria-label={t('members.list.viewPhotoAria', 'Voir la photo de {{prenom}} {{nom}}', { prenom: m.prenom, nom: m.nom })}
                         disabled={!m.photoBase64 || !m.photoBase64.startsWith('data:image')}
                       >
+<<<<<<< HEAD
                         {m.photoBase64 ? (
                           <img src={getPhotoSrc(m.photoBase64)} alt="Photo membre" />
+=======
+                        {m.photoBase64 && m.photoBase64.startsWith('data:image') ? (
+                          <img src={m.photoBase64} alt="Photo membre" />
+>>>>>>> 6f1292589edbeb8b77fbaf7e4467b9a1c89fb61c
                         ) : (
                           <User size={20} />
                         )}
