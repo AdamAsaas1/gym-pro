@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { UserPlus, Search, Pencil, Trash2, ToggleLeft, ToggleRight, Filter, Eye, Download } from 'lucide-react';
+import { UserPlus, Search, Pencil, Trash2, ToggleLeft, ToggleRight, Filter, Eye, Download, User } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { useGym } from '../context/GymContext';
@@ -376,11 +376,11 @@ function MemberDetails({ membre, activites, paiements, onClose, onSetEcheanceDay
     <div className="member-details">
       <div className="member-details__info">
         <div className="member-profile">
-          <div className="member-profile__avatar" style={{ background: act?.couleur + '22', color: act?.couleur }}>
-            {membre.photoBase64 ? (
+          <div className="member-profile__avatar" style={{ background: act?.couleur ? `${act.couleur}22` : 'rgba(255, 255, 255, 0.1)', color: act?.couleur || 'var(--clr-muted)' }}>
+            {membre.photoBase64 && membre.photoBase64.startsWith('data:image') ? (
               <img src={membre.photoBase64} alt="Photo membre" />
             ) : (
-              <span>{membre.prenom[0]}{membre.nom[0]}</span>
+              <User size={32} />
             )}
           </div>
           <div>
@@ -524,7 +524,7 @@ export default function Membres() {
   const openDelete = (m) => { setSelected(m); setModal('delete'); };
   const openView   = (m) => { setSelected(m); setModal('view');   };
   const openPhoto  = (m) => {
-    if (!m?.photoBase64) return;
+    if (!m?.photoBase64 || !m.photoBase64.startsWith('data:image')) return;
     setSelected(m);
     setModal('photo');
   };
@@ -670,16 +670,16 @@ export default function Membres() {
                     <div className="td-member">
                       <button
                         type="button"
-                        className={`td-avatar${m.photoBase64 ? ' td-avatar--clickable' : ''}`}
-                        style={{ background: act?.couleur + '22', color: act?.couleur }}
+                        className={`td-avatar${m.photoBase64 && m.photoBase64.startsWith('data:image') ? ' td-avatar--clickable' : ''}`}
+                        style={{ background: act?.couleur ? `${act.couleur}22` : 'rgba(255, 255, 255, 0.1)', color: act?.couleur || 'var(--clr-muted)' }}
                         onClick={() => openPhoto(m)}
                         aria-label={t('members.list.viewPhotoAria', 'Voir la photo de {{prenom}} {{nom}}', { prenom: m.prenom, nom: m.nom })}
-                        disabled={!m.photoBase64}
+                        disabled={!m.photoBase64 || !m.photoBase64.startsWith('data:image')}
                       >
-                        {m.photoBase64 ? (
+                        {m.photoBase64 && m.photoBase64.startsWith('data:image') ? (
                           <img src={m.photoBase64} alt="Photo membre" />
                         ) : (
-                          <span>{m.prenom[0]}{m.nom[0]}</span>
+                          <User size={20} />
                         )}
                       </button>
                       <div>
@@ -773,7 +773,7 @@ export default function Membres() {
       {modal === 'photo' && selected && (
         <Modal title={t('members.modals.photoTitle', 'Photo du membre')} onClose={() => setModal(null)} size="lg">
           <div className="photo-viewer">
-            {selected.photoBase64 ? (
+            {selected.photoBase64 && selected.photoBase64.startsWith('data:image') ? (
               <img src={selected.photoBase64} alt={t('members.list.viewPhotoAria', 'Photo de {{prenom}} {{nom}}', { prenom: selected.prenom, nom: selected.nom })} />
             ) : (
               <div className="photo-placeholder">{t('members.form.noPhoto', 'Aucune photo')}</div>

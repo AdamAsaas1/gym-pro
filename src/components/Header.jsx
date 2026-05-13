@@ -139,9 +139,9 @@ export default function Header() {
         <button className="header-action header-action--ghost" onClick={logout}>{t('header.logout', 'Deconnexion')}</button>
 
         {/* ── Language Switcher ── */}
-        <div className="notif-wrap" ref={langWrapRef}>
+        <div className="lang-switcher" ref={langWrapRef}>
           <button
-            className="notif-btn"
+            className="lang-switcher__btn"
             onClick={() => setLangOpen((o) => !o)}
             title="Language"
           >
@@ -153,19 +153,19 @@ export default function Header() {
           </button>
           
           {langOpen && (
-            <div className="notif-panel lang-panel" style={{ width: '150px' }}>
-              <div className="notif-list">
-                <button className="notif-item" onClick={() => { i18n.changeLanguage('en'); setLangOpen(false); }}>
-                  <span className="fi fi-gb" style={{ marginRight: '10px' }}></span> English
+            <div className="lang-switcher__panel">
+              <div className="lang-switcher__list">
+                <button className={`lang-switcher__item ${i18n.language === 'en' ? 'lang-switcher__item--active' : ''}`} onClick={() => { i18n.changeLanguage('en'); setLangOpen(false); }}>
+                  <span className="fi fi-gb"></span> English
                 </button>
-                <button className="notif-item" onClick={() => { i18n.changeLanguage('fr'); setLangOpen(false); }}>
-                  <span className="fi fi-fr" style={{ marginRight: '10px' }}></span> Français
+                <button className={`lang-switcher__item ${i18n.language === 'fr' ? 'lang-switcher__item--active' : ''}`} onClick={() => { i18n.changeLanguage('fr'); setLangOpen(false); }}>
+                  <span className="fi fi-fr"></span> Français
                 </button>
-                <button className="notif-item" onClick={() => { i18n.changeLanguage('es'); setLangOpen(false); }}>
-                  <span className="fi fi-es" style={{ marginRight: '10px' }}></span> Español
+                <button className={`lang-switcher__item ${i18n.language === 'es' ? 'lang-switcher__item--active' : ''}`} onClick={() => { i18n.changeLanguage('es'); setLangOpen(false); }}>
+                  <span className="fi fi-es"></span> Español
                 </button>
-                <button className="notif-item" onClick={() => { i18n.changeLanguage('ar'); setLangOpen(false); }}>
-                  <span className="fi fi-ma" style={{ marginRight: '10px' }}></span> العربية
+                <button className={`lang-switcher__item ${i18n.language === 'ar' ? 'lang-switcher__item--active' : ''}`} onClick={() => { i18n.changeLanguage('ar'); setLangOpen(false); }}>
+                  <span className="fi fi-ma"></span> العربية
                 </button>
               </div>
             </div>
