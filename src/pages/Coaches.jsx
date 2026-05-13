@@ -1,5 +1,6 @@
 import { Phone, Mail, Award, Calendar } from 'lucide-react';
 import { useGym } from '../context/GymContext';
+import { useTranslation } from 'react-i18next';
 
 const SCHEDULE = {
   musculation: 'Lundi au Samedi (matin & soir)',
@@ -10,12 +11,12 @@ const SCHEDULE = {
 
 export default function Coaches() {
   const { coaches, membres, activites } = useGym();
+  const { t } = useTranslation();
 
   return (
     <div className="page fade-in">
       <p className="page-desc">
-        Notre équipe de coachs qualifiés assure un encadrement professionnel et personnalisé
-        pour chaque section de la salle.
+        {t('coaches.description', 'Notre équipe de coachs qualifiés assure un encadrement professionnel et personnalisé pour chaque section de la salle.')}
       </p>
 
       <div className="coaches-grid">

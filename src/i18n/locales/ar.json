@@ -1,0 +1,494 @@
+{
+  "header": {
+    "role": "الدور",
+    "logout": "تسجيل الخروج",
+    "searchPlaceholder": "البحث عن عضو، دفعة...",
+    "newMember": "عضو جديد",
+    "cashIn": "تحصيل",
+    "defaultConfig": "تم استخدام الإعدادات الافتراضية",
+    "notifications": "الإشعارات",
+    "markAllRead": "تحديد الكل كمقروء",
+    "emptyNotifications": "لا توجد تنبيهات في هذه الفئة",
+    "manageSubscriptions": "إدارة جميع الاشتراكات",
+    "filters": {
+      "all": "الكل",
+      "danger": "عاجل",
+      "warning": "قريب",
+      "info": "غير نشط"
+    },
+    "sections": {
+      "danger": "انتهاء الصلاحية العاجل",
+      "warning": "انتهاء الصلاحية القريب",
+      "info": "الأعضاء غير النشطين"
+    }
+  },
+  "titles": {
+    "dashboard": "لوحة القيادة",
+    "access": "إدارة الوصول",
+    "members": "إدارة الأعضاء",
+    "planning": "تخطيط الجلسات",
+    "activities": "الأنشطة والتخصصات",
+    "subscriptions": "الاشتراكات",
+    "coaches": "فريق التدريب",
+    "permissions": "إدارة الصلاحيات",
+    "payments": "المدفوعات",
+    "settings": "الإعدادات",
+    "notifications": "الإشعارات"
+  },
+  "sidebar": {
+    "collapse": "طي",
+    "tagline": "صالتك، أداؤك",
+    "section": "الإدارة",
+    "activeMembers": "أعضاء نشطون",
+    "performance": "الأداء",
+    "active": "نشط",
+    "toPay": "للدفع"
+  },
+  "subscriptions": {
+    "monthly": "شهري",
+    "1month": "شهر واحد",
+    "quarterly": "فصلي",
+    "3months": "3 أشهر",
+    "yearly": "سنوي",
+    "12months": "12 شهراً",
+    "estimatedRevenue": "الإيرادات الشهرية المقدرة (الأعضاء النشطون)",
+    "memberCount": "عضو",
+    "revActivations": "إيرادات / تفعيلات",
+    "expiring30Days": "اشتراكات تنتهي في غضون 30 يومًا",
+    "noExpiring": "لا توجد اشتراكات تنتهي في غضون 30 يومًا. ✅",
+    "table": {
+      "member": "العضو",
+      "section": "القسم",
+      "activity": "النشاط",
+      "subscription": "الاشتراك",
+      "expiration": "الانتهاء",
+      "daysLeft": "الأيام المتبقية"
+    },
+    "days": "أيام"
+  },
+  "activities": {
+    "menSection": "قسم الرجال",
+    "womenSection": "قسم النساء",
+    "childrenSection": "قسم الأطفال",
+    "mixedSection": "القسم المختلط (عالمي)",
+    "description": "صالتنا غير مختلطة. كل قسم له مساحته الخاصة، أوقاته ومدرب متخصص.",
+    "registered": "مسجلون",
+    "active": "نشطون",
+    "rates": "الأسعار",
+    "monthly": "شهري",
+    "quarterly": "فصلي",
+    "yearly": "سنوي",
+    "coach": "المدرب"
+  },
+  "notifications": {
+    "title": "إشعارات المسؤول",
+    "createBtn": "إنشاء إشعار",
+    "stats": {
+      "totalSent": "إجمالي المرسلة",
+      "autoReminders": "تذكيرات تلقائية",
+      "complaints": "الشكاوى"
+    },
+    "table": {
+      "type": "النوع",
+      "title": "العنوان",
+      "message": "الرسالة",
+      "target": "الهدف / الجدول",
+      "seen": "تمت المشاهدة",
+      "actions": "الإجراءات",
+      "loading": "جارٍ التحميل...",
+      "noNotifications": "لم يتم العثور على إشعارات",
+      "typeAuto": "تلقائي",
+      "members": "عضو (أعضاء)",
+      "autoDays": "تلقائي (ي-{{days}})",
+      "delete": "حذف"
+    },
+    "modal": {
+      "newNotification": "إشعار جديد",
+      "type": "نوع الإشعار",
+      "typeNormal": "رسالة مباشرة",
+      "typeReminder": "تذكير بالدفع (تلقائي)",
+      "typeReclamation": "شكوى / حالة طارئة",
+      "notifTitle": "العنوان",
+      "placeholderReminder": "مثال: تجديد اشتراكك",
+      "placeholderTitle": "عنوان الرسالة",
+      "scheduleLabel": "البرمجة (إرسال قبل كم يوم؟)",
+      "daysBefore": "أيام قبل",
+      "recipients": "المستلمون",
+      "targetAll": "الجميع",
+      "targetActivity": "النشاط",
+      "targetMember": "عضو",
+      "searchMember": "البحث عن عضو...",
+      "messageBody": "الرسالة",
+      "messagePlaceholder": "محتوى الإشعار...",
+      "cancel": "إلغاء",
+      "saving": "جارٍ الحفظ...",
+      "activateReminder": "تفعيل التذكير",
+      "sendNow": "إرسال الآن"
+    },
+    "recipients": {
+      "title": "تتبع المستلمين",
+      "loading": "جارٍ التحميل...",
+      "member": "العضو",
+      "status": "الحالة",
+      "seenAt": "شوهد في",
+      "seen": "شوهد",
+      "sent": "أُرسل"
+    }
+  },
+  "coaches": {
+    "description": "يضمن فريقنا من المدربين المؤهلين تأطيراً احترافياً ومخصصاً لكل قسم من أقسام الصالة."
+  },
+  "dashboard": {
+    "performance": "الأداء",
+    "title": "إدارة ASAAS GYM",
+    "subtitle": "نظرة عامة على الأعضاء النشطين والإيرادات والتنبيهات لمعالجتها. تحليل سريع وإجراءات فورية.",
+    "activityRate": "معدل النشاط",
+    "healthScore": "مؤشر الصحة",
+    "alerts7Days": "تنبيهات 7 أيام",
+    "viewMembers": "عرض الأعضاء",
+    "cashIn": "تحصيل دفعة",
+    "generating": "جارٍ الإنشاء...",
+    "exportPDF": "تصدير PDF",
+    "cards": {
+      "today": "اليوم",
+      "distribution": {
+        "title": "التوزيع حسب القسم",
+        "subtitle": "توزيع الأعضاء النشطين حسب الفئة."
+      },
+      "detail": "التفاصيل",
+      "activities": {
+        "title": "أهم الأنشطة",
+        "subtitle": "أعلى 4 أنشطة حسب حجم التسجيل."
+      },
+      "risk": {
+        "title": "اشتراكات في خطر",
+        "subtitle": "تنتهي خلال 7 أيام.",
+        "empty": "لا توجد اشتراكات حرجة في الوقت الحالي."
+      },
+      "daysAbbr": "ي",
+      "recent": {
+        "title": "أحدث التسجيلات",
+        "subtitle": "أعضاء جدد مسجلون."
+      }
+    },
+    "status": {
+      "inactive": "غير نشط",
+      "late": "متأخر",
+      "soon": "ينتهي قريباً",
+      "active": "نشط"
+    },
+    "chart": {
+      "men": "رجال",
+      "women": "نساء",
+      "children": "أطفال"
+    },
+    "stats": {
+      "totalMembers": "إجمالي الأعضاء",
+      "activeMembers": "أعضاء نشطون",
+      "inactive": "غير نشطين",
+      "monthlyRevenue": "الإيرادات الشهرية",
+      "alert7Days": "تنبيه 7 أيام"
+    },
+    "panel": {
+      "priorities": "أولويات فورية",
+      "expirations7days": "انتهاء خلال 7 أيام",
+      "inactiveMembers": "أعضاء غير نشطين",
+      "estimatedRevenue": "الإيرادات المقدرة"
+    }
+  },
+  "login": {
+    "system": "نظام ASAAS PRO",
+    "title": "إدارة صالتك بكل سهولة.",
+    "subtitle": "وصول سريع، نظيف وآمن.",
+    "secureConnection": "اتصال آمن",
+    "welcome": "مرحباً",
+    "instruction": "قم بتسجيل الدخول للوصول إلى لوحة القيادة.",
+    "error": {
+      "failed": "فشل تسجيل الدخول. تحقق من بيانات الاعتماد الخاصة بك."
+    },
+    "username": "اسم المستخدم",
+    "placeholder": {
+      "username": "مثال: admin",
+      "password": "أدخل كلمة المرور"
+    },
+    "password": "كلمة المرور",
+    "testAccounts": "حسابات الاختبار: superadmin / superadmin123 أو admin / admin123",
+    "submitting": "جاري الاتصال...",
+    "submit": "تسجيل الدخول",
+    "restrictedAccess": "الوصول مقتصر على الموظفين المصرح لهم."
+  },
+  "members": {
+    "form": {
+      "errNom": "النسب مطلوب",
+      "errPrenom": "الاسم مطلوب",
+      "errTel": "الهاتف مطلوب",
+      "errDateNaissance": "تاريخ الميلاد مطلوب",
+      "errPassword": "كلمة المرور مطلوبة للأعضاء الجدد",
+      "lastName": "النسب",
+      "phLastName": "النسب",
+      "firstName": "الاسم",
+      "phFirstName": "الاسم",
+      "section": "القسم",
+      "secMen": "رجال (بالغون)",
+      "secWomen": "نساء (بالغات)",
+      "secChildren": "أطفال (6–14 سنة)",
+      "activity": "النشاط",
+      "noActivity": "لا يوجد نشاط متاح",
+      "createActivityWarning": "يرجى إنشاء نشاط لهذا القسم في الإعدادات.",
+      "subscription": "الاشتراك",
+      "subMonthly": "شهري (شهر واحد)",
+      "subQuarterly": "فصلي (3 أشهر)",
+      "subYearly": "سنوي (12 شهراً)",
+      "status": "الحالة",
+      "statusActive": "نشط",
+      "statusInactive": "غير نشط",
+      "phone": "الهاتف",
+      "email": "البريد الإلكتروني",
+      "birthDate": "تاريخ الميلاد",
+      "registrationDate": "تاريخ التسجيل",
+      "calculatedExpiration": "تاريخ انتهاء الصلاحية (محسوب)",
+      "newPassword": "كلمة مرور جديدة (اتركه فارغاً لعدم التغيير)",
+      "initialPassword": "كلمة المرور الأولية *",
+      "photo": "صورة العضو",
+      "photoAlt": "صورة العضو",
+      "noPhoto": "لا توجد صورة",
+      "openCamera": "فتح الكاميرا",
+      "takePhoto": "التقاط الصورة",
+      "closeCamera": "إغلاق",
+      "removePhoto": "إزالة الصورة",
+      "amountToCollect": "المبلغ المراد تحصيله :",
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "registerMember": "تسجيل العضو"
+    },
+    "delete": {
+      "confirmMessage": "هل تريد الحذف نهائياً:",
+      "cancel": "إلغاء",
+      "confirm": "حذف"
+    },
+    "details": {
+      "activity": "النشاط",
+      "subscription": "الاشتراك",
+      "registration": "التسجيل",
+      "expiration": "انتهاء الصلاحية",
+      "gender": "الجنس",
+      "birthDate": "تاريخ الميلاد",
+      "manualStatus": "حالة يدوية",
+      "totalPaid": "إجمالي المدفوعات",
+      "paymentDay": "يوم الدفع",
+      "setPaymentDate": "تحديد تاريخ الدفع (لهذا العضو)",
+      "nextPaymentDate": "تاريخ الدفع القادم:",
+      "paymentHistory": "سجل المدفوعات",
+      "paymentItem": "دفعة",
+      "close": "إغلاق",
+      "noPaymentRecorded": "لم يتم تسجيل أي دفعة.",
+      "paymentMode": "الوضع:",
+      "downloadReceipt": "تنزيل الإيصال"
+    },
+    "title": "الأعضاء",
+    "management": "إدارة الأعضاء",
+    "subtitle": "التحكم في التسجيلات، الحالات والأنشطة من لوحة واضحة وسريعة.",
+    "newMember": "عضو جديد",
+    "totalMembers": "إجمالي الأعضاء",
+    "activeMembers": "أعضاء نشطون",
+    "inactiveMembers": "أعضاء غير نشطين",
+    "expirations7Days": "انتهاء صلاحية خلال 7 أيام",
+    "filters": {
+      "searchPlaceholder": "البحث بالاسم، الهاتف، البريد الإلكتروني، النشاط...",
+      "allSections": "جميع الأقسام",
+      "men": "رجال",
+      "women": "نساء",
+      "children": "أطفال",
+      "allActivities": "جميع الأنشطة",
+      "allStatuses": "جميع الحالات",
+      "active": "نشط",
+      "inactive": "غير نشط",
+      "reset": "إعادة ضبط"
+    },
+    "tableMember": "العضو",
+    "tableSection": "القسم",
+    "tableActivity": "النشاط",
+    "tableSubscription": "الاشتراك",
+    "tableExpiration": "انتهاء الصلاحية",
+    "tableStatus": "الحالة",
+    "tableActions": "الإجراءات",
+    "list": {
+      "noMembersFound": "لم يتم العثور على أعضاء.",
+      "viewPhotoAria": "عرض صورة {{prenom}} {{nom}}",
+      "toggleStatus": "تبديل الحالة",
+      "viewProfile": "عرض الملف",
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "pagination": {
+      "prev": "السابق",
+      "next": "التالي"
+    },
+    "modals": {
+      "addMember": "تسجيل عضو جديد",
+      "editMember": "تعديل العضو",
+      "confirmDeleteTitle": "تأكيد الحذف",
+      "viewMemberTitle": "ملف العضو",
+      "photoTitle": "صورة العضو"
+    }
+  },
+  "payments": {
+    "modal": {
+      "subType": "نوع الاشتراك",
+      "amountToCollect": "المبلغ المحصل (درهم)",
+      "paymentMode": "طريقة الدفع",
+      "newExpiration": "تاريخ الانتهاء الجديد",
+      "duration": "المدة",
+      "days": "أيام",
+      "totalToCollect": "الإجمالي المراد تحصيله",
+      "sendReceiptReminders": "إرسال إيصال + تذكيرات",
+      "remindersActive": "التذكيرات نشطة",
+      "daysBeforeExp": "أيام قبل الانتهاء",
+      "cancel": "إلغاء",
+      "fullWorkflow": "سير عمل كامل",
+      "confirmPayment": "تأكيد الدفع"
+    },
+    "title": "المدفوعات",
+    "management": "إدارة التحصيلات",
+    "subtitle": "تتبع المدفوعات، تحقق من الوصول وقم بتشغيل تحصيل في ثوانٍ.",
+    "tabMembers": "الأعضاء والوصول",
+    "tabHistory": "سجل المدفوعات",
+    "collectedThisMonth": "تم تحصيله هذا الشهر",
+    "membersGoodStanding": "أعضاء في وضع سليم",
+    "toRenew": "للتجديد",
+    "paymentsThisMonth": "مدفوعات هذا الشهر",
+    "table": {
+      "noMembers": "لم يتم العثور على أعضاء",
+      "member": "العضو",
+      "activity": "النشاط",
+      "subscription": "الاشتراك",
+      "expiration": "الانتهاء",
+      "access": "وصول الصالة",
+      "amount": "المبلغ",
+      "action": "الإجراء",
+      "btnCollect": "تحصيل",
+      "btnRenew": "تجديد"
+    },
+    "histo": {
+      "showAll": "عرض الكل",
+      "thisMonth": "هذا الشهر",
+      "totalLabel": "الإجمالي :",
+      "paymentItem": "دفعة",
+      "noPaymentFound": "لم يتم تسجيل أي دفعة",
+      "emptyStateHelp": "ستظهر المدفوعات هنا بعد التحصيل",
+      "table": {
+        "member": "العضو",
+        "activity": "النشاط",
+        "subscription": "الاشتراك",
+        "mode": "الطريقة",
+        "date": "التاريخ",
+        "amount": "المبلغ",
+        "receipt": "الإيصال",
+        "downloadPdfTitle": "تنزيل الإيصال بصيغة PDF"
+      }
+    },
+    "searchPlaceholder": "البحث عن عضو...",
+    "unknownMember": "غير معروف"
+  },
+  "access": {
+    "title": "إدارة الوصول",
+    "subtitle": "التحكم عن طريق التعرف على الوجه",
+    "modeVerification": "وضع التحقق",
+    "modeEnrollment": "وضع التسجيل",
+    "selectMember": "اختر عضواً لتسجيله...",
+    "captureAndEnroll": "التقاط وتسجيل",
+    "verifyAccess": "التحقق من الوصول",
+    "accessAuthorized": "تم السماح بالوصول",
+    "accessDenied": "تم رفض الوصول",
+    "recentHistory": "السجل الحديث",
+    "noPassage": "لم يتم تسجيل أي مرور",
+    "unknown": "غير معروف",
+    "errSelectMember": "يرجى اختيار عضو",
+    "enrollSuccess": "تم تسجيل العضو بنجاح!",
+    "errorPrefix": "خطأ: ",
+    "reasons": {
+      "No face detected in the frame": "لم يتم اكتشاف أي وجه في الإطار",
+      "Multiple faces detected": "تم اكتشاف وجوه متعددة",
+      "Could not analyze face": "تعذر تحليل الوجه",
+      "No enrolled members found in database": "لم يتم العثور على أعضاء مسجلين في قاعدة البيانات",
+      "No valid encodings found in database": "لم يتم العثور على ترميزات صالحة في قاعدة البيانات",
+      "Member status is inactive": "حالة العضو غير نشطة",
+      "Subscription has expired": "انتهت صلاحية الاشتراك",
+      "Access Granted": "تم منح الوصول",
+      "Face not recognized": "لم يتم التعرف على الوجه"
+    }
+  },
+  "permissions": {
+    "security": "الأمان",
+    "management": "إدارة الصلاحيات",
+    "subtitle": "المدير العام لديه كل الصلاحيات. قم بإعداد صلاحيات الأدوار الأخرى لصفحات القائمة هنا.",
+    "accessControl": "مراقبة الوصول للصفحات",
+    "roleToConfigure": "الدور المراد إعداده",
+    "resetRole": "إعادة تعيين هذا الدور",
+    "noCustomRoles": "لم يتم العثور على أدوار قابلة للتخصيص لهذا الحساب.",
+    "superadminNote": "المشرف العام مسموح له دائمًا بدخول جميع الصفحات، بما في ذلك صفحة الإدارة هذه."
+  },
+  "planning": {
+    "men": "♂ رجال",
+    "women": "♀ نساء",
+    "children": "👶 أطفال"
+  },
+  "settings": {
+    "success": {
+      "gymSaved": "تم حفظ إعدادات الصالة بنجاح!",
+      "activityUpdated": "تم تحديث النشاط \"{{name}}\".",
+      "activityCreated": "تم إنشاء النشاط \"{{name}}\" بنجاح.",
+      "title": "نجاح!",
+      "continue": "متابعة"
+    },
+    "error": {
+      "gymSave": "حدث خطأ أثناء الحفظ.",
+      "activitySave": "حدث خطأ أثناء حفظ النشاط.",
+      "deleteActivity": "حدث خطأ أثناء الحذف."
+    },
+    "confirm": {
+      "deleteActivity": "هل أنت متأكد أنك تريد حذف هذا النشاط؟"
+    },
+    "title": "إعدادات الصالة",
+    "subtitle": "قم بإعداد الهوية البصرية وجدول التسعير الخاص بصالتك.",
+    "identity": {
+      "title": "هوية الصالة",
+      "logo": "شعار الصالة",
+      "logoPlaceholder": "شعار",
+      "chooseFile": "اختر ملفاً",
+      "gymName": "اسم الصالة",
+      "saving": "جارٍ الحفظ...",
+      "save": "حفظ"
+    },
+    "activities": {
+      "title": "الأنشطة والأسعار",
+      "new": "جديد",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "noActivities": "لم يتم إعداد أي نشاط."
+    },
+    "modal": {
+      "editActivity": "تعديل النشاط",
+      "newActivity": "نشاط جديد",
+      "activityName": "اسم النشاط",
+      "activityNamePlaceholder": "مثال: كمال الأجسام، كاراتيه...",
+      "priceMonth": "السعر الشهري (درهم)",
+      "priceYear": "السعر السنوي (درهم)",
+      "assuranceFirst": "التأمين (السنة الأولى)",
+      "assuranceNext": "التأمين (التجديد)",
+      "inscriptionFees": "رسوم التسجيل (درهم)",
+      "maxCapacity": "السعة القصوى",
+      "description": "الوصف",
+      "descriptionPlaceholder": "وصف موجز للنشاط...",
+      "section": "القسم (الجنس)",
+      "sectionMen": "رجال",
+      "sectionWomen": "نساء",
+      "sectionChildren": "أطفال",
+      "sectionUniversal": "عالمي",
+      "coachName": "اسم المدرب",
+      "iconColor": "أيقونة ولون",
+      "saveBtn": "حفظ",
+      "cancelBtn": "إلغاء"
+    }
+  }
+}

@@ -1,11 +1,17 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
-import { UserPlus, Search, Pencil, Trash2, ToggleLeft, ToggleRight, Filter, Eye, Download } from 'lucide-react';
+import { UserPlus, Search, Pencil, Trash2, ToggleLeft, ToggleRight, Filter, Eye, Download, User } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { useGym } from '../context/GymContext';
 import { telechargerRecu } from '../api/client';
+import { useTranslation } from 'react-i18next';
 
 // Removing hardcoded ACTIVITES_BY_GENRE as we now use the database
+
+const getPhotoSrc = (base64) => {
+  if (!base64) return null;
+  return base64.startsWith('data:image') ? base64 : `data:image/jpeg;base64,${base64}`;
+};
 
 const EMPTY_FORM = {
   nom: '', prenom: '', genre: 'homme', activite: '',
@@ -25,6 +31,7 @@ function computeExpiration(dateInscription, abonnement, durations) {
 }
 
 function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, variant = 'default' }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState(() => ({
     ...EMPTY_FORM,
     ...initial,
@@ -77,11 +84,11 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
 
   const validate = () => {
     const e = {};
-    if (!form.nom.trim())       e.nom = 'Nom obligatoire';
-    if (!form.prenom.trim())    e.prenom = 'Prénom obligatoire';
-    if (!form.telephone.trim()) e.telephone = 'Téléphone obligatoire';
-    if (!form.dateNaissance)    e.dateNaissance = 'Date de naissance obligatoire';
-    if (!initial?.id && !form.password) e.password = 'Mot de passe obligatoire pour les nouveaux membres';
+    if (!form.nom.trim())       e.nom = t('members.form.errNom', 'Nom obligatoire');
+    if (!form.prenom.trim())    e.prenom = t('members.form.errPrenom', 'Prénom obligatoire');
+    if (!form.telephone.trim()) e.telephone = t('members.form.errTel', 'Téléphone obligatoire');
+    if (!form.dateNaissance)    e.dateNaissance = t('members.form.errDateNaissance', 'Date de naissance obligatoire');
+    if (!initial?.id && !form.password) e.password = t('members.form.errPassword', 'Mot de passe obligatoire pour les nouveaux membres');
     return e;
   };
 
@@ -134,40 +141,40 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
     <form onSubmit={submit} className={`member-form${variant === 'wide' ? ' member-form--wide' : ''}`}>
       <div className="form-row">
         <div className="form-group">
-          <label>Nom *</label>
-          <input value={form.nom} onChange={(e) => set('nom', e.target.value.toUpperCase())} placeholder="NOM" />
+          <label>{t('members.form.lastName', 'Nom')} *</label>
+          <input value={form.nom} onChange={(e) => set('nom', e.target.value.toUpperCase())} placeholder={t('members.form.phLastName', 'NOM')} />
           {errors.nom && <span className="form-error">{errors.nom}</span>}
         </div>
         <div className="form-group">
-          <label>Prénom *</label>
-          <input value={form.prenom} onChange={(e) => set('prenom', e.target.value)} placeholder="Prénom" />
+          <label>{t('members.form.firstName', 'Prénom')} *</label>
+          <input value={form.prenom} onChange={(e) => set('prenom', e.target.value)} placeholder={t('members.form.phFirstName', 'Prénom')} />
           {errors.prenom && <span className="form-error">{errors.prenom}</span>}
         </div>
       </div>
 
       <div className="form-row">
         <div className="form-group">
-          <label>Section *</label>
+          <label>{t('members.form.section', 'Section')} *</label>
           <select value={form.genre} onChange={(e) => set('genre', e.target.value)}>
-            <option value="homme">Hommes (Adultes)</option>
-            <option value="femme">Femmes (Adultes)</option>
-            <option value="enfant">Enfants (6–14 ans)</option>
+            <option value="homme">{t('members.form.secMen', 'Hommes (Adultes)')}</option>
+            <option value="femme">{t('members.form.secWomen', 'Femmes (Adultes)')}</option>
+            <option value="enfant">{t('members.form.secChildren', 'Enfants (6–14 ans)')}</option>
           </select>
         </div>
         <div className="form-group">
-          <label>Activité *</label>
+          <label>{t('members.form.activity', 'Activité')} *</label>
           <select value={form.activite} onChange={(e) => set('activite', e.target.value)}>
             {activiteOpts.length > 0 ? (
               activiteOpts.map((a) => (
-                <option key={a.id} value={a.id}>{a.icon} {a.nom}</option>
+                <option key={a.id} value={a.id}>{a.icon} {t(a.nom, a.nom)}</option>
               ))
             ) : (
-              <option value="">Aucune activité disponible</option>
+              <option value="">{t('members.form.noActivity', 'Aucune activité disponible')}</option>
             )}
           </select>
           {activiteOpts.length === 0 && (
             <span className="form-error" style={{ fontSize: '0.7rem' }}>
-              Veuillez créer une activité pour cette section dans les paramètres.
+              {t('members.form.createActivityWarning', 'Veuillez créer une activité pour cette section dans les paramètres.')}
             </span>
           )}
         </div>
@@ -175,53 +182,53 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
 
       <div className="form-row">
         <div className="form-group">
-          <label>Abonnement *</label>
+          <label>{t('members.form.subscription', 'Abonnement')} *</label>
           <select value={form.abonnement} onChange={(e) => set('abonnement', e.target.value)}>
-            <option value="mensuel">Mensuel (1 mois)</option>
-            <option value="trimestriel">Trimestriel (3 mois)</option>
-            <option value="annuel">Annuel (12 mois)</option>
+            <option value="mensuel">{t('members.form.subMonthly', 'Mensuel (1 mois)')}</option>
+            <option value="trimestriel">{t('members.form.subQuarterly', 'Trimestriel (3 mois)')}</option>
+            <option value="annuel">{t('members.form.subYearly', 'Annuel (12 mois)')}</option>
           </select>
         </div>
         <div className="form-group">
-          <label>Statut</label>
+          <label>{t('members.form.status', 'Statut')}</label>
           <select value={form.statut} onChange={(e) => set('statut', e.target.value)}>
-            <option value="actif">Actif</option>
-            <option value="inactif">Inactif</option>
+            <option value="actif">{t('members.form.statusActive', 'Actif')}</option>
+            <option value="inactif">{t('members.form.statusInactive', 'Inactif')}</option>
           </select>
         </div>
       </div>
 
       <div className="form-row">
         <div className="form-group">
-          <label>Téléphone *</label>
+          <label>{t('members.form.phone', 'Téléphone')} *</label>
           <input value={form.telephone} onChange={(e) => set('telephone', e.target.value)} placeholder="0600-000-000" />
           {errors.telephone && <span className="form-error">{errors.telephone}</span>}
         </div>
         <div className="form-group">
-          <label>Email</label>
+          <label>{t('members.form.email', 'Email')}</label>
           <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="email@exemple.com" />
         </div>
       </div>
 
       <div className="form-row">
         <div className="form-group">
-          <label>Date de naissance *</label>
+          <label>{t('members.form.birthDate', 'Date de naissance')} *</label>
           <input type="date" value={form.dateNaissance} onChange={(e) => set('dateNaissance', e.target.value)} />
           {errors.dateNaissance && <span className="form-error">{errors.dateNaissance}</span>}
         </div>
         <div className="form-group">
-          <label>Date d'inscription</label>
+          <label>{t('members.form.registrationDate', "Date d'inscription")}</label>
           <input type="date" value={form.dateInscription} onChange={(e) => set('dateInscription', e.target.value)} />
         </div>
       </div>
 
       <div className="form-group">
-        <label>Date d'expiration (calculée)</label>
+        <label>{t('members.form.calculatedExpiration', "Date d'expiration (calculée)")}</label>
         <input type="date" value={form.dateExpiration} readOnly className="input--readonly" />
       </div>
       
       <div className="form-group">
-        <label>{initial?.id ? 'Nouveau mot de passe (laisser vide pour ne pas changer)' : 'Mot de passe initial *'}</label>
+        <label>{initial?.id ? t('members.form.newPassword', 'Nouveau mot de passe (laisser vide pour ne pas changer)') : t('members.form.initialPassword', 'Mot de passe initial *')}</label>
         <input 
           type="password" 
           value={form.password} 
@@ -233,27 +240,27 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
       </div>
 
       <div className="form-group">
-        <label>Photo du membre</label>
+        <label>{t('members.form.photo', 'Photo du membre')}</label>
         <div className="photo-capture">
           <div className="photo-preview">
             {form.photoBase64 ? (
-              <img src={form.photoBase64} alt="Photo membre" />
+              <img src={form.photoBase64} alt={t('members.form.photoAlt', 'Photo membre')} />
             ) : (
-              <div className="photo-placeholder">Aucune photo</div>
+              <div className="photo-placeholder">{t('members.form.noPhoto', 'Aucune photo')}</div>
             )}
           </div>
           <div className="photo-actions">
             {!cameraOn ? (
               <button type="button" className="btn btn--ghost btn--sm" onClick={startCamera}>
-                Ouvrir la camera
+                {t('members.form.openCamera', 'Ouvrir la camera')}
               </button>
             ) : (
               <>
                 <button type="button" className="btn btn--primary btn--sm" onClick={capturePhoto}>
-                  Prendre la photo
+                  {t('members.form.takePhoto', 'Prendre la photo')}
                 </button>
                 <button type="button" className="btn btn--ghost btn--sm" onClick={stopCamera}>
-                  Fermer
+                  {t('members.form.closeCamera', 'Fermer')}
                 </button>
               </>
             )}
@@ -263,7 +270,7 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
                 className="btn btn--ghost btn--sm"
                 onClick={() => setForm((prev) => ({ ...prev, photoBase64: '' }))}
               >
-                Retirer la photo
+                {t('members.form.removePhoto', 'Retirer la photo')}
               </button>
             )}
           </div>
@@ -282,16 +289,16 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
         const price = act?.prix[form.abonnement];
         return act ? (
           <div className="price-preview">
-            <span>Montant a encaisser :</span>
+            <span>{t('members.form.amountToCollect', 'Montant a encaisser :')}</span>
             <strong style={{ color: act.couleur }}>{price?.toLocaleString('fr-FR')} DH</strong>
           </div>
         ) : null;
       })()}
 
       <div className="form-actions">
-        <button type="button" className="btn btn--ghost" onClick={onClose}>Annuler</button>
+        <button type="button" className="btn btn--ghost" onClick={onClose}>{t('members.form.cancel', 'Annuler')}</button>
         <button type="submit" className="btn btn--primary">
-          {initial?.id ? 'Enregistrer' : 'Inscrire le Membre'}
+          {initial?.id ? t('members.form.save', 'Enregistrer') : t('members.form.registerMember', 'Inscrire le Membre')}
         </button>
       </div>
     </form>
@@ -299,13 +306,14 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
 }
 
 function DeleteConfirm({ membre, onConfirm, onClose }) {
+  const { t } = useTranslation();
   return (
     <div style={{ textAlign: 'center' }}>
-      <p style={{ marginBottom: '8px' }}>Voulez-vous supprimer definitivement :</p>
+      <p style={{ marginBottom: '8px' }}>{t('members.delete.confirmMessage', 'Voulez-vous supprimer definitivement :')}</p>
       <strong style={{ fontSize: '1.1rem' }}>{membre.prenom} {membre.nom}</strong>?
       <div className="form-actions" style={{ marginTop: '24px' }}>
-        <button className="btn btn--ghost" onClick={onClose}>Annuler</button>
-        <button className="btn btn--danger" onClick={() => { onConfirm(membre.id); onClose(); }}>Supprimer</button>
+        <button className="btn btn--ghost" onClick={onClose}>{t('members.delete.cancel', 'Annuler')}</button>
+        <button className="btn btn--danger" onClick={() => { onConfirm(membre.id); onClose(); }}>{t('members.delete.confirm', 'Supprimer')}</button>
       </div>
     </div>
   );
@@ -349,6 +357,7 @@ function getNextPaymentDate(day) {
 }
 
 function MemberDetails({ membre, activites, paiements, onClose, onSetEcheanceDay }) {
+  const { t } = useTranslation();
   const initialDay = membre?.dateExpiration ? Number(membre.dateExpiration.split('-')[2]) : 15;
   const [payDay, setPayDay] = useState(clampDay(initialDay));
   const act = activites.find((a) => a.id === membre.activite);
@@ -372,11 +381,11 @@ function MemberDetails({ membre, activites, paiements, onClose, onSetEcheanceDay
     <div className="member-details">
       <div className="member-details__info">
         <div className="member-profile">
-          <div className="member-profile__avatar" style={{ background: act?.couleur + '22', color: act?.couleur }}>
+          <div className="member-profile__avatar" style={{ background: act?.couleur ? `${act.couleur}22` : 'rgba(255, 255, 255, 0.1)', color: act?.couleur || 'var(--clr-muted)' }}>
             {membre.photoBase64 ? (
-              <img src={membre.photoBase64} alt="Photo membre" />
+              <img src={getPhotoSrc(membre.photoBase64)} alt="Photo membre" />
             ) : (
-              <span>{membre.prenom[0]}{membre.nom[0]}</span>
+              <User size={32} />
             )}
           </div>
           <div>
@@ -388,45 +397,45 @@ function MemberDetails({ membre, activites, paiements, onClose, onSetEcheanceDay
 
         <div className="member-info-grid">
           <div className="member-info-card">
-            <div className="member-info-label">Activite</div>
-            <div className="member-info-value">{act?.nom || membre.activite}</div>
+            <div className="member-info-label">{t('members.details.activity', 'Activite')}</div>
+            <div className="member-info-value">{t(act?.nom || membre.activite, act?.nom || membre.activite)}</div>
           </div>
           <div className="member-info-card">
-            <div className="member-info-label">Abonnement</div>
+            <div className="member-info-label">{t('members.details.subscription', 'Abonnement')}</div>
             <div className="member-info-value">{membre.abonnement}</div>
           </div>
           <div className="member-info-card">
-            <div className="member-info-label">Inscription</div>
+            <div className="member-info-label">{t('members.details.registration', 'Inscription')}</div>
             <div className="member-info-value">{formatDate(membre.dateInscription)}</div>
           </div>
           <div className="member-info-card">
-            <div className="member-info-label">Expiration</div>
+            <div className="member-info-label">{t('members.details.expiration', 'Expiration')}</div>
             <div className="member-info-value">{formatDate(membre.dateExpiration)}</div>
           </div>
         </div>
 
         <div className="member-info-grid">
           <div className="member-info-card">
-            <div className="member-info-label">Genre</div>
+            <div className="member-info-label">{t('members.details.gender', 'Genre')}</div>
             <div className="member-info-value">{membre.genre}</div>
           </div>
           <div className="member-info-card">
-            <div className="member-info-label">Date de naissance</div>
+            <div className="member-info-label">{t('members.details.birthDate', 'Date de naissance')}</div>
             <div className="member-info-value">{formatDate(membre.dateNaissance)}</div>
           </div>
           <div className="member-info-card">
-            <div className="member-info-label">Statut manuel</div>
+            <div className="member-info-label">{t('members.details.manualStatus', 'Statut manuel')}</div>
             <div className="member-info-value">{membre.statut}</div>
           </div>
           <div className="member-info-card">
-            <div className="member-info-label">Total paye</div>
+            <div className="member-info-label">{t('members.details.totalPaid', 'Total paye')}</div>
             <div className="member-info-value">{total.toLocaleString('fr-FR')} DH</div>
           </div>
         </div>
 
         <div className="member-actions">
           <div className="member-actions__input">
-            <label>Jour de paiement</label>
+            <label>{t('members.details.paymentDay', 'Jour de paiement')}</label>
             <input
               type="number"
               min={1}
@@ -436,23 +445,23 @@ function MemberDetails({ membre, activites, paiements, onClose, onSetEcheanceDay
             />
           </div>
           <button className="btn btn--primary btn--sm" onClick={() => onSetEcheanceDay(membre, payDay)}>
-            Fixer la date de paiement (ce membre)
+            {t('members.details.setPaymentDate', 'Fixer la date de paiement (ce membre)')}
           </button>
-          <span className="member-actions__hint">Prochaine date de paiement: {formatDate(getNextPaymentDate(payDay))}</span>
+          <span className="member-actions__hint">{t('members.details.nextPaymentDate', 'Prochaine date de paiement:')} {formatDate(getNextPaymentDate(payDay))}</span>
         </div>
       </div>
 
       <div className="member-details__timeline">
         <div className="member-timeline__head">
           <div>
-            <div className="member-timeline__title">Historique paiements</div>
-            <div className="member-timeline__sub">{items.length} paiement{items.length > 1 ? 's' : ''}</div>
+            <div className="member-timeline__title">{t('members.details.paymentHistory', 'Historique paiements')}</div>
+            <div className="member-timeline__sub">{items.length} {t('members.details.paymentItem', 'paiement')}{items.length > 1 ? 's' : ''}</div>
           </div>
-          <button className="btn btn--ghost btn--sm" onClick={onClose}>Fermer</button>
+          <button className="btn btn--ghost btn--sm" onClick={onClose}>{t('members.details.close', 'Fermer')}</button>
         </div>
 
         {items.length === 0 ? (
-          <div className="member-timeline__empty">Aucun paiement enregistre.</div>
+          <div className="member-timeline__empty">{t('members.details.noPaymentRecorded', 'Aucun paiement enregistre.')}</div>
         ) : (
           <div className="member-timeline">
             {items.map((p) => (
@@ -465,9 +474,9 @@ function MemberDetails({ membre, activites, paiements, onClose, onSetEcheanceDay
                     </div>
                     <div className="timeline-item__amount">{p.montant.toLocaleString('fr-FR')} DH</div>
                   </div>
-                  <div className="timeline-item__meta">Mode: {p.mode}</div>
+                  <div className="timeline-item__meta">{t('members.details.paymentMode', 'Mode:')} {p.mode}</div>
                   <button className="timeline-item__btn" onClick={() => handleDownloadRecu(p.id)}>
-                    <Download size={14} /> Telecharger recu
+                    <Download size={14} /> {t('members.details.downloadReceipt', 'Telecharger recu')}
                   </button>
                 </div>
               </div>
@@ -491,6 +500,7 @@ export default function Membres() {
   const [page,     setPage]     = useState(1);
   const [modal,    setModal]    = useState(null); // null | 'add' | 'edit' | 'delete' | 'view'
   const [selected, setSelected] = useState(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const nextQuery = searchParams.get('q') ?? '';
@@ -519,7 +529,7 @@ export default function Membres() {
   const openDelete = (m) => { setSelected(m); setModal('delete'); };
   const openView   = (m) => { setSelected(m); setModal('view');   };
   const openPhoto  = (m) => {
-    if (!m?.photoBase64) return;
+    if (!m?.photoBase64 || !m.photoBase64.startsWith('data:image')) return;
     setSelected(m);
     setModal('photo');
   };
@@ -560,34 +570,34 @@ export default function Membres() {
     <div className="page membres-page fade-in">
       <section className="members-hero">
         <div>
-          <span className="members-hero__eyebrow">Membres</span>
-          <h2 className="members-hero__title">Gestion des membres</h2>
+          <span className="members-hero__eyebrow">{t('members.title', 'Membres')}</span>
+          <h2 className="members-hero__title">{t('members.management', 'Gestion des membres')}</h2>
           <p className="members-hero__subtitle">
-            Controlez les inscriptions, statuts et activites depuis un panneau clair et rapide.
+            {t('members.subtitle', 'Controlez les inscriptions, statuts et activites depuis un panneau clair et rapide.')}
           </p>
         </div>
         <div className="members-hero__actions">
           <button className="btn btn--primary" onClick={() => { setSelected(null); setModal('add'); }}>
-            <UserPlus size={16} /> Nouveau membre
+            <UserPlus size={16} /> {t('members.newMember', 'Nouveau membre')}
           </button>
         </div>
       </section>
 
       <section className="members-kpis">
         <div className="members-kpi">
-          <div className="members-kpi__label">Total membres</div>
+          <div className="members-kpi__label">{t('members.totalMembers', 'Total membres')}</div>
           <div className="members-kpi__value">{stats.total}</div>
         </div>
         <div className="members-kpi">
-          <div className="members-kpi__label">Membres actifs</div>
+          <div className="members-kpi__label">{t('members.activeMembers', 'Membres actifs')}</div>
           <div className="members-kpi__value">{stats.actifs}</div>
         </div>
         <div className="members-kpi">
-          <div className="members-kpi__label">Membres inactifs</div>
+          <div className="members-kpi__label">{t('members.inactiveMembers', 'Membres inactifs')}</div>
           <div className="members-kpi__value">{stats.inactifs}</div>
         </div>
         <div className="members-kpi">
-          <div className="members-kpi__label">Expirations 7 jours</div>
+          <div className="members-kpi__label">{t('members.expirations7Days', 'Expirations 7 jours')}</div>
           <div className="members-kpi__value">{stats.expSoon}</div>
         </div>
       </section>
@@ -597,7 +607,7 @@ export default function Membres() {
           <div className="toolbar__search members-search">
             <Search size={16} className="toolbar__search-icon" />
             <input
-              placeholder="Rechercher par nom, prenom, telephone, email, activite..."
+              placeholder={t('members.filters.searchPlaceholder', 'Rechercher par nom, prenom, telephone, email, activite...')}
               value={query}
               onChange={(e) => { setQuery(e.target.value); setPage(1); }}
             />
@@ -610,22 +620,22 @@ export default function Membres() {
           <div className="toolbar__filters">
             <Filter size={15} />
             <select value={fGenre} onChange={(e) => { setFGenre(e.target.value); setPage(1); }}>
-              <option value="">Toutes sections</option>
-              <option value="homme">Hommes</option>
-              <option value="femme">Femmes</option>
-              <option value="enfant">Enfants</option>
+              <option value="">{t('members.filters.allSections', 'Toutes sections')}</option>
+              <option value="homme">{t('members.filters.men', 'Hommes')}</option>
+              <option value="femme">{t('members.filters.women', 'Femmes')}</option>
+              <option value="enfant">{t('members.filters.children', 'Enfants')}</option>
             </select>
             <select value={fAct} onChange={(e) => { setFAct(e.target.value); setPage(1); }}>
-              <option value="">Toutes activites</option>
-              {activites.map((a) => <option key={a.id} value={a.id}>{a.nom}</option>)}
+              <option value="">{t('members.filters.allActivities', 'Toutes activites')}</option>
+              {activites.map((a) => <option key={a.id} value={a.id}>{t(a.nom, a.nom)}</option>)}
             </select>
             <select value={fStatut} onChange={(e) => { setFStatut(e.target.value); setPage(1); }}>
-              <option value="">Tous statuts</option>
-              <option value="actif">Actif</option>
-              <option value="inactif">Inactif</option>
+              <option value="">{t('members.filters.allStatuses', 'Tous statuts')}</option>
+              <option value="actif">{t('members.filters.active', 'Actif')}</option>
+              <option value="inactif">{t('members.filters.inactive', 'Inactif')}</option>
             </select>
             {(query || fGenre || fAct || fStatut) && (
-              <button className="btn btn--ghost btn--sm" onClick={resetFilters}>Reinitialiser</button>
+              <button className="btn btn--ghost btn--sm" onClick={resetFilters}>{t('members.filters.reset', 'Reinitialiser')}</button>
             )}
           </div>
         </div>
@@ -636,20 +646,20 @@ export default function Membres() {
           <thead>
             <tr>
               <th>#</th>
-              <th>Membre</th>
-              <th>Section</th>
-              <th>Activité</th>
-              <th>Abonnement</th>
-              <th>Expiration</th>
-              <th>Statut</th>
-              <th>Actions</th>
+              <th>{t('members.tableMember', 'Membre')}</th>
+              <th>{t('members.tableSection', 'Section')}</th>
+              <th>{t('members.tableActivity', 'Activité')}</th>
+              <th>{t('members.tableSubscription', 'Abonnement')}</th>
+              <th>{t('members.tableExpiration', 'Expiration')}</th>
+              <th>{t('members.tableStatus', 'Statut')}</th>
+              <th>{t('members.tableActions', 'Actions')}</th>
             </tr>
           </thead>
           <tbody>
             {paginated.length === 0 ? (
               <tr>
                 <td colSpan="8" style={{ textAlign: 'center', padding: '40px', color: 'var(--clr-muted)' }}>
-                  Aucun membre trouvé.
+                  {t('members.list.noMembersFound', 'Aucun membre trouvé.')}
                 </td>
               </tr>
             ) : paginated.map((m) => {
@@ -666,15 +676,15 @@ export default function Membres() {
                       <button
                         type="button"
                         className={`td-avatar${m.photoBase64 ? ' td-avatar--clickable' : ''}`}
-                        style={{ background: act?.couleur + '22', color: act?.couleur }}
+                        style={{ background: act?.couleur ? `${act.couleur}22` : 'rgba(255, 255, 255, 0.1)', color: act?.couleur || 'var(--clr-muted)' }}
                         onClick={() => openPhoto(m)}
-                        aria-label={`Voir la photo de ${m.prenom} ${m.nom}`}
+                        aria-label={t('members.list.viewPhotoAria', 'Voir la photo de {{prenom}} {{nom}}', { prenom: m.prenom, nom: m.nom })}
                         disabled={!m.photoBase64}
                       >
                         {m.photoBase64 ? (
-                          <img src={m.photoBase64} alt="Photo membre" />
+                          <img src={getPhotoSrc(m.photoBase64)} alt="Photo membre" />
                         ) : (
-                          <span>{m.prenom[0]}{m.nom[0]}</span>
+                          <User size={20} />
                         )}
                       </button>
                       <div>
@@ -701,17 +711,17 @@ export default function Membres() {
                     <button
                       className={`status-toggle${m.statut === 'actif' ? ' status-toggle--on' : ''}`}
                       onClick={() => toggleStatut(m.id)}
-                      title="Basculer statut"
+                      title={t('members.list.toggleStatus', 'Basculer statut')}
                     >
                       {m.statut === 'actif' ? <ToggleRight size={22} /> : <ToggleLeft size={22} />}
-                      {m.statut}
+                      {m.statut === 'actif' ? t('members.form.statusActive', 'Actif') : t('members.form.statusInactive', 'Inactif')}
                     </button>
                   </td>
                   <td>
                     <div className="action-btns">
-                      <button className="icon-btn" onClick={() => openView(m)} title="Voir fiche"><Eye size={15} /></button>
-                      <button className="icon-btn icon-btn--edit"   onClick={() => openEdit(m)}   title="Modifier"><Pencil size={15} /></button>
-                      <button className="icon-btn icon-btn--delete" onClick={() => openDelete(m)} title="Supprimer"><Trash2 size={15} /></button>
+                      <button className="icon-btn" onClick={() => openView(m)} title={t('members.list.viewProfile', 'Voir fiche')}><Eye size={15} /></button>
+                      <button className="icon-btn icon-btn--edit"   onClick={() => openEdit(m)}   title={t('members.list.edit', 'Modifier')}><Pencil size={15} /></button>
+                      <button className="icon-btn icon-btn--delete" onClick={() => openDelete(m)} title={t('members.list.delete', 'Supprimer')}><Trash2 size={15} /></button>
                     </div>
                   </td>
                 </tr>
@@ -724,18 +734,18 @@ export default function Membres() {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="pagination">
-          <button className="btn btn--ghost btn--sm" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>← Préc.</button>
+          <button className="btn btn--ghost btn--sm" disabled={page === 1} onClick={() => setPage((p) => p - 1)}>← {t('members.pagination.prev', 'Préc.')}</button>
           {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
             <button key={p} className={`pagination__btn${p === page ? ' pagination__btn--active' : ''}`} onClick={() => setPage(p)}>{p}</button>
           ))}
-          <button className="btn btn--ghost btn--sm" disabled={page === totalPages} onClick={() => setPage((p) => p + 1)}>Suiv. →</button>
+          <button className="btn btn--ghost btn--sm" disabled={page === totalPages} onClick={() => setPage((p) => p + 1)}>{t('members.pagination.next', 'Suiv.')} →</button>
         </div>
       )}
 
       {/* Modals */}
       {(modal === 'add' || modal === 'edit') && (
         <Modal
-          title={modal === 'add' ? 'Inscrire un nouveau membre' : 'Modifier le membre'}
+          title={modal === 'add' ? t('members.modals.addMember', 'Inscrire un nouveau membre') : t('members.modals.editMember', 'Modifier le membre')}
           onClose={() => setModal(null)}
           size={modal === 'add' ? 'xl' : 'lg'}
         >
@@ -750,12 +760,12 @@ export default function Membres() {
         </Modal>
       )}
       {modal === 'delete' && selected && (
-        <Modal title="Confirmer la Suppression" onClose={() => setModal(null)}>
+        <Modal title={t('members.modals.confirmDeleteTitle', 'Confirmer la Suppression')} onClose={() => setModal(null)}>
           <DeleteConfirm membre={selected} onConfirm={deleteMembre} onClose={() => setModal(null)} />
         </Modal>
       )}
       {modal === 'view' && selected && (
-        <Modal title="Fiche membre" onClose={() => setModal(null)} size="lg">
+        <Modal title={t('members.modals.viewMemberTitle', 'Fiche membre')} onClose={() => setModal(null)} size="lg">
           <MemberDetails
             membre={selected}
             activites={activites}
@@ -766,12 +776,12 @@ export default function Membres() {
         </Modal>
       )}
       {modal === 'photo' && selected && (
-        <Modal title="Photo du membre" onClose={() => setModal(null)} size="lg">
+        <Modal title={t('members.modals.photoTitle', 'Photo du membre')} onClose={() => setModal(null)} size="lg">
           <div className="photo-viewer">
             {selected.photoBase64 ? (
-              <img src={selected.photoBase64} alt={`Photo de ${selected.prenom} ${selected.nom}`} />
+              <img src={getPhotoSrc(selected.photoBase64)} alt={t('members.list.viewPhotoAria', 'Photo de {{prenom}} {{nom}}', { prenom: selected.prenom, nom: selected.nom })} />
             ) : (
-              <div className="photo-placeholder">Aucune photo</div>
+              <div className="photo-placeholder">{t('members.form.noPhoto', 'Aucune photo')}</div>
             )}
             <div className="photo-viewer__name">{selected.prenom} {selected.nom}</div>
           </div>

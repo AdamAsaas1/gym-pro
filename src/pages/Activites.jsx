@@ -1,21 +1,23 @@
 import { Users, TrendingUp, UserCheck } from 'lucide-react';
 import { useGym } from '../context/GymContext';
 
-const GENRE_LABEL = { 
-  homme: 'Section Hommes', 
-  femme: 'Section Femmes', 
-  enfant: 'Section Enfants',
-  universel: 'Section Mixte (Universel)'
-};
+import { useTranslation } from 'react-i18next';
 
 export default function Activites() {
   const { membres, activites } = useGym();
+  const { t } = useTranslation();
+
+  const GENRE_LABEL = { 
+    homme: t('activities.menSection', 'Section Hommes'), 
+    femme: t('activities.womenSection', 'Section Femmes'), 
+    enfant: t('activities.childrenSection', 'Section Enfants'),
+    universel: t('activities.mixedSection', 'Section Mixte (Universel)')
+  };
 
   return (
     <div className="page fade-in">
       <p className="page-desc">
-        Notre salle est <strong>non mixte</strong>. Chaque section dispose de son propre espace,
-        ses horaires et son coach spécialisé.
+        {t('activities.description', 'Notre salle est non mixte. Chaque section dispose de son propre espace, ses horaires et son coach spécialisé.')}
       </p>
 
       <div className="activites-grid">
@@ -44,36 +46,36 @@ export default function Activites() {
                   <Users size={15} />
                   <div>
                     <div className="act-stat__val">{inscrits.length}</div>
-                    <div className="act-stat__lbl">Inscrits</div>
+                    <div className="act-stat__lbl">{t('activities.registered', 'Inscrits')}</div>
                   </div>
                 </div>
                 <div className="act-stat">
                   <TrendingUp size={15} />
                   <div>
                     <div className="act-stat__val">{actifs}</div>
-                    <div className="act-stat__lbl">Actifs</div>
+                    <div className="act-stat__lbl">{t('activities.active', 'Actifs')}</div>
                   </div>
                 </div>
               </div>
 
               {/* Tarifs */}
               <div className="act-card__tarifs">
-                <div className="tarif-title">Tarifs</div>
+                <div className="tarif-title">{t('activities.rates', 'Tarifs')}</div>
                 <div className="tarif-row">
-                  <span>Mensuel</span>     <strong>{act.prix.mensuel} DH</strong>
+                  <span>{t('activities.monthly', 'Mensuel')}</span>     <strong>{act.prix.mensuel} DH</strong>
                 </div>
                 <div className="tarif-row">
-                  <span>Trimestriel</span> <strong>{act.prix.trimestriel} DH</strong>
+                  <span>{t('activities.quarterly', 'Trimestriel')}</span> <strong>{act.prix.trimestriel} DH</strong>
                 </div>
                 <div className="tarif-row">
-                  <span>Annuel</span>      <strong>{act.prix.annuel} DH</strong>
+                  <span>{t('activities.yearly', 'Annuel')}</span>      <strong>{act.prix.annuel} DH</strong>
                 </div>
               </div>
 
               {/* Coach */}
               <div className="act-card__coach">
                 <UserCheck size={14} />
-                Coach : <strong>{act.coachNom}</strong>
+                {t('activities.coach', 'Coach')} : <strong>{act.coachNom}</strong>
               </div>
             </div>
           );

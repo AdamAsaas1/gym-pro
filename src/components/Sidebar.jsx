@@ -3,24 +3,26 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Users, Calendar, Dumbbell, CreditCard, UserCheck, ChevronLeft, ChevronRight, Banknote, ShieldCheck, Bell, Settings, Camera} from 'lucide-react';
 import { useGym } from '../context/GymContext';
 import PermissionRender from './PermissionRender';
+import { useTranslation } from 'react-i18next';
 
 const NAV = [
-  { to: '/',            icon: LayoutDashboard, label: 'Tableau de Bord', end: true },
-  { to: '/acces',       icon: Camera,          label: 'Gestion d\'Accès'           },
-  { to: '/membres',     icon: Users,           label: 'Membres'                   },
-  { to: '/paiements',  icon: Banknote,        label: 'Paiements'                 },
-  { to: '/planning',    icon: Calendar,        label: 'Planning'                  },
-  { to: '/activites',   icon: Dumbbell,        label: 'Activités'                 },
-  { to: '/abonnements', icon: CreditCard,      label: 'Abonnements'               },
-  { to: '/coaches',     icon: UserCheck,       label: 'Coachs'                    },
-  { to: '/notifications', icon: Bell,          label: 'Notifications'             },
-  { to: '/permissions', icon: ShieldCheck,     label: 'Permissions'               },
-  { to: '/settings',    icon: Settings,        label: 'Paramètres'                },
+  { to: '/',            icon: LayoutDashboard, label: 'titles.dashboard', end: true },
+  { to: '/acces',       icon: Camera,          label: 'titles.access'              },
+  { to: '/membres',     icon: Users,           label: 'titles.members'                   },
+  { to: '/paiements',  icon: Banknote,        label: 'titles.payments'                 },
+  { to: '/planning',    icon: Calendar,        label: 'titles.planning'                  },
+  { to: '/activites',   icon: Dumbbell,        label: 'titles.activities'                 },
+  { to: '/abonnements', icon: CreditCard,      label: 'titles.subscriptions'               },
+  { to: '/coaches',     icon: UserCheck,       label: 'titles.coaches'                    },
+  { to: '/notifications', icon: Bell,          label: 'titles.notifications'             },
+  { to: '/permissions', icon: ShieldCheck,     label: 'titles.permissions'               },
+  { to: '/settings',    icon: Settings,        label: 'titles.settings'                },
 ];
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const { stats, statsP, gymSettings } = useGym();
+  const { t } = useTranslation();
 
   return (
     <aside className={`sidebar${collapsed ? ' sidebar--collapsed' : ''}`}>
@@ -34,16 +36,16 @@ export default function Sidebar() {
           )}
           {!collapsed && <span>{gymSettings?.name || 'ASAAS GYM'}</span>}
         </div>
-        <button className="sidebar__collapse-btn" onClick={() => setCollapsed((v) => !v)} title="Réduire">
+        <button className="sidebar__collapse-btn" onClick={() => setCollapsed((v) => !v)} title={t('sidebar.collapse', 'Réduire')}>
           {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
       </div>
 
       {!collapsed && (
-        <div className="sidebar__gym-label">Votre salle, votre performance</div>
+        <div className="sidebar__gym-label">{t('sidebar.tagline', 'Votre salle, votre performance')}</div>
       )}
 
-      {!collapsed && <div className="sidebar__section">Pilotage</div>}
+      {!collapsed && <div className="sidebar__section">{t('sidebar.section', 'Pilotage')}</div>}
 
       {/* Nav */}
       <nav className="sidebar__nav">
@@ -53,10 +55,10 @@ export default function Sidebar() {
               to={to}
               end={end}
               className={({ isActive }) => `sidebar__link${isActive ? ' sidebar__link--active' : ''}`}
-              title={collapsed ? label : undefined}
+              title={collapsed ? t(label) : undefined}
             >
               {createElement(NavIcon, { size: 19, className: 'sidebar__link-icon' })}
-              {!collapsed && <span>{label}</span>}
+              {!collapsed && <span>{t(label)}</span>}
               {!collapsed && to === '/paiements' && statsP?.aRegler > 0 && (
                 <span className="sidebar__badge">{statsP.aRegler}</span>
               )}
@@ -70,16 +72,16 @@ export default function Sidebar() {
         <div className="sidebar__bottom">
           <div className="sidebar__status">
             <span className="sidebar__status-dot" />
-            <span>{stats.actifs} membres actifs</span>
+            <span>{stats.actifs} {t('sidebar.activeMembers', 'membres actifs')}</span>
           </div>
           <div className="sidebar__insight">
-            <div className="sidebar__insight-title">Performance</div>
+            <div className="sidebar__insight-title">{t('sidebar.performance', 'Performance')}</div>
             <div className="sidebar__insight-row">
-              <span>Actifs</span>
+              <span>{t('sidebar.active', 'Actifs')}</span>
               <strong>{stats.actifs}</strong>
             </div>
             <div className="sidebar__insight-row">
-              <span>A regler</span>
+              <span>{t('sidebar.toPay', 'A regler')}</span>
               <strong>{statsP?.aRegler ?? 0}</strong>
             </div>
           </div>

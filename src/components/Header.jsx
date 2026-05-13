@@ -5,7 +5,8 @@ import { useGym } from '../context/GymContext';
 import PermissionRender from './PermissionRender';
 import { usePermissions } from '../context/PermissionContext';
 import { useAuth } from '../context/AuthContext';
-
+import { useTranslation } from 'react-i18next';
+import { Globe } from 'lucide-react';
 const TITLES = {
   '/':            'Tableau de Bord',
   '/acces':       'Gestion d\'Accès',
@@ -49,19 +50,25 @@ export default function Header() {
   const { notifications, readIds, markRead, clearAll, unreadCount, configFallback, gymSettings } = useGym();
   const { currentRole, hasPageAccess } = usePermissions();
   const { logout } = useAuth();
-  const title = TITLES[pathname] ?? (gymSettings?.name || 'ASAAS GYM');
+  const { t, i18n } = useTranslation();
+  
+  const title = t(`titles.${pathname.replace('/', '') || 'dashboard'}`, TITLES[pathname] ?? (gymSettings?.name || 'ASAAS GYM'));
+  
   const [open, setOpen]     = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
   const wrapRef = useRef(null);
+  const langWrapRef = useRef(null);
 
-  const dateStr = new Date().toLocaleDateString('fr-FR', {
+  const dateStr = new Date().toLocaleDateString(i18n.language === 'ar' ? 'ar-MA' : 'fr-FR', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
 
   useEffect(() => {
     const handler = (e) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+      if (langWrapRef.current && !langWrapRef.current.contains(e.target)) setLangOpen(false);
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
@@ -112,25 +119,59 @@ export default function Header() {
       <div className="app-header__actions">
         <div className="header-search">
           <input
-            placeholder="Rechercher un membre, paiement..."
+            placeholder={t('header.searchPlaceholder', 'Rechercher un membre, paiement...')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <PermissionRender page="/membres">
-          <Link to="/membres" className="header-action header-action--ghost">Nouveau membre</Link>
+          <Link to="/membres" className="header-action header-action--ghost">{t('header.newMember', 'Nouveau membre')}</Link>
         </PermissionRender>
         <PermissionRender page="/paiements">
-          <Link to="/paiements" className="header-action header-action--primary">Encaisser</Link>
+          <Link to="/paiements" className="header-action header-action--primary">{t('header.cashIn', 'Encaisser')}</Link>
         </PermissionRender>
       </div>
 
       <div className="app-header__right">
         <div className="header-role">
-          <label>Role</label>
+          <label>{t('header.role', 'Role')}</label>
           <div className="header-role__pill">{ROLE_LABELS[currentRole] || currentRole}</div>
         </div>
-        <button className="header-action header-action--ghost" onClick={logout}>Deconnexion</button>
+        <button className="header-action header-action--ghost" onClick={logout}>{t('header.logout', 'Deconnexion')}</button>
+
+        {/* ── Language Switcher ── */}
+        <div className="lang-switcher" ref={langWrapRef}>
+          <button
+            className="lang-switcher__btn"
+            onClick={() => setLangOpen((o) => !o)}
+            title="Language"
+          >
+            {i18n.language === 'en' && <span className="fi fi-gb"></span>}
+            {i18n.language === 'fr' && <span className="fi fi-fr"></span>}
+            {i18n.language === 'es' && <span className="fi fi-es"></span>}
+            {i18n.language === 'ar' && <span className="fi fi-ma"></span>}
+            {(!i18n.language || !['en', 'fr', 'es', 'ar'].includes(i18n.language)) && <Globe size={18} />}
+          </button>
+          
+          {langOpen && (
+            <div className="lang-switcher__panel">
+              <div className="lang-switcher__list">
+                <button className={`lang-switcher__item ${i18n.language === 'en' ? 'lang-switcher__item--active' : ''}`} onClick={() => { i18n.changeLanguage('en'); setLangOpen(false); }}>
+                  <span className="fi fi-gb"></span> English
+                </button>
+                <button className={`lang-switcher__item ${i18n.language === 'fr' ? 'lang-switcher__item--active' : ''}`} onClick={() => { i18n.changeLanguage('fr'); setLangOpen(false); }}>
+                  <span className="fi fi-fr"></span> Français
+                </button>
+                <button className={`lang-switcher__item ${i18n.language === 'es' ? 'lang-switcher__item--active' : ''}`} onClick={() => { i18n.changeLanguage('es'); setLangOpen(false); }}>
+                  <span className="fi fi-es"></span> Español
+                </button>
+                <button className={`lang-switcher__item ${i18n.language === 'ar' ? 'lang-switcher__item--active' : ''}`} onClick={() => { i18n.changeLanguage('ar'); setLangOpen(false); }}>
+                  <span className="fi fi-ma"></span> العربية
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* ── Notification Bell ── */}
         <div className="notif-wrap" ref={wrapRef}>
@@ -144,21 +185,21 @@ export default function Header() {
           </button>
 
           {open && (
-            <div className="notif-panel">
+            <div className={`notif-panel ${i18n.language === 'ar' ? 'notif-panel--rtl' : ''}`}>
 
               {/* Header */}
               <div className="notif-panel__head">
                 <div className="notif-panel__head-left">
                   <Bell size={15} />
-                  <span>Notifications</span>
+                  <span>{t('header.notifications', 'Notifications')}</span>
                   {notifications.length > 0 && (
                     <span className="notif-panel__total">{notifications.length}</span>
                   )}
                 </div>
                 <div className="notif-panel__head-right">
                   {unreadCount > 0 && (
-                    <button className="notif-markall" onClick={clearAll} title="Tout marquer comme lu">
-                      <CheckCheck size={14} /> Tout lire
+                    <button className="notif-markall" onClick={clearAll} title={t('header.markAllRead', 'Tout lire')}>
+                      <CheckCheck size={14} /> {t('header.markAllRead', 'Tout lire')}
                     </button>
                   )}
                   <button className="notif-panel__close" onClick={() => setOpen(false)}>
@@ -179,7 +220,7 @@ export default function Header() {
                       className={`notif-filter${filter === f.key ? ' notif-filter--active' : ''}`}
                       onClick={() => setFilter(f.key)}
                     >
-                      {f.label}
+                      {t(`header.filters.${f.key}`, f.label)}
                       {cnt > 0 && <span className="notif-filter__cnt">{cnt}</span>}
                     </button>
                   );
@@ -190,13 +231,13 @@ export default function Header() {
               {filtered.length === 0 ? (
                 <div className="notif-empty">
                   <Bell size={32} style={{ opacity: 0.2 }} />
-                  <span>Aucune alerte dans cette catégorie</span>
+                  <span>{t('header.emptyNotifications', 'Aucune alerte dans cette catégorie')}</span>
                 </div>
               ) : (
                 <div className="notif-list">
                   {grouped.map(({ type, items }) => (
                     <div key={type} className="notif-group">
-                      <div className="notif-group__label">{SECTION_LABELS[type]}</div>
+                      <div className="notif-group__label">{t(`header.sections.${type}`, SECTION_LABELS[type])}</div>
                       {items.map((n) => {
                         const cfg  = TYPE_CFG[n.type];
                         const Icon = cfg.Icon;
@@ -235,7 +276,7 @@ export default function Header() {
               {/* Footer */}
               <PermissionRender page="/abonnements">
                 <Link to="/abonnements" className="notif-footer" onClick={() => setOpen(false)}>
-                  <span>Gérer tous les abonnements</span>
+                  <span>{t('header.manageSubscriptions', 'Gérer tous les abonnements')}</span>
                   <ChevronRight size={14} />
                 </Link>
               </PermissionRender>

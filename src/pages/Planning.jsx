@@ -2,16 +2,18 @@ import { useState } from 'react';
 import { Calendar, Clock, User } from 'lucide-react';
 import { useGym } from '../context/GymContext';
 import { JOURS } from '../context/gymStatic';
-
-const TABS = [
-  { key: 'homme',  label: '♂ Hommes',  color: '#3b82f6' },
-  { key: 'femme',  label: '♀ Femmes',  color: '#ec4899' },
-  { key: 'enfant', label: '👶 Enfants', color: '#22c55e' },
-];
+import { useTranslation } from 'react-i18next';
 
 export default function Planning() {
   const { planning, activites } = useGym();
+  const { t } = useTranslation();
   const [tab, setTab] = useState('homme');
+
+  const TABS = [
+    { key: 'homme',  label: t('planning.men', '♂ Hommes'),  color: '#3b82f6' },
+    { key: 'femme',  label: t('planning.women', '♀ Femmes'),  color: '#ec4899' },
+    { key: 'enfant', label: t('planning.children', '👶 Enfants'), color: '#22c55e' },
+  ];
 
   const filtered = planning.filter((s) => s.genre === tab);
 
