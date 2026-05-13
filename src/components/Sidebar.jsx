@@ -1,6 +1,6 @@
 import { createElement, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, Calendar, Dumbbell, CreditCard, UserCheck, ChevronLeft, ChevronRight, Banknote, ShieldCheck, Bell, Camera } from 'lucide-react';
+import { LayoutDashboard, Users, Calendar, Dumbbell, CreditCard, UserCheck, ChevronLeft, ChevronRight, Banknote, ShieldCheck, Bell, Settings, Camera} from 'lucide-react';
 import { useGym } from '../context/GymContext';
 import PermissionRender from './PermissionRender';
 
@@ -15,19 +15,24 @@ const NAV = [
   { to: '/coaches',     icon: UserCheck,       label: 'Coachs'                    },
   { to: '/notifications', icon: Bell,          label: 'Notifications'             },
   { to: '/permissions', icon: ShieldCheck,     label: 'Permissions'               },
+  { to: '/settings',    icon: Settings,        label: 'Paramètres'                },
 ];
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
-  const { stats, statsP } = useGym();
+  const { stats, statsP, gymSettings } = useGym();
 
   return (
     <aside className={`sidebar${collapsed ? ' sidebar--collapsed' : ''}`}>
       {/* Logo */}
       <div className="sidebar__brand">
         <div className="sidebar__logo">
-          <img src="/logo_asaas.jpg" alt="ASAAS GYM" className="sidebar__logo-img" />
-          {!collapsed && <span>ASAAS GYM</span>}
+          {gymSettings?.logo_base64 ? (
+            <img src={gymSettings.logo_base64} alt={gymSettings.name} className="sidebar__logo-img" />
+          ) : (
+            <img src="/logo_asaas.jpg" alt="ASAAS GYM" className="sidebar__logo-img" />
+          )}
+          {!collapsed && <span>{gymSettings?.name || 'ASAAS GYM'}</span>}
         </div>
         <button className="sidebar__collapse-btn" onClick={() => setCollapsed((v) => !v)} title="Réduire">
           {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}

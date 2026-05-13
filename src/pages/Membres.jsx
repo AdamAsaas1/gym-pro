@@ -5,14 +5,10 @@ import Modal from '../components/Modal';
 import { useGym } from '../context/GymContext';
 import { telechargerRecu } from '../api/client';
 
-const ACTIVITES_BY_GENRE = {
-  homme:  ['musculation', 'kickboxing'],
-  femme:  ['aerobic'],
-  enfant: ['karate'],
-};
+// Removing hardcoded ACTIVITES_BY_GENRE as we now use the database
 
 const EMPTY_FORM = {
-  nom: '', prenom: '', genre: 'homme', activite: 'musculation',
+  nom: '', prenom: '', genre: 'homme', activite: '',
   abonnement: 'mensuel', statut: 'actif', telephone: '', email: '',
   dateNaissance: '', dateInscription: new Date().toISOString().split('T')[0],
   dateExpiration: '',
@@ -32,6 +28,7 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
   const [form, setForm] = useState(() => ({
     ...EMPTY_FORM,
     ...initial,
+    activite: initial?.activite || activites.find(a => a.genre === (initial?.genre || 'homme') || a.genre === 'universel')?.id || '',
     dateExpiration: initial?.dateExpiration || computeExpiration(
       initial?.dateInscription || EMPTY_FORM.dateInscription,
       initial?.abonnement || EMPTY_FORM.abonnement,
@@ -63,7 +60,8 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
     setForm((prev) => {
       const next = { ...prev, [key]: val };
       if (key === 'genre') {
-        next.activite = ACTIVITES_BY_GENRE[val][0];
+        const firstAct = activites.find(a => a.genre === val || a.genre === 'universel');
+        next.activite = firstAct ? firstAct.id : '';
       }
       if (key === 'dateInscription' || key === 'abonnement') {
         next.dateExpiration = computeExpiration(
@@ -94,7 +92,7 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
     onSave(form);
   };
 
-  const activiteOpts = activites.filter((a) => ACTIVITES_BY_GENRE[form.genre].includes(a.id));
+  const activiteOpts = activites.filter((a) => a.genre === form.genre || a.genre === 'universel');
 
   const startCamera = async () => {
     setCameraError('');
@@ -159,10 +157,19 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
         <div className="form-group">
           <label>Activité *</label>
           <select value={form.activite} onChange={(e) => set('activite', e.target.value)}>
-            {activiteOpts.map((a) => (
-              <option key={a.id} value={a.id}>{a.icon} {a.nom}</option>
-            ))}
+            {activiteOpts.length > 0 ? (
+              activiteOpts.map((a) => (
+                <option key={a.id} value={a.id}>{a.icon} {a.nom}</option>
+              ))
+            ) : (
+              <option value="">Aucune activité disponible</option>
+            )}
           </select>
+          {activiteOpts.length === 0 && (
+            <span className="form-error" style={{ fontSize: '0.7rem' }}>
+              Veuillez créer une activité pour cette section dans les paramètres.
+            </span>
+          )}
         </div>
       </div>
 
