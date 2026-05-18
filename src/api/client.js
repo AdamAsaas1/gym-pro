@@ -214,4 +214,22 @@ export const checkAccess = (imageBase64) => api.post('/access-control/check', { 
 export const getAccessHistory = (limit = 50) => api.get('/access-control/history', { params: { limit } }).then(r => r.data)
 export const enrollMember = (membreId, imageBase64) => api.post(`/access-control/enroll/${membreId}`, { image_base64: imageBase64 }).then(r => r.data)
 
+// ─── Boutique / Products ────────────────────────────────────────────────────────
+export const getProducts = () => requestWithFallback([
+  () => api.get('/products/'),
+  () => api.get('/api/products')
+])
+export const createProduct = (data) => requestWithFallback([
+  () => api.post('/products/', data),
+  () => api.post('/api/products', data)
+])
+export const updateProduct = (id, data) => requestWithFallback([
+  () => api.put(`/products/${id}`, data),
+  () => api.put(`/api/products/${id}`, data)
+])
+export const deleteProduct = (id) => requestWithFallback([
+  () => api.delete(`/products/${id}`),
+  () => api.delete(`/api/products/${id}`)
+])
+
 export default api
