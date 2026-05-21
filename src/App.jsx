@@ -19,6 +19,7 @@ import Permissions from './pages/Permissions';
 import AdminNotifications from './pages/AdminNotifications';
 import GestionAcces from './pages/GestionAcces';
 import Settings from './pages/Settings';
+import Boutique from './pages/Boutique';
 
 function RequireAuth({ children }) {
   const { isAuthenticated, loadingAuth } = useAuth();
@@ -77,6 +78,7 @@ function Layout() {
             <Route path="/abonnements" element={<ProtectedPage page="/abonnements"><Abonnements /></ProtectedPage>} />
             <Route path="/coaches" element={<ProtectedPage page="/coaches"><Coaches /></ProtectedPage>} />
             <Route path="/notifications" element={<ProtectedPage page="/notifications"><AdminNotifications /></ProtectedPage>} />
+            <Route path="/boutique"    element={<ProtectedPage page="/boutique"><Boutique /></ProtectedPage>} />
             <Route path="/permissions" element={<ProtectedPage page="/permissions"><Permissions /></ProtectedPage>} />
             <Route path="/settings"    element={<ProtectedPage page="/settings"><Settings /></ProtectedPage>} />
             <Route path="*"            element={<Navigate to="/" />} />

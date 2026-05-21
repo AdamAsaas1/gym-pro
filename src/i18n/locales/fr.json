@@ -33,7 +33,8 @@
     "permissions": "Gestion des Permissions",
     "payments": "Paiements",
     "settings": "Paramètres",
-    "notifications": "Notifications"
+    "notifications": "Notifications",
+    "store": "Boutique"
   },
   "sidebar": {
     "collapse": "Réduire",
@@ -489,6 +490,46 @@
       "iconColor": "Icone & Couleur",
       "saveBtn": "Enregistrer",
       "cancelBtn": "Annuler"
+    }
+  },
+  "store": {
+    "title": "Boutique",
+    "management": "Gestion du Store",
+    "subtitle": "Gérez vos produits, accessoires et suppléments vendus au club.",
+    "newProduct": "Nouveau Produit",
+    "loading": "Chargement des produits...",
+    "empty": "Aucun produit trouvé.",
+    "lowStock": "Stock Faible",
+    "outOfStock": "Rupture",
+    "edit": "Modifier",
+    "filters": {
+      "searchPlaceholder": "Rechercher un produit..."
+    },
+    "modals": {
+      "addProduct": "Ajouter un Produit",
+      "editProduct": "Modifier le Produit",
+      "confirmDeleteTitle": "Supprimer le produit"
+    },
+    "delete": {
+      "confirmMessage": "Voulez-vous vraiment supprimer le produit :",
+      "cancel": "Annuler",
+      "confirm": "Supprimer",
+      "error": "Erreur lors de la suppression"
+    },
+    "form": {
+      "errName": "Le nom est obligatoire",
+      "errPrice": "Prix invalide",
+      "errStock": "Stock invalide",
+      "name": "Nom du produit",
+      "price": "Prix",
+      "stock": "Stock",
+      "category": "Catégorie",
+      "description": "Description",
+      "imageUrl": "URL de l'image",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "add": "Ajouter",
+      "errorSave": "Erreur lors de la sauvegarde"
     }
   }
 }

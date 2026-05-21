@@ -1,6 +1,6 @@
 import { createElement, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, Calendar, Dumbbell, CreditCard, UserCheck, ChevronLeft, ChevronRight, Banknote, ShieldCheck, Bell, Settings, Camera} from 'lucide-react';
+import { LayoutDashboard, Users, Calendar, Dumbbell, CreditCard, UserCheck, ChevronLeft, ChevronRight, Banknote, ShieldCheck, Bell, Settings, Camera, ShoppingBag} from 'lucide-react';
 import { useGym } from '../context/GymContext';
 import PermissionRender from './PermissionRender';
 import { useTranslation } from 'react-i18next';
@@ -14,6 +14,7 @@ const NAV = [
   { to: '/activites',   icon: Dumbbell,        label: 'titles.activities'                 },
   { to: '/abonnements', icon: CreditCard,      label: 'titles.subscriptions'               },
   { to: '/coaches',     icon: UserCheck,       label: 'titles.coaches'                    },
+  { to: '/boutique',    icon: ShoppingBag,     label: 'titles.store'                      },
   { to: '/notifications', icon: Bell,          label: 'titles.notifications'             },
   { to: '/permissions', icon: ShieldCheck,     label: 'titles.permissions'               },
   { to: '/settings',    icon: Settings,        label: 'titles.settings'                },
