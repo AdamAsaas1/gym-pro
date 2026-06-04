@@ -232,4 +232,15 @@ export const deleteProduct = (id) => requestWithFallback([
   () => api.delete(`/api/products/${id}`)
 ])
 
+// ─── Commandes / Orders ──────────────────────────────────────────────────────────
+export const getCommandes = () => requestWithFallback([
+  () => api.get('/commandes/'),
+  () => api.get('/api/commandes')
+])
+export const updateCommandeStatus = (id, status) => requestWithFallback([
+  () => api.patch(`/commandes/${id}/status`, { status }),
+  () => api.patch(`/api/commandes/${id}/status`, { status })
+])
+
 export default api
+
