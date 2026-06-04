@@ -44,7 +44,8 @@
     "payments": "Paiements",
     "settings": "Paramètres",
     "notifications": "Notifications",
-    "store": "Boutique"
+    "store": "Boutique",
+    "live": "Direct & Affluence"
   },
   "sidebar": {
     "collapse": "Réduire",
@@ -578,6 +579,49 @@
         "status": "Statut",
         "actions": "Actions"
       }
+    }
+  },
+  "live": {
+    "title": "Surveillance & Occupation IA en Direct",
+    "subtitle": "Gérez la liaison des caméras CCTV et surveillez le taux de fréquentation en temps réel grâce au machine learning (YOLOv8).",
+    "paneTitle": "Cartographie des Caméras & Activités",
+    "coach": "Coach",
+    "noCoach": "Sans Coach",
+    "editCamera": "Configurer la caméra",
+    "startLive": "Lancer le live",
+    "cameraSource": "Source de Caméra :",
+    "noCameraLinked": "Aucune caméra liée",
+    "currentOccupancy": "Affluence Actuelle :",
+    "occupancy": "Occupation",
+    "status": {
+      "calm": "Calme",
+      "moderate": "Modéré",
+      "crowded": "Surchargé",
+      "unknown": "Inconnu"
+    },
+    "modal": {
+      "title": "Modifier la liaison caméra",
+      "sourceLabel": "Source de la caméra (IP RTSP, Fichier de test MP4)",
+      "capacityLabel": "Capacité Maximale de la zone (Membres)",
+      "videoTestLabel": "Fichier Vidéo pour test (.mp4)",
+      "uploadBtn": "Importer une vidéo",
+      "uploading": "Importation...",
+      "uploadSuccess": "Fichier importé avec succès sur le serveur !",
+      "saveBtn": "Enregistrer la configuration",
+      "cancelBtn": "Annuler"
+    },
+    "preview": {
+      "title": "Visualisation en Direct : {{activity}}",
+      "connecting": "Connexion au flux de comptage...",
+      "connected": "Flux IA Connecté - Analyse en temps réel",
+      "disconnected": "Déconnecté - Reconnexion en cours...",
+      "troubleshoot": "Si le flux ne se charge pas, vérifiez que le worker Python (camera_worker.py) tourne en arrière-plan et que la source de la caméra est accessible.",
+      "statsTitle": "Statistiques d'Occupation",
+      "detectedMembers": "Membres détectés",
+      "maxCapacity": "Capacité max",
+      "processingMode": "Mode de traitement",
+      "realtimeFps": "Temps réel (10 FPS)",
+      "closeBtn": "Fermer"
     }
   }
 }

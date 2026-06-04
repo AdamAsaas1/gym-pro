@@ -44,7 +44,8 @@
     "payments": "Pagos",
     "settings": "Ajustes",
     "notifications": "Notificaciones",
-    "store": "Boutique"
+    "store": "Boutique",
+    "live": "Directo y Afluencia"
   },
   "sidebar": {
     "collapse": "Ocultar",
@@ -577,6 +578,49 @@
         "status": "Estado",
         "actions": "Acciones"
       }
+    }
+  },
+  "live": {
+    "title": "Vigilancia por IA y Ocupación en Vivo",
+    "subtitle": "Gestione el mapeo de cámaras CCTV y controle las tasas de asistencia en vivo mediante aprendizaje automático (YOLOv8).",
+    "paneTitle": "Mapeo de Cámaras y Actividades",
+    "coach": "Entrenador",
+    "noCoach": "Sin Entrenador",
+    "editCamera": "Configurar cámara",
+    "startLive": "Iniciar transmisión",
+    "cameraSource": "Origen de la cámara:",
+    "noCameraLinked": "Ninguna cámara vinculada",
+    "currentOccupancy": "Afluencia Actual:",
+    "occupancy": "Ocupación",
+    "status": {
+      "calm": "Calma",
+      "moderate": "Moderado",
+      "crowded": "Lleno",
+      "unknown": "Desconocido"
+    },
+    "modal": {
+      "title": "Vincular Origen de Cámara",
+      "sourceLabel": "Origen de la cámara (IP RTSP, Archivo MP4 de prueba)",
+      "capacityLabel": "Capacidad Máxima de la zona (Miembros)",
+      "videoTestLabel": "Archivo de video para prueba (.mp4)",
+      "uploadBtn": "Subir Video",
+      "uploading": "Subiendo...",
+      "uploadSuccess": "¡Video subido con éxito al servidor!",
+      "saveBtn": "Guardar Configuración",
+      "cancelBtn": "Cancelar"
+    },
+    "preview": {
+      "title": "Vista en Vivo: {{activity}}",
+      "connecting": "Conectando al flujo de ocupación...",
+      "connected": "Transmisión de IA Conectada - Análisis en tiempo real",
+      "disconnected": "Desconectado - Reconectando...",
+      "troubleshoot": "Si la transmisión no carga, verifique que el worker de Python esté funcionando y que el origen de la cámara sea accesible.",
+      "statsTitle": "Estadísticas de Ocupación",
+      "detectedMembers": "Miembros detectados",
+      "maxCapacity": "Capacidad máx",
+      "processingMode": "Modo de procesamiento",
+      "realtimeFps": "Tiempo real (10 FPS)",
+      "closeBtn": "Cerrar"
     }
   }
 }

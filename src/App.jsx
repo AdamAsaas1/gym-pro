@@ -20,6 +20,7 @@ import AdminNotifications from './pages/AdminNotifications';
 import GestionAcces from './pages/GestionAcces';
 import Settings from './pages/Settings';
 import Boutique from './pages/Boutique';
+import LiveShow from './pages/LiveShow';
 
 function RequireAuth({ children }) {
   const { isAuthenticated, loadingAuth } = useAuth();
@@ -72,6 +73,7 @@ function Layout() {
             <Route path="/" element={<ProtectedPage page="/"><Dashboard /></ProtectedPage>} />
             <Route path="/acces" element={<ProtectedPage page="/acces"><GestionAcces /></ProtectedPage>} />
             <Route path="/membres" element={<ProtectedPage page="/membres"><Membres /></ProtectedPage>} />
+            <Route path="/live" element={<ProtectedPage page="/live"><LiveShow /></ProtectedPage>} />
             <Route path="/paiements" element={<ProtectedPage page="/paiements"><Paiements /></ProtectedPage>} />
             <Route path="/planning" element={<ProtectedPage page="/planning"><Planning /></ProtectedPage>} />
             <Route path="/activites" element={<ProtectedPage page="/activites"><Activites /></ProtectedPage>} />

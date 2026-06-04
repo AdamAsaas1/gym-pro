@@ -1,6 +1,6 @@
 import { createElement, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, Calendar, Dumbbell, CreditCard, UserCheck, ChevronLeft, ChevronRight, Banknote, ShieldCheck, Bell, Settings, Camera, ShoppingBag} from 'lucide-react';
+import { LayoutDashboard, Users, Calendar, Dumbbell, CreditCard, UserCheck, ChevronLeft, ChevronRight, Banknote, ShieldCheck, Bell, Settings, Camera, ShoppingBag, Tv } from 'lucide-react';
 import { useGym } from '../context/GymContext';
 import PermissionRender from './PermissionRender';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,7 @@ const NAV = [
   { to: '/',            icon: LayoutDashboard, label: 'titles.dashboard', end: true },
   { to: '/acces',       icon: Camera,          label: 'titles.access'              },
   { to: '/membres',     icon: Users,           label: 'titles.members'                   },
+  { to: '/live',        icon: Tv,              label: 'titles.live'                      },
   { to: '/paiements',  icon: Banknote,        label: 'titles.payments'                 },
   { to: '/planning',    icon: Calendar,        label: 'titles.planning'                  },
   { to: '/activites',   icon: Dumbbell,        label: 'titles.activities'                 },

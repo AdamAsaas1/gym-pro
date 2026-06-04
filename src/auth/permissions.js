@@ -2,6 +2,7 @@ export const ALL_PAGES = [
   { path: '/', label: 'Tableau de Bord' },
   { path: '/acces', label: 'Gestion d\'Accès' },
   { path: '/membres', label: 'Membres' },
+  { path: '/live', label: 'Direct & Affluence' },
   { path: '/paiements', label: 'Paiements' },
   { path: '/planning', label: 'Planning' },
   { path: '/activites', label: 'Activites' },
@@ -16,7 +17,7 @@ export const ROLE_ORDER = ['superadmin', 'admin'];
 
 export const DEFAULT_ROLE_PERMISSIONS = {
   superadmin: ['*'],
-  admin: ['/', '/acces', '/membres', '/paiements', '/planning', '/activites', '/abonnements', '/coaches', '/boutique', '/notifications'],
+  admin: ['/', '/acces', '/membres', '/live', '/paiements', '/planning', '/activites', '/abonnements', '/coaches', '/boutique', '/notifications'],
 };
 
 export const PAGE_PATHS = new Set(ALL_PAGES.map((p) => p.path));

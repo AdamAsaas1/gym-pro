@@ -44,7 +44,8 @@
     "payments": "Payments",
     "settings": "Settings",
     "notifications": "Notifications",
-    "store": "Boutique"
+    "store": "Boutique",
+    "live": "Live & Occupancy"
   },
   "sidebar": {
     "collapse": "Collapse",
@@ -578,6 +579,49 @@
         "status": "Status",
         "actions": "Actions"
       }
+    }
+  },
+  "live": {
+    "title": "Live AI Surveillance & Occupancy",
+    "subtitle": "Manage CCTV camera mapping and monitor live attendance rates utilizing machine learning (YOLOv8).",
+    "paneTitle": "Camera & Activity Mapping",
+    "coach": "Coach",
+    "noCoach": "No Coach",
+    "editCamera": "Configure Camera",
+    "startLive": "Start Live View",
+    "cameraSource": "Camera Source:",
+    "noCameraLinked": "No camera linked",
+    "currentOccupancy": "Current Occupancy:",
+    "occupancy": "Occupancy",
+    "status": {
+      "calm": "Calm",
+      "moderate": "Moderate",
+      "crowded": "Crowded",
+      "unknown": "Unknown"
+    },
+    "modal": {
+      "title": "Link Camera Source",
+      "sourceLabel": "Camera Source (RTSP IP, Test MP4 File)",
+      "capacityLabel": "Maximum Capacity of the Zone (Members)",
+      "videoTestLabel": "Video File for Testing (.mp4)",
+      "uploadBtn": "Upload Video",
+      "uploading": "Uploading...",
+      "uploadSuccess": "Video uploaded successfully to the server!",
+      "saveBtn": "Save Configuration",
+      "cancelBtn": "Cancel"
+    },
+    "preview": {
+      "title": "Live View: {{activity}}",
+      "connecting": "Connecting to occupancy feed...",
+      "connected": "AI Feed Connected - Real-time Analysis",
+      "disconnected": "Disconnected - Reconnecting...",
+      "troubleshoot": "If the feed does not load, please verify that the Python background worker is running and the camera source is accessible.",
+      "statsTitle": "Occupancy Statistics",
+      "detectedMembers": "Detected Members",
+      "maxCapacity": "Max Capacity",
+      "processingMode": "Processing Mode",
+      "realtimeFps": "Real-time (10 FPS)",
+      "closeBtn": "Close"
     }
   }
 }

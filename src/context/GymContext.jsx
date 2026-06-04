@@ -142,7 +142,9 @@ export function GymProvider({ children }) {
             coachNom: a.coach_name || 'À définir',
             icon: a.icon || '🏋️', 
             bg: a.color ? `${a.color}15` : 'rgba(99, 102, 241, 0.1)', 
-            couleur: a.color || '#6366f1'
+            couleur: a.color || '#6366f1',
+            camera_source: a.camera_source || '',
+            current_capacity: a.current_capacity || 0
           }));
           setActivites(mapped);
         } else {
@@ -160,11 +162,11 @@ export function GymProvider({ children }) {
     return () => { ignore = true; };
   }, [isAuthenticated, loadingAuth]);
 
-  // Polling for updates every 15 seconds
+  // Polling for updates every 15 seconds (members/orders) and 20 seconds (activities)
   useEffect(() => {
     if (!isAuthenticated || loadingAuth) return;
 
-    const interval = setInterval(() => {
+    const interval15 = setInterval(() => {
       apiClient.getMembres().then(data => {
         setMembres(data.map(fromApi));
       }).catch(err => console.error('Error polling members:', err));
@@ -174,7 +176,41 @@ export function GymProvider({ children }) {
       }).catch(err => console.error('Error polling orders:', err));
     }, 15000);
 
-    return () => clearInterval(interval);
+    const refreshActs = () => {
+      apiClient.getActivities().then(data => {
+        if (data && data.length > 0) {
+          const mapped = data.map(a => ({
+            id: a.id,
+            nom: a.name,
+            prix: { 
+              mensuel: Number(a.price_month), 
+              trimestriel: Number(a.price_month) * 3 * 0.9,
+              annuel: Number(a.price_year) 
+            },
+            inscription_fees: Number(a.inscription_fees),
+            assurance_first: Number(a.assurance_first_year),
+            assurance_next: Number(a.assurance_next_years),
+            max_capacity: a.max_capacity,
+            genre: a.genre || 'homme',
+            description: a.description || '',
+            coachNom: a.coach_name || 'À définir',
+            icon: a.icon || '🏋️', 
+            bg: a.color ? `${a.color}15` : 'rgba(99, 102, 241, 0.1)', 
+            couleur: a.color || '#6366f1',
+            camera_source: a.camera_source || '',
+            current_capacity: a.current_capacity || 0
+          }));
+          setActivites(mapped);
+        }
+      }).catch(err => console.error('Error polling activities:', err));
+    };
+
+    const interval20 = setInterval(refreshActs, 20000);
+
+    return () => {
+      clearInterval(interval15);
+      clearInterval(interval20);
+    };
   }, [isAuthenticated, loadingAuth]);
 
   /* ── Actions CRUD via API ─────────────────────────── */
@@ -258,7 +294,9 @@ export function GymProvider({ children }) {
       coachNom: ac.coach_name || '',
       icon: ac.icon || '🏋️', 
       bg: ac.color ? `${ac.color}15` : 'rgba(99, 102, 241, 0.1)', 
-      couleur: ac.color || '#6366f1'
+      couleur: ac.color || '#6366f1',
+      camera_source: ac.camera_source || '',
+      current_capacity: ac.current_capacity || 0
     })));
     return a;
   };
@@ -279,7 +317,9 @@ export function GymProvider({ children }) {
       coachNom: ac.coach_name || '',
       icon: ac.icon || '🏋️', 
       bg: ac.color ? `${ac.color}15` : 'rgba(99, 102, 241, 0.1)', 
-      couleur: ac.color || '#6366f1'
+      couleur: ac.color || '#6366f1',
+      camera_source: ac.camera_source || '',
+      current_capacity: ac.current_capacity || 0
     })));
   };
 
