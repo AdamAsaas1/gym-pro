@@ -2115,7 +2115,7 @@ input, select, button, textarea { font-family: inherit; }
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 200;
+  z-index: 99999;
   padding: 16px;
   overflow-y: auto;
 }
