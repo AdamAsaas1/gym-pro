@@ -14,12 +14,22 @@
       "all": "Tous",
       "danger": "Urgents",
       "warning": "Proches",
+      "order": "Commandes",
       "info": "Inactifs"
     },
     "sections": {
       "danger": "Expirations urgentes",
       "warning": "Expirations proches",
+      "order": "Nouvelles commandes",
       "info": "Membres inactifs"
+    },
+    "orders": {
+      "goToBoutique": "Voir dans la Boutique",
+      "number": "Commande",
+      "items": "Articles"
+    },
+    "modals": {
+      "orderDetailsTitle": "Détails de la Commande"
     }
   },
   "titles": {
@@ -45,6 +55,7 @@
     "active": "Actifs",
     "toPay": "A regler"
   },
+
   "subscriptions": {
     "monthly": "Mensuel",
     "1month": "1 mois",
@@ -495,7 +506,7 @@
   "store": {
     "title": "Boutique",
     "management": "Gestion du Store",
-    "subtitle": "Gérez vos produits, accessoires et suppléments vendus au club.",
+    "subtitle": "Gérez vos produits, réductions et commandes clients.",
     "newProduct": "Nouveau Produit",
     "loading": "Chargement des produits...",
     "empty": "Aucun produit trouvé.",
@@ -525,11 +536,48 @@
       "stock": "Stock",
       "category": "Catégorie",
       "description": "Description",
-      "imageUrl": "URL de l'image",
+      "imageUrl": "Image URL",
       "cancel": "Annuler",
       "save": "Enregistrer",
       "add": "Ajouter",
-      "errorSave": "Erreur lors de la sauvegarde"
+      "errorSave": "Erreur lors de la sauvegarde",
+      "promo": "Prix Promo (Optionnel)",
+      "errPromo": "Prix promo invalide",
+      "errPromoPrice": "Le prix promo doit être inférieur au prix normal",
+      "images": "Photos du produit (Multiple)",
+      "chooseFiles": "Ajouter des photos",
+      "pasteUrlPlaceholder": "Ou coller l'URL d'une image (ex: https://...)"
+    },
+    "tabs": {
+      "products": "Produits",
+      "orders": "Commandes"
+    },
+    "badgePromo": "PROMO",
+    "orders": {
+      "loading": "Chargement des commandes...",
+      "empty": "Aucune commande trouvée.",
+      "client": "Client",
+      "date": "Date",
+      "items": "Articles",
+      "paymentMethod": "Paiement",
+      "address": "Adresse / Livraison",
+      "pickupAtGym": "Retrait au Club",
+      "errorStatus": "Erreur lors de la mise à jour du statut",
+      "status": {
+        "pending": "En attente",
+        "delivered": "Livré",
+        "collected": "Récupéré",
+        "cancelled": "Annulé"
+      },
+      "payment": {
+        "delivery": "Paiement à la livraison",
+        "gym": "Paiement au Club"
+      },
+      "table": {
+        "total": "Total",
+        "status": "Statut",
+        "actions": "Actions"
+      }
     }
   }
 }

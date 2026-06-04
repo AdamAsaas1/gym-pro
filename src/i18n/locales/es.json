@@ -14,12 +14,22 @@
       "all": "Todos",
       "danger": "Urgentes",
       "warning": "Próximos",
+      "order": "Pedidos",
       "info": "Inactivos"
     },
     "sections": {
       "danger": "Expirations urgentes",
       "warning": "Expirations próximas",
+      "order": "Nuevos pedidos",
       "info": "Miembros inactivos"
+    },
+    "orders": {
+      "goToBoutique": "Ver en la Tienda",
+      "number": "Pedido",
+      "items": "Artículos"
+    },
+    "modals": {
+      "orderDetailsTitle": "Detalles del Pedido"
     }
   },
   "titles": {
@@ -33,7 +43,8 @@
     "permissions": "Gestión de Permisos",
     "payments": "Pagos",
     "settings": "Ajustes",
-    "notifications": "Notificaciones"
+    "notifications": "Notificaciones",
+    "store": "Boutique"
   },
   "sidebar": {
     "collapse": "Ocultar",
@@ -489,6 +500,83 @@
       "iconColor": "Icono y Color",
       "saveBtn": "Guardar",
       "cancelBtn": "Cancelar"
+    }
+  },
+  "store": {
+    "title": "Boutique",
+    "management": "Gestión de Tienda",
+    "subtitle": "Gestione sus productos, descuentos y pedidos de clientes.",
+    "newProduct": "Nuevo Producto",
+    "loading": "Cargando productos...",
+    "empty": "No se encontraron productos.",
+    "lowStock": "Stock Bajo",
+    "outOfStock": "Agotado",
+    "edit": "Editar",
+    "filters": {
+      "searchPlaceholder": "Buscar producto..."
+    },
+    "modals": {
+      "addProduct": "Añadir Producto",
+      "editProduct": "Editar Producto",
+      "confirmDeleteTitle": "Eliminar Producto"
+    },
+    "delete": {
+      "confirmMessage": "¿Realmente desea eliminar el producto:",
+      "cancel": "Cancelar",
+      "confirm": "Eliminar",
+      "error": "Error al eliminar el producto"
+    },
+    "form": {
+      "errName": "El nombre es obligatorio",
+      "errPrice": "Precio inválido",
+      "errStock": "Stock inválido",
+      "name": "Nombre del producto",
+      "price": "Precio",
+      "stock": "Stock",
+      "category": "Categoría",
+      "description": "Descripción",
+      "imageUrl": "URL de imagen",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "add": "Añadir",
+      "errorSave": "Error al guardar el producto",
+      "promo": "Precio Promo (Opcional)",
+      "errPromo": "Precio promo inválido",
+      "errPromoPrice": "El precio promo debe ser inferior al precio original",
+      "images": "Fotos del producto (Múltiples)",
+      "chooseFiles": "Añadir fotos",
+      "pasteUrlPlaceholder": "O pegue la URL de la imagen (ej: https://...)"
+    },
+    "tabs": {
+      "products": "Productos",
+      "orders": "Pedidos"
+    },
+    "badgePromo": "PROMO",
+    "orders": {
+      "loading": "Cargando pedidos...",
+      "empty": "No se encontraron pedidos.",
+      "client": "Cliente",
+      "date": "Fecha",
+      "items": "Artículos",
+      "paymentMethod": "Pago",
+      "address": "Dirección / Entrega",
+      "pickupAtGym": "Recoger en el Gimnasio",
+      "errorStatus": "Error al actualizar el estado del pedido",
+      "status": {
+        "pending": "Pendiente",
+        "delivered": "Entregado",
+        "collected": "Recogido",
+        "cancelled": "Cancelado"
+      },
+      "payment": {
+        "delivery": "Pago contra entrega",
+        "gym": "Pago en el Gimnasio"
+      },
+      "table": {
+        "total": "Total",
+        "status": "Estado",
+        "actions": "Acciones"
+      }
     }
   }
 }

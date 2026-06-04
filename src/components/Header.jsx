@@ -1,12 +1,15 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
-import { Bell, Calendar, X, AlertTriangle, Clock, UserX, CheckCheck, ChevronRight } from 'lucide-react';
+import { Bell, Calendar, X, AlertTriangle, Clock, UserX, CheckCheck, ChevronRight, ShoppingBag } from 'lucide-react';
 import { useGym } from '../context/GymContext';
 import PermissionRender from './PermissionRender';
 import { usePermissions } from '../context/PermissionContext';
 import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { Globe } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import Modal from './Modal';
+
 const TITLES = {
   '/':            'Tableau de Bord',
   '/acces':       'Gestion d\'Accès',
@@ -27,6 +30,7 @@ const TYPE_CFG = {
   danger:  { color: '#ef4444', bg: 'rgba(239,68,68,0.09)',   label: 'Urgent',    Icon: AlertTriangle },
   warning: { color: '#f97316', bg: 'rgba(249,115,22,0.09)',  label: 'Attention', Icon: Clock         },
   info:    { color: '#94a3b8', bg: 'rgba(148,163,184,0.07)', label: 'Inactif',   Icon: UserX         },
+  order:   { color: '#3b82f6', bg: 'rgba(59,130,246,0.09)',  label: 'Commande',  Icon: ShoppingBag   },
 };
 
 const GENRE_ICONS = { homme: 'H', femme: 'F', enfant: 'E' };
@@ -35,6 +39,7 @@ const FILTERS = [
   { key: 'all',     label: 'Tous'      },
   { key: 'danger',  label: 'Urgents'   },
   { key: 'warning', label: 'Proches'   },
+  { key: 'order',   label: 'Commandes' },
   { key: 'info',    label: 'Inactifs'  },
 ];
 
@@ -42,6 +47,7 @@ const SECTION_LABELS = {
   danger:  'Expirations urgentes',
   warning: 'Expirations proches',
   info:    'Membres inactifs',
+  order:   'Nouvelles commandes',
 };
 
 export default function Header() {
@@ -58,6 +64,7 @@ export default function Header() {
   const [langOpen, setLangOpen] = useState(false);
   const [filter, setFilter] = useState('all');
   const [search, setSearch] = useState('');
+  const [selectedOrder, setSelectedOrder] = useState(null);
   const wrapRef = useRef(null);
   const langWrapRef = useRef(null);
 
@@ -77,7 +84,7 @@ export default function Header() {
   const filtered = filter === 'all' ? notifications : notifications.filter((n) => n.type === filter);
 
   /* Group by type */
-  const grouped = ['danger', 'warning', 'info'].reduce((acc, t) => {
+  const grouped = ['danger', 'warning', 'order', 'info'].reduce((acc, t) => {
     const items = filtered.filter((n) => n.type === t);
     if (items.length) acc.push({ type: t, items });
     return acc;
@@ -104,7 +111,7 @@ export default function Header() {
   }, [search, runSearch]);
 
   return (
-    <header className="app-header">
+    <header className="app-header" style={selectedOrder ? { zIndex: 9999 } : {}}>
       <div className="app-header__left">
         <h1 className="app-header__title">{title}</h1>
         <span className="app-header__date">
@@ -247,7 +254,13 @@ export default function Header() {
                             key={n.id}
                             className={`notif-item${read ? ' notif-item--read' : ''}`}
                             style={{ '--nc': cfg.color, '--nbg': cfg.bg }}
-                            onClick={() => markRead(n.id)}
+                            onClick={() => {
+                              markRead(n.id);
+                              if (n.type === 'order') {
+                                setSelectedOrder(n.order);
+                                setOpen(false);
+                              }
+                            }}
                           >
                             {!read && <span className="notif-item__unread-dot" />}
                             <div className="notif-item__icon-wrap">
@@ -287,6 +300,115 @@ export default function Header() {
 
         <div className="header-avatar">GP</div>
       </div>
+
+      {selectedOrder && createPortal(
+        <Modal
+          title={t('header.modals.orderDetailsTitle', 'Détails de la Commande')}
+          onClose={() => setSelectedOrder(null)}
+        >
+          <div className="order-details-modal">
+            <div className="order-details-header" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--primary)', fontWeight: 'bold' }}>
+                  {t('header.orders.number', 'Commande')} #{selectedOrder.id}
+                </h3>
+                <span style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                  {new Date(selectedOrder.created_at).toLocaleString('fr-FR')}
+                </span>
+              </div>
+              <span 
+                style={{ 
+                  padding: '4px 12px', 
+                  borderRadius: '12px', 
+                  fontSize: '0.85rem', 
+                  fontWeight: 'bold',
+                  textTransform: 'uppercase',
+                  backgroundColor: selectedOrder.status === 'pending' ? 'rgba(245, 158, 11, 0.15)' :
+                                   selectedOrder.status === 'delivered' ? 'rgba(53, 208, 127, 0.15)' :
+                                   selectedOrder.status === 'collected' ? 'rgba(59, 130, 246, 0.15)' :
+                                   'rgba(239, 68, 68, 0.15)',
+                  color: selectedOrder.status === 'pending' ? '#f59e0b' :
+                         selectedOrder.status === 'delivered' ? '#35d07f' :
+                         selectedOrder.status === 'collected' ? '#3b82f6' :
+                         '#ef4444',
+                  border: selectedOrder.status === 'pending' ? '1px solid rgba(245, 158, 11, 0.3)' :
+                          selectedOrder.status === 'delivered' ? '1px solid rgba(53, 208, 127, 0.3)' :
+                          selectedOrder.status === 'collected' ? '1px solid rgba(59, 130, 246, 0.3)' :
+                          '1px solid rgba(239, 68, 68, 0.3)'
+                }}
+              >
+                {selectedOrder.status === 'pending' ? t('store.orders.status.pending', 'En attente') :
+                 selectedOrder.status === 'delivered' ? t('store.orders.status.delivered', 'Livré') :
+                 selectedOrder.status === 'collected' ? t('store.orders.status.collected', 'Récupéré') :
+                 t('store.orders.status.cancelled', 'Annulé')}
+              </span>
+            </div>
+
+            <div className="order-details-client" style={{ marginBottom: '1.5rem', backgroundColor: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '8px' }}>
+              <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.95rem', textTransform: 'uppercase', color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>
+                {t('store.orders.client', 'Client')}
+              </h4>
+              <p style={{ margin: 0, fontWeight: 'bold', fontSize: '1.1rem' }}>
+                {selectedOrder.membre_prenom} {selectedOrder.membre_nom}
+              </p>
+              {selectedOrder.payment_method === 'cash_on_delivery' ? (
+                <div style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
+                  <strong>{t('store.orders.deliveryAddress', 'Adresse de livraison :')}</strong>
+                  <div style={{ color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                    {selectedOrder.address}, {selectedOrder.postal_code} {selectedOrder.city}
+                  </div>
+                </div>
+              ) : (
+                <div style={{ marginTop: '0.5rem', fontSize: '0.9rem', color: 'var(--primary)', fontStyle: 'italic' }}>
+                  {t('store.orders.pickupAtGym', 'Retrait au Club')}
+                </div>
+              )}
+            </div>
+
+            <div className="order-details-items" style={{ marginBottom: '1.5rem' }}>
+              <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.95rem', textTransform: 'uppercase', color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>
+                {t('header.orders.items', 'Articles')}
+              </h4>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {selectedOrder.items?.map((item) => (
+                  <li key={item.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                    <span>
+                      {item.product?.name || `Produit #${item.product_id}`} <strong style={{ color: 'var(--primary)' }}>x{item.quantity}</strong>
+                    </span>
+                    <span style={{ fontWeight: 'bold' }}>
+                      {(item.price * item.quantity).toLocaleString('fr-FR')} DH
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="order-details-total" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', marginBottom: '2rem' }}>
+              <span style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{t('store.orders.table.total', 'Total')}</span>
+              <span style={{ fontWeight: 'bold', fontSize: '1.4rem', color: 'var(--primary)' }}>
+                {selectedOrder.total_price.toLocaleString('fr-FR')} DH
+              </span>
+            </div>
+
+            <div className="form-actions" style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
+              <button className="btn btn--ghost" onClick={() => setSelectedOrder(null)}>
+                {t('store.form.cancel', 'Fermer')}
+              </button>
+              <button
+                className="btn btn--primary"
+                onClick={() => {
+                  setSelectedOrder(null);
+                  navigate('/boutique?tab=commandes', { state: { activeTab: 'commandes' } });
+                }}
+              >
+                <ShoppingBag size={16} style={{ marginRight: '8px', verticalAlign: 'middle', display: 'inline' }} />
+                {t('header.orders.goToBoutique', 'Voir dans la Boutique')}
+              </button>
+            </div>
+          </div>
+        </Modal>,
+        document.body
+      )}
     </header>
   );
 }

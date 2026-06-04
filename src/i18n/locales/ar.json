@@ -14,12 +14,22 @@
       "all": "الكل",
       "danger": "عاجل",
       "warning": "قريب",
+      "order": "الطلبات",
       "info": "غير نشط"
     },
     "sections": {
       "danger": "انتهاء الصلاحية العاجل",
       "warning": "انتهاء الصلاحية القريب",
+      "order": "الطلبات الجديدة",
       "info": "الأعضاء غير النشطين"
+    },
+    "orders": {
+      "goToBoutique": "عرض في المتجر",
+      "number": "الطلب",
+      "items": "العناصر"
+    },
+    "modals": {
+      "orderDetailsTitle": "تفاصيل الطلب"
     }
   },
   "titles": {
@@ -33,7 +43,8 @@
     "permissions": "إدارة الصلاحيات",
     "payments": "المدفوعات",
     "settings": "الإعدادات",
-    "notifications": "الإشعارات"
+    "notifications": "الإشعارات",
+    "store": "المتجر"
   },
   "sidebar": {
     "collapse": "طي",
@@ -44,6 +55,7 @@
     "active": "نشط",
     "toPay": "للدفع"
   },
+
   "subscriptions": {
     "monthly": "شهري",
     "1month": "شهر واحد",
@@ -489,6 +501,83 @@
       "iconColor": "أيقونة ولون",
       "saveBtn": "حفظ",
       "cancelBtn": "إلغاء"
+    }
+  },
+  "store": {
+    "title": "المتجر",
+    "management": "إدارة المتجر",
+    "subtitle": "إدارة منتجاتك، الخصومات وطلبات العملاء.",
+    "newProduct": "منتج جديد",
+    "loading": "جاري تحميل المنتجات...",
+    "empty": "لم يتم العثور على أي منتج.",
+    "lowStock": "مخزون منخفض",
+    "outOfStock": "نفذت الكمية",
+    "edit": "تعديل",
+    "filters": {
+      "searchPlaceholder": "البحث عن منتج..."
+    },
+    "modals": {
+      "addProduct": "إضافة منتج",
+      "editProduct": "تعديل المنتج",
+      "confirmDeleteTitle": "حذف المنتج"
+    },
+    "delete": {
+      "confirmMessage": "هل تريد حقًا حذف المنتج:",
+      "cancel": "إلغاء",
+      "confirm": "حذف",
+      "error": "خطأ أثناء الحذف"
+    },
+    "form": {
+      "errName": "الاسم مطلوب",
+      "errPrice": "سعر غير صالح",
+      "errStock": "مخزون غير صالح",
+      "name": "اسم المنتج",
+      "price": "السعر",
+      "stock": "المخزون",
+      "category": "الفئة",
+      "description": "الوصف",
+      "imageUrl": "رابط الصورة",
+      "cancel": "إلغاء",
+      "save": "حفظ",
+      "add": "إضافة",
+      "errorSave": "خطأ أثناء الحفظ",
+      "promo": "السعر الترويجي (اختياري)",
+      "errPromo": "سعر ترويجي غير صالح",
+      "errPromoPrice": "يجب أن يكون السعر الترويجي أقل من السعر الأصلي",
+      "images": "صور المنتج (متعددة)",
+      "chooseFiles": "إضافة صور",
+      "pasteUrlPlaceholder": "أو الصق رابط الصورة (مثال: https://...)"
+    },
+    "tabs": {
+      "products": "المنتجات",
+      "orders": "الطلبات"
+    },
+    "badgePromo": "عرض ترويجي",
+    "orders": {
+      "loading": "جاري تحميل الطلبات...",
+      "empty": "لم يتم العثور على أي طلب.",
+      "client": "العميل",
+      "date": "التاريخ",
+      "items": "العناصر",
+      "paymentMethod": "الدفع",
+      "address": "العنوان / التوصيل",
+      "pickupAtGym": "الاستلام من النادي",
+      "errorStatus": "خطأ أثناء تحديث حالة الطلب",
+      "status": {
+        "pending": "في الانتظار",
+        "delivered": "تم التوصيل",
+        "collected": "تم الاستلام",
+        "cancelled": "ملغى"
+      },
+      "payment": {
+        "delivery": "الدفع عند الاستلام",
+        "gym": "الدفع في النادي"
+      },
+      "table": {
+        "total": "الإجمالي",
+        "status": "الحالة",
+        "actions": "الإجراءات"
+      }
     }
   }
 }

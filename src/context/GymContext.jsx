@@ -77,6 +77,7 @@ export function GymProvider({ children }) {
   const [readIds, setReadIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState(false);
+  const [commandes, setCommandes] = useState([]);
 
   /* ── Charger les données depuis l'API au démarrage ── */
   useEffect(() => {
@@ -89,6 +90,7 @@ export function GymProvider({ children }) {
         if (!ignore) {
           setMembres([]);
           setPaiements([]);
+          setCommandes([]);
           setApiError(false);
           setLoading(false);
         }
@@ -97,12 +99,13 @@ export function GymProvider({ children }) {
 
       if (!ignore) setLoading(true);
       try {
-        const [msRes, psRes, cfgRes, settingsRes, actsRes] = await Promise.allSettled([
+        const [msRes, psRes, cfgRes, settingsRes, actsRes, cmdRes] = await Promise.allSettled([
           apiClient.getMembres(),
           apiClient.getPaiements(),
           apiClient.getConfig(),
           apiClient.getSettings(),
           apiClient.getActivities(),
+          apiClient.getCommandes(),
         ]);
         if (ignore) return;
 
@@ -110,6 +113,8 @@ export function GymProvider({ children }) {
         else setMembres([]);
         if (psRes.status === 'fulfilled') setPaiements(psRes.value.map(fromApiP));
         else setPaiements([]);
+        if (cmdRes && cmdRes.status === 'fulfilled') setCommandes(cmdRes.value);
+        else setCommandes([]);
 
         const cfg = cfgRes.status === 'fulfilled' ? cfgRes.value : null;
         setConfigFallback(cfgRes.status !== 'fulfilled');
@@ -153,6 +158,23 @@ export function GymProvider({ children }) {
 
     fetchAll();
     return () => { ignore = true; };
+  }, [isAuthenticated, loadingAuth]);
+
+  // Polling for updates every 15 seconds
+  useEffect(() => {
+    if (!isAuthenticated || loadingAuth) return;
+
+    const interval = setInterval(() => {
+      apiClient.getMembres().then(data => {
+        setMembres(data.map(fromApi));
+      }).catch(err => console.error('Error polling members:', err));
+
+      apiClient.getCommandes().then(data => {
+        setCommandes(data || []);
+      }).catch(err => console.error('Error polling orders:', err));
+    }, 15000);
+
+    return () => clearInterval(interval);
   }, [isAuthenticated, loadingAuth]);
 
   /* ── Actions CRUD via API ─────────────────────────── */
@@ -316,16 +338,51 @@ export function GymProvider({ children }) {
         }
       }
     });
+
+    commandes.forEach((cmd) => {
+      if (cmd.status === 'pending') {
+        const m = membres.find((mb) => mb.id === cmd.membre_id);
+        list.push({
+          id: `order_${cmd.id}`,
+          type: 'order',
+          membre: m || {
+            prenom: cmd.membre_prenom || 'Client',
+            nom: cmd.membre_nom || `#${cmd.membre_id}`,
+            genre: 'homme',
+            activite: 'Achat Boutique',
+            telephone: 'N/A',
+          },
+          days: null,
+          created_at: cmd.created_at,
+          msg: `Commande #${cmd.id} (${cmd.payment_method === 'cash_on_delivery' ? 'Livraison' : 'Club'})`,
+          submsg: `Achat boutique — Total: ${cmd.total_price} DH`,
+          order: cmd,
+        });
+      }
+    });
+
     return list.sort((a, b) => {
-      const order = { danger: 0, warning: 1, info: 2 };
+      const order = { danger: 0, warning: 1, order: 2, info: 3 };
       if (order[a.type] !== order[b.type]) return order[a.type] - order[b.type];
+      if (a.type === 'order' && b.type === 'order') {
+        return new Date(b.created_at) - new Date(a.created_at);
+      }
       return (a.days ?? 999) - (b.days ?? 999);
     });
-  }, [membres]);
+  }, [membres, commandes]);
 
   const markRead  = (id) => setReadIds((prev) => new Set([...prev, id]));
   const clearAll  = () => setReadIds(new Set(notifications.map((n) => n.id)));
   const unreadCount = notifications.filter((n) => !readIds.has(n.id)).length;
+
+  const fetchCommandes = async () => {
+    try {
+      const data = await apiClient.getCommandes();
+      setCommandes(data || []);
+    } catch (err) {
+      console.error('Failed to load orders', err);
+    }
+  };
 
   /* ── stats paiements ── */
   const statsP = useMemo(() => {
@@ -338,7 +395,7 @@ export function GymProvider({ children }) {
   }, [membres, paiements]);
 
   return (
-    <GymContext.Provider value={{ membres, paiements, coaches: COACHES, activites, gymSettings, planning: PLANNING, abonnementDurations, configFallback, stats, statsP, notifications, readIds, markRead, clearAll, unreadCount, loading, apiError, addMembre, updateMembre, deleteMembre, toggleStatut, enregistrerPaiement, enregistrerPaiementWorkflow, updateSettings, addActivity, updateActivity, deleteActivity }}>
+    <GymContext.Provider value={{ membres, paiements, coaches: COACHES, activites, gymSettings, planning: PLANNING, abonnementDurations, configFallback, stats, statsP, notifications, readIds, markRead, clearAll, unreadCount, loading, apiError, addMembre, updateMembre, deleteMembre, toggleStatut, enregistrerPaiement, enregistrerPaiementWorkflow, updateSettings, addActivity, updateActivity, deleteActivity, commandes, setCommandes, fetchCommandes }}>
       {loading && isAuthenticated ? (
         <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', background:'#0f172a', color:'#94a3b8', fontSize:'1.1rem', gap:'12px' }}>
           <div style={{ width:28, height:28, border:'3px solid #334155', borderTop:'3px solid #6366f1', borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
