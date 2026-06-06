@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import Webcam from 'react-webcam';
-import { Camera, CheckCircle, XCircle, AlertCircle, History, UserPlus } from 'lucide-react';
+import { Camera, CheckCircle, XCircle, AlertCircle, History, UserPlus, QrCode } from 'lucide-react';
 import { checkAccess, getAccessHistory, getMembres, enrollMember } from '../api/client';
 import { useTranslation } from 'react-i18next';
 import './GestionAcces.css';
@@ -16,6 +16,8 @@ const GestionAcces = () => {
   const [enrollMode, setEnrollMode] = useState(false);
   const [enrollMsg, setEnrollMsg] = useState('');
   const [enrollStatus, setEnrollStatus] = useState(''); // 'success' | 'error'
+  const [scanPaused, setScanPaused] = useState(false);
+  const [manualCode, setManualCode] = useState('');
 
   const fetchHistory = async () => {
     try {
@@ -43,23 +45,71 @@ const GestionAcces = () => {
   }, []);
 
   const capture = useCallback(() => {
+    if (!webcamRef.current) return null;
     const imageSrc = webcamRef.current.getScreenshot();
     return imageSrc;
   }, [webcamRef]);
 
-  const handleVerify = async () => {
+  const handleVerify = async (qrOnly = false) => {
+    if (isProcessing || scanPaused) return;
     const imageSrc = capture();
     if (!imageSrc) return;
 
     setIsProcessing(true);
     setAccessResult(null);
     try {
-      const result = await checkAccess(imageSrc);
-      setAccessResult(result);
+      const result = await checkAccess(imageSrc, qrOnly);
+      if (qrOnly && result && result.status === 'no_qr') {
+        setAccessResult({ status: 'denied', reason: 'No QR Code detected' });
+      } else {
+        setAccessResult(result);
+      }
       fetchHistory();
+      
+      setScanPaused(true);
+      setTimeout(() => {
+        setScanPaused(false);
+        setAccessResult(null);
+      }, 5000);
     } catch (err) {
       const msg = err.response?.data?.detail || err.message;
       setAccessResult({ status: 'denied', reason: msg });
+      
+      setScanPaused(true);
+      setTimeout(() => {
+        setScanPaused(false);
+        setAccessResult(null);
+      }, 4000);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleManualVerify = async () => {
+    if (isProcessing || scanPaused || !manualCode.trim()) return;
+
+    setIsProcessing(true);
+    setAccessResult(null);
+    try {
+      const result = await checkAccess(null, false, manualCode.trim());
+      setAccessResult(result);
+      fetchHistory();
+      setManualCode('');
+      
+      setScanPaused(true);
+      setTimeout(() => {
+        setScanPaused(false);
+        setAccessResult(null);
+      }, 5000);
+    } catch (err) {
+      const msg = err.response?.data?.detail || err.message;
+      setAccessResult({ status: 'denied', reason: msg });
+      
+      setScanPaused(true);
+      setTimeout(() => {
+        setScanPaused(false);
+        setAccessResult(null);
+      }, 4000);
     } finally {
       setIsProcessing(false);
     }
@@ -154,14 +204,46 @@ const GestionAcces = () => {
                   )}
                 </div>
               ) : (
-                <button
-                  onClick={handleVerify}
-                  disabled={isProcessing}
-                  className="access-btn-primary"
-                >
-                  <Camera size={26} />
-                  Vérifier l'Accès
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', alignItems: 'center' }}>
+                  <button
+                    onClick={() => handleVerify(false)}
+                    disabled={isProcessing || scanPaused}
+                    className="access-btn-primary"
+                    style={{ width: '100%' }}
+                  >
+                    <Camera size={26} />
+                    {t('access.verifyFace', "Verify with Face Recognition")}
+                  </button>
+                  <button
+                    onClick={() => handleVerify(true)}
+                    disabled={isProcessing || scanPaused}
+                    className="access-btn-primary"
+                    style={{ width: '100%', backgroundColor: '#d4af37', color: '#000' }}
+                  >
+                    <QrCode size={26} />
+                    {t('access.verifyQr', "Verify with QR Code")}
+                  </button>
+
+                  <div style={{ display: 'flex', gap: '8px', width: '100%', marginTop: '8px' }}>
+                    <input
+                      type="text"
+                      value={manualCode}
+                      onChange={(e) => setManualCode(e.target.value)}
+                      placeholder={t('access.manualCodePlaceholder', 'Enter card serial manually...')}
+                      disabled={isProcessing || scanPaused}
+                      className="access-select"
+                      style={{ flex: 1, height: '46px', margin: 0 }}
+                    />
+                    <button
+                      onClick={handleManualVerify}
+                      disabled={isProcessing || scanPaused || !manualCode.trim()}
+                      className="access-btn-primary"
+                      style={{ width: 'auto', padding: '0 20px', height: '46px', margin: 0, whiteSpace: 'nowrap' }}
+                    >
+                      {t('access.submitCode', 'Verify')}
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           </div>

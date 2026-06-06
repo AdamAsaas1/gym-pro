@@ -418,6 +418,16 @@
     "errSelectMember": "Por favor seleccione un miembro",
     "enrollSuccess": "¡Miembro inscrito con éxito!",
     "errorPrefix": "Error: ",
+    "autoScanMode": "Modo Auto-Scan",
+    "scanningActive": "ESCANEO ACTIVO",
+    "scanningPaused": "PAUSA DE ESCANEO",
+    "cooldown": "Espera",
+    "active": "Activo",
+    "verifyManual": "Verificar Manualmente",
+    "verifyFace": "Verificar con Reconocimiento Facial",
+    "verifyQr": "Verificar con Código QR",
+    "manualCodePlaceholder": "Ingrese el serial de la tarjeta manualmente...",
+    "submitCode": "Verificar",
     "reasons": {
       "No face detected in the frame": "No se detectó ningún rostro en el marco",
       "Multiple faces detected": "Se detectaron múltiples rostros",
@@ -427,7 +437,9 @@
       "Member status is inactive": "El estado del miembro está inactivo",
       "Subscription has expired": "La suscripción ha expirado",
       "Access Granted": "Acceso concedido",
-      "Face not recognized": "Rostro no reconocido"
+      "Face not recognized": "Rostro no reconocido",
+      "Invalid QR Code": "Código QR no válido",
+      "No QR Code detected": "No se detectó ningún código QR"
     }
   },
   "permissions": {

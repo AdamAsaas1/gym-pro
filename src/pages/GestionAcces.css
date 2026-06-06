@@ -385,3 +385,113 @@
   font-family: monospace;
   font-weight: 600;
 }
+
+/* Auto-Scan Mode Styles */
+.autoscan-toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--clr-surface2);
+  border: 1px solid var(--clr-border);
+  padding: 10px 16px;
+  border-radius: 99px;
+  margin-top: 8px;
+  width: 100%;
+  max-width: 320px;
+  align-self: center;
+}
+
+.autoscan-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--clr-text);
+  font-size: 0.95rem;
+  user-select: none;
+}
+
+.autoscan-label input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--clr-primary);
+  cursor: pointer;
+}
+
+.autoscan-status {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 99px;
+  text-transform: uppercase;
+}
+
+.autoscan-status.active {
+  background: rgba(57, 255, 20, 0.15);
+  color: var(--clr-primary);
+  box-shadow: 0 0 10px rgba(57, 255, 20, 0.2);
+  animation: pulseScan 1.5s infinite;
+}
+
+.autoscan-status.paused {
+  background: rgba(255, 215, 0, 0.15);
+  color: #ffd700;
+}
+
+@keyframes pulseScan {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+.access-camera-wrapper.autoscan-active {
+  border-color: rgba(57, 255, 20, 0.5);
+  box-shadow: 0 0 20px rgba(57, 255, 20, 0.15);
+}
+
+.access-camera-wrapper.autoscan-paused {
+  border-color: rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+}
+
+.autoscan-overlay-indicator {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.7);
+  padding: 6px 12px;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  z-index: 10;
+}
+
+.autoscan-overlay-indicator.active {
+  border-color: rgba(57, 255, 20, 0.4);
+}
+
+.autoscan-overlay-indicator.paused {
+  border-color: rgba(255, 215, 0, 0.4);
+}
+
+.autoscan-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.autoscan-dot.active {
+  background: var(--clr-primary);
+  box-shadow: 0 0 8px var(--clr-primary);
+  animation: pulseScan 1.5s infinite;
+}
+
+.autoscan-dot.paused {
+  background: #ffd700;
+  box-shadow: 0 0 8px #ffd700;
+}

@@ -419,6 +419,16 @@
     "errSelectMember": "يرجى اختيار عضو",
     "enrollSuccess": "تم تسجيل العضو بنجاح!",
     "errorPrefix": "خطأ: ",
+    "autoScanMode": "وضع المسح التلقائي",
+    "scanningActive": "المسح نشط",
+    "scanningPaused": "تم إيقاف المسح مؤقتًا",
+    "cooldown": "فترة الانتظار",
+    "active": "نشط",
+    "verifyManual": "التحقق يدوياً",
+    "verifyFace": "التحقق بالتعرف على الوجه",
+    "verifyQr": "التحقق برمز QR",
+    "manualCodePlaceholder": "أدخل الرقم التسلسلي للبطاقة يدوياً...",
+    "submitCode": "التحقق",
     "reasons": {
       "No face detected in the frame": "لم يتم اكتشاف أي وجه في الإطار",
       "Multiple faces detected": "تم اكتشاف وجوه متعددة",
@@ -428,7 +438,9 @@
       "Member status is inactive": "حالة العضو غير نشطة",
       "Subscription has expired": "انتهت صلاحية الاشتراك",
       "Access Granted": "تم منح الوصول",
-      "Face not recognized": "لم يتم التعرف على الوجه"
+      "Face not recognized": "لم يتم التعرف على الوجه",
+      "Invalid QR Code": "رمز QR غير صالح",
+      "No QR Code detected": "لم يتم اكتشاف رمز QR"
     }
   },
   "permissions": {
