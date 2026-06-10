@@ -65,7 +65,7 @@ const GestionAcces = () => {
         setAccessResult(result);
       }
       fetchHistory();
-      
+
       setScanPaused(true);
       setTimeout(() => {
         setScanPaused(false);
@@ -74,7 +74,7 @@ const GestionAcces = () => {
     } catch (err) {
       const msg = err.response?.data?.detail || err.message;
       setAccessResult({ status: 'denied', reason: msg });
-      
+
       setScanPaused(true);
       setTimeout(() => {
         setScanPaused(false);
@@ -95,7 +95,7 @@ const GestionAcces = () => {
       setAccessResult(result);
       fetchHistory();
       setManualCode('');
-      
+
       setScanPaused(true);
       setTimeout(() => {
         setScanPaused(false);
@@ -104,7 +104,7 @@ const GestionAcces = () => {
     } catch (err) {
       const msg = err.response?.data?.detail || err.message;
       setAccessResult({ status: 'denied', reason: msg });
-      
+
       setScanPaused(true);
       setTimeout(() => {
         setScanPaused(false);
@@ -158,7 +158,7 @@ const GestionAcces = () => {
       </div>
 
       <div className="access-grid">
-        
+
         {/* Left Column: Camera */}
         <div className="access-container" style={{ gap: '20px' }}>
           <div className="access-camera-card">
@@ -294,7 +294,7 @@ const GestionAcces = () => {
                     <p className="access-history-reason">{t(`access.reasons.${item.reason}`, item.reason)}</p>
                   </div>
                   <span className="access-history-time">
-                    {new Date(item.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
               ))

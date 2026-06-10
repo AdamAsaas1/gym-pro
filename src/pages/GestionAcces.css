@@ -40,7 +40,7 @@
 
 .access-btn:hover {
   background: var(--clr-surface3);
-  border-color: rgba(57,255,20,0.3);
+  border-color: rgba(57, 255, 20, 0.3);
 }
 
 .access-btn-primary {
@@ -54,14 +54,14 @@
   padding: 14px 32px;
   border-radius: 99px;
   font-weight: 700;
-  box-shadow: 0 8px 20px rgba(57,255,20,0.35);
+  box-shadow: 0 8px 20px rgba(57, 255, 20, 0.35);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .access-btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(57,255,20,0.45);
+  box-shadow: 0 12px 28px rgba(57, 255, 20, 0.45);
 }
 
 .access-btn-primary:disabled {
@@ -84,7 +84,7 @@
 }
 
 .access-camera-card {
-  background: linear-gradient(180deg, rgba(57,255,20,0.02), rgba(0,0,0,0.15)), var(--clr-surface);
+  background: linear-gradient(180deg, rgba(57, 255, 20, 0.02), rgba(0, 0, 0, 0.15)), var(--clr-surface);
   border: 1px solid var(--clr-border);
   border-radius: var(--radius);
   padding: 24px;
@@ -99,12 +99,12 @@
   background: #000;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   aspect-ratio: 16/9;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
 }
 
 .access-camera-wrapper video {
@@ -116,7 +116,7 @@
 .access-processing {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0, 0, 0, 0.6);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -126,14 +126,16 @@
 .access-spinner {
   width: 48px;
   height: 48px;
-  border: 4px solid rgba(57,255,20,0.2);
+  border: 4px solid rgba(57, 255, 20, 0.2);
   border-top-color: var(--clr-primary);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .access-actions {
@@ -167,7 +169,7 @@
 
 .access-select:focus {
   border-color: var(--clr-primary);
-  box-shadow: 0 0 0 2px rgba(57,255,20,0.2);
+  box-shadow: 0 0 0 2px rgba(57, 255, 20, 0.2);
 }
 
 .access-msg {
@@ -179,15 +181,15 @@
 }
 
 .access-msg.success {
-  background: rgba(57,255,20,0.1);
+  background: rgba(57, 255, 20, 0.1);
   color: var(--clr-primary-h);
-  border: 1px solid rgba(57,255,20,0.2);
+  border: 1px solid rgba(57, 255, 20, 0.2);
 }
 
 .access-msg.error {
-  background: rgba(239,68,68,0.1);
+  background: rgba(239, 68, 68, 0.1);
   color: #ef4444;
-  border: 1px solid rgba(239,68,68,0.2);
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .access-result {
@@ -200,13 +202,13 @@
 }
 
 .access-result.authorized {
-  background: rgba(57,255,20,0.08);
-  border: 1px solid rgba(57,255,20,0.25);
+  background: rgba(57, 255, 20, 0.08);
+  border: 1px solid rgba(57, 255, 20, 0.25);
 }
 
 .access-result.denied {
-  background: rgba(239,68,68,0.08);
-  border: 1px solid rgba(239,68,68,0.25);
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
 }
 
 .access-result-icon {
@@ -220,15 +222,15 @@
 }
 
 .access-result.authorized .access-result-icon {
-  background: rgba(57,255,20,0.15);
+  background: rgba(57, 255, 20, 0.15);
   color: var(--clr-primary);
-  box-shadow: 0 0 20px rgba(57,255,20,0.2);
+  box-shadow: 0 0 20px rgba(57, 255, 20, 0.2);
 }
 
 .access-result.denied .access-result-icon {
-  background: rgba(239,68,68,0.15);
+  background: rgba(239, 68, 68, 0.15);
   color: #ef4444;
-  box-shadow: 0 0 20px rgba(239,68,68,0.2);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.2);
 }
 
 .access-result-text {
@@ -258,7 +260,7 @@
   margin-top: 8px;
   font-size: 1rem;
   color: var(--clr-text);
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   padding: 8px 12px;
   border-radius: 6px;
   display: inline-block;
@@ -309,8 +311,14 @@
   gap: 12px;
 }
 
-.access-history-list::-webkit-scrollbar { width: 6px; }
-.access-history-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
+.access-history-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.access-history-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+}
 
 .access-history-empty {
   display: flex;
@@ -325,7 +333,7 @@
 
 .access-history-item {
   background: var(--clr-surface2);
-  border: 1px solid rgba(255,255,255,0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   padding: 16px;
   display: flex;
@@ -379,7 +387,7 @@
 .access-history-time {
   font-size: 0.8rem;
   color: var(--clr-muted);
-  background: rgba(255,255,255,0.05);
+  background: rgba(255, 255, 255, 0.05);
   padding: 4px 10px;
   border-radius: 6px;
   font-family: monospace;
@@ -440,9 +448,17 @@
 }
 
 @keyframes pulseScan {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
+  0% {
+    opacity: 0.6;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.6;
+  }
 }
 
 .access-camera-wrapper.autoscan-active {
