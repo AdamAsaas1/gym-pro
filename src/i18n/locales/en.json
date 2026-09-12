@@ -409,6 +409,7 @@
     "modeVerification": "Verification Mode",
     "modeEnrollment": "Enrollment Mode",
     "selectMember": "Select a member to enroll...",
+    "noMemberFound": "No member found",
     "captureAndEnroll": "Capture & Enroll",
     "verifyAccess": "Verify Access",
     "accessAuthorized": "Access Authorized",

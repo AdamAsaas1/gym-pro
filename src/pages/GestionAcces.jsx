@@ -18,6 +18,9 @@ const GestionAcces = () => {
   const [enrollStatus, setEnrollStatus] = useState(''); // 'success' | 'error'
   const [scanPaused, setScanPaused] = useState(false);
   const [manualCode, setManualCode] = useState('');
+  const [memberQuery, setMemberQuery] = useState('');
+  const [showMemberList, setShowMemberList] = useState(false);
+  const memberBoxRef = useRef(null);
 
   const fetchHistory = async () => {
     try {
@@ -43,6 +46,24 @@ const GestionAcces = () => {
     const interval = setInterval(fetchHistory, 10000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (memberBoxRef.current && !memberBoxRef.current.contains(e.target)) {
+        setShowMemberList(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const selectedMembreObj = membres.find(m => String(m.id) === String(selectedMembre));
+
+  const filteredMembres = membres.filter(m => {
+    const q = memberQuery.trim().toLowerCase();
+    if (!q) return true;
+    return `${m.prenom} ${m.nom} ${m.email}`.toLowerCase().includes(q);
+  });
 
   const capture = useCallback(() => {
     if (!webcamRef.current) return null;
@@ -179,16 +200,37 @@ const GestionAcces = () => {
             <div className="access-actions">
               {enrollMode ? (
                 <div className="access-enroll-form">
-                  <select
-                    value={selectedMembre}
-                    onChange={(e) => setSelectedMembre(e.target.value)}
-                    className="access-select"
-                  >
-                    <option value="">{t('access.selectMember', 'Sélectionner un membre à enrôler...')}</option>
-                    {membres.map(m => (
-                      <option key={m.id} value={m.id}>{m.prenom} {m.nom} - {m.email}</option>
-                    ))}
-                  </select>
+                  <div className="access-combobox" ref={memberBoxRef}>
+                    <input
+                      type="text"
+                      className="access-select"
+                      placeholder={t('access.selectMember', 'Sélectionner un membre à enrôler...')}
+                      value={showMemberList ? memberQuery : (selectedMembreObj ? `${selectedMembreObj.prenom} ${selectedMembreObj.nom} - ${selectedMembreObj.email}` : '')}
+                      onChange={(e) => { setMemberQuery(e.target.value); setShowMemberList(true); }}
+                      onFocus={() => { setMemberQuery(''); setShowMemberList(true); }}
+                    />
+                    {showMemberList && (
+                      <div className="access-combobox-list">
+                        {filteredMembres.length === 0 ? (
+                          <div className="access-combobox-empty">{t('access.noMemberFound', 'Aucun membre trouvé')}</div>
+                        ) : (
+                          filteredMembres.map(m => (
+                            <div
+                              key={m.id}
+                              className={`access-combobox-item${String(m.id) === String(selectedMembre) ? ' selected' : ''}`}
+                              onClick={() => {
+                                setSelectedMembre(m.id);
+                                setMemberQuery('');
+                                setShowMemberList(false);
+                              }}
+                            >
+                              {m.prenom} {m.nom} - {m.email}
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    )}
+                  </div>
                   <button
                     onClick={handleEnroll}
                     disabled={isProcessing || !selectedMembre}

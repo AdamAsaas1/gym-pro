@@ -409,6 +409,7 @@
     "modeVerification": "وضع التحقق",
     "modeEnrollment": "وضع التسجيل",
     "selectMember": "اختر عضواً لتسجيله...",
+    "noMemberFound": "لم يتم العثور على أي عضو",
     "captureAndEnroll": "التقاط وتسجيل",
     "verifyAccess": "التحقق من الوصول",
     "accessAuthorized": "تم السماح بالوصول",

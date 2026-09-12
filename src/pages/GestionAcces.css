@@ -172,6 +172,44 @@
   box-shadow: 0 0 0 2px rgba(57, 255, 20, 0.2);
 }
 
+.access-combobox {
+  position: relative;
+  width: 100%;
+}
+
+.access-combobox-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--clr-surface2);
+  border: 1px solid var(--clr-border);
+  border-radius: 8px;
+  z-index: 20;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.access-combobox-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: var(--clr-text);
+}
+
+.access-combobox-item:hover,
+.access-combobox-item.selected {
+  background: var(--clr-primary);
+  color: #000;
+}
+
+.access-combobox-empty {
+  padding: 12px 16px;
+  color: var(--clr-muted);
+  font-size: 0.9rem;
+}
+
 .access-msg {
   padding: 12px 16px;
   border-radius: 8px;
@@ -443,8 +481,8 @@
 }
 
 .autoscan-status.paused {
-  background: rgba(255, 215, 0, 0.15);
-  color: #ffd700;
+  background: rgba(249, 115, 22, 0.15);
+  color: #f97316;
 }
 
 @keyframes pulseScan {
@@ -467,8 +505,8 @@
 }
 
 .access-camera-wrapper.autoscan-paused {
-  border-color: rgba(255, 215, 0, 0.5);
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.15);
+  border-color: rgba(249, 115, 22, 0.5);
+  box-shadow: 0 0 20px rgba(249, 115, 22, 0.15);
 }
 
 .autoscan-overlay-indicator {
@@ -492,7 +530,7 @@
 }
 
 .autoscan-overlay-indicator.paused {
-  border-color: rgba(255, 215, 0, 0.4);
+  border-color: rgba(249, 115, 22, 0.4);
 }
 
 .autoscan-dot {
@@ -508,6 +546,6 @@
 }
 
 .autoscan-dot.paused {
-  background: #ffd700;
-  box-shadow: 0 0 8px #ffd700;
+  background: #f97316;
+  box-shadow: 0 0 8px #f97316;
 }

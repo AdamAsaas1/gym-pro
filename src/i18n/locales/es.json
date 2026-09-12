@@ -408,6 +408,7 @@
     "modeVerification": "Modo de Verificación",
     "modeEnrollment": "Modo de Inscripción",
     "selectMember": "Seleccionar un miembro para inscribir...",
+    "noMemberFound": "No se encontró ningún miembro",
     "captureAndEnroll": "Capturar e Inscribir",
     "verifyAccess": "Verificar Acceso",
     "accessAuthorized": "Acceso Autorizado",
