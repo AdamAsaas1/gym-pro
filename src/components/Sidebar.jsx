@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import { LayoutDashboard, Users, Calendar, Dumbbell, CreditCard, UserCheck, ChevronLeft, ChevronRight, Banknote, ShieldCheck, Bell, Settings, Camera, ShoppingBag, Tv } from 'lucide-react';
 import { useGym } from '../context/GymContext';
 import PermissionRender from './PermissionRender';
+import SidebarUserPanel from './SidebarUserPanel';
 import { useTranslation } from 'react-i18next';
 
 const NAV = [
@@ -43,9 +44,7 @@ export default function Sidebar() {
         </button>
       </div>
 
-      {!collapsed && (
-        <div className="sidebar__gym-label">{t('sidebar.tagline', 'Votre salle, votre performance')}</div>
-      )}
+      {!collapsed && <SidebarUserPanel />}
 
       {!collapsed && <div className="sidebar__section">{t('sidebar.section', 'Pilotage')}</div>}
 
