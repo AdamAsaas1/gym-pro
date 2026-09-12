@@ -541,9 +541,17 @@ export default function Membres() {
   };
 
   const handleSave = async (data) => {
-    if (data.id) await updateMembre(data);
-    else          await addMembre(data);
-    setModal(null);
+    try {
+      if (data.id) await updateMembre(data);
+      else          await addMembre(data);
+      setModal(null);
+    } catch (err) {
+      const detail = err?.response?.data?.detail;
+      const msg = Array.isArray(detail)
+        ? detail.map((d) => d.msg).join(', ')
+        : detail || t('members.form.saveError', "Erreur lors de l'enregistrement du membre.");
+      alert(msg);
+    }
   };
 
   const GENRE_INFO = {

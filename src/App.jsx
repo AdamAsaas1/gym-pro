@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { GymProvider, useGym } from './context/GymContext';
+import { GymProvider } from './context/GymContext';
 import { PermissionProvider, usePermissions } from './context/PermissionContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import PermissionRender from './components/PermissionRender';
@@ -46,19 +46,6 @@ function ProtectedPage({ page, children }) {
 }
 
 function ForceSettingsRedirect({ children }) {
-  const { user } = useAuth();
-  const { activites, loading } = useGym();
-  const location = useLocation();
-
-  if (loading) return null;
-
-  // If no activities exist and user is superadmin, force them to settings
-  const needsSetup = activites.length === 0 && user?.role === 'superadmin';
-  
-  if (needsSetup && location.pathname !== '/settings') {
-    return <Navigate to="/settings" replace />;
-  }
-
   return children;
 }
 
