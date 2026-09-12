@@ -9,13 +9,14 @@
 }
 
 .settings-header h1 {
+  font-family: var(--font-display);
   font-size: 2rem;
-  color: #fff;
+  color: var(--clr-heading);
   margin-bottom: 0.5rem;
 }
 
 .settings-header p {
-  color: #94a3b8;
+  color: var(--clr-muted);
 }
 
 .settings-grid {
@@ -31,16 +32,17 @@
 }
 
 .settings-card {
-  background: #1e293b;
-  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(57,255,20,0.03), rgba(0,0,0,0.15)), var(--clr-surface);
+  border-radius: var(--radius);
   padding: 2rem;
-  border: 1px solid #334155;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(57,255,20,0.18);
+  box-shadow: 0 14px 34px rgba(0,0,0,0.35);
 }
 
 .settings-card h2 {
+  font-family: var(--font-display);
   font-size: 1.25rem;
-  color: #ffd700;
+  color: var(--clr-primary-h);
   margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
@@ -54,36 +56,36 @@
 .form-group label {
   display: block;
   margin-bottom: 0.5rem;
-  color: #94a3b8;
+  color: var(--clr-muted);
   font-size: 0.875rem;
 }
 
 .form-control {
   width: 100%;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--clr-surface2);
+  border: 1px solid var(--clr-border);
   border-radius: 8px;
   padding: 0.75rem 1rem;
-  color: #fff;
+  color: var(--clr-text);
   transition: all 0.2s;
 }
 
 .form-control:focus {
   outline: none;
-  border-color: #ffd700;
-  box-shadow: 0 0 0 2px rgba(255, 215, 0, 0.1);
+  border-color: var(--clr-primary);
+  box-shadow: 0 0 0 2px rgba(57,255,20,0.12);
 }
 
 .logo-preview {
   width: 120px;
   height: 120px;
   border-radius: 12px;
-  background: #0f172a;
+  background: var(--clr-surface2);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 1rem;
-  border: 2px dashed #334155;
+  border: 2px dashed var(--clr-border);
   overflow: hidden;
   position: relative;
 }
@@ -95,12 +97,12 @@
 }
 
 .logo-placeholder {
-  color: #475569;
+  color: var(--clr-muted);
 }
 
 .btn-primary {
-  background: #ffd700;
-  color: #000;
+  background: linear-gradient(135deg, #39ff14, #12b981);
+  color: #061109;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -110,17 +112,24 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  box-shadow: 0 8px 20px rgba(57,255,20,0.25);
 }
 
 .btn-primary:hover {
-  background: #ffec3d;
   transform: translateY(-1px);
+  box-shadow: 0 12px 28px rgba(57,255,20,0.4);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
 }
 
 .btn-secondary {
-  background: transparent;
-  color: #ffd700;
-  border: 1px solid #ffd700;
+  background: rgba(57,255,20,0.06);
+  color: var(--clr-primary-h);
+  border: 1px solid rgba(57,255,20,0.3);
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   font-weight: 600;
@@ -129,7 +138,7 @@
 }
 
 .btn-secondary:hover {
-  background: rgba(255, 215, 0, 0.05);
+  background: rgba(57,255,20,0.14);
 }
 
 /* Activities List */
@@ -141,8 +150,8 @@
 }
 
 .activity-item {
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--clr-surface2);
+  border: 1px solid var(--clr-border);
   border-left: 6px solid var(--tc);
   border-radius: 12px;
   padding: 0.75rem 1rem;
@@ -155,8 +164,8 @@
 }
 
 .activity-item:hover {
-  background: #1e293b;
-  border-color: #475569;
+  background: var(--clr-surface3);
+  border-color: rgba(57,255,20,0.35);
   transform: translateX(4px);
 }
 
@@ -180,13 +189,13 @@
 
 .activity-info h3 {
   font-size: 1rem;
-  color: #fff;
+  color: var(--clr-heading);
   margin-bottom: 0.25rem;
 }
 
 .activity-info p {
   font-size: 0.8125rem;
-  color: #64748b;
+  color: var(--clr-muted);
 }
 
 .activity-actions {
@@ -195,9 +204,9 @@
 }
 
 .action-btn {
-  background: #1e293b;
-  border: 1px solid #334155;
-  color: #94a3b8;
+  background: var(--clr-surface2);
+  border: 1px solid var(--clr-border);
+  color: var(--clr-muted);
   width: 32px;
   height: 32px;
   border-radius: 6px;
@@ -209,8 +218,8 @@
 }
 
 .action-btn:hover {
-  color: #ffd700;
-  border-color: #ffd700;
+  color: var(--clr-primary-h);
+  border-color: var(--clr-primary);
 }
 
 .action-btn.delete:hover {
@@ -225,7 +234,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.65);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -234,15 +243,15 @@
 }
 
 .settings-modal {
-  background: #1e293b;
+  background: var(--clr-surface);
   width: 100%;
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
   border-radius: 16px;
   padding: 2rem;
-  border: 1px solid #334155;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(57,255,20,0.18);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.7);
 }
 
 .modal-header {
@@ -253,15 +262,20 @@
 }
 
 .modal-header h2 {
+  font-family: var(--font-display);
   font-size: 1.5rem;
-  color: #ffd700;
+  color: var(--clr-primary-h);
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: #94a3b8;
+  color: var(--clr-muted);
   cursor: pointer;
+}
+
+.close-btn:hover {
+  color: var(--clr-text);
 }
 
 .price-row {
@@ -272,19 +286,19 @@
 
 .success-modal {
   max-width: 400px;
-  border-color: #ffd700;
+  border-color: rgba(57,255,20,0.4);
 }
 
 .success-icon {
   width: 80px;
   height: 80px;
-  background: rgba(255, 215, 0, 0.1);
+  background: rgba(57,255,20,0.1);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5rem;
-  border: 1px solid rgba(255, 215, 0, 0.2);
+  border: 1px solid rgba(57,255,20,0.25);
 }
 
 .icon-selector,
@@ -293,8 +307,8 @@
   gap: 0.5rem;
   flex-wrap: wrap;
   padding: 0.5rem;
-  background: #0f172a;
-  border: 1px solid #334155;
+  background: var(--clr-surface2);
+  border: 1px solid var(--clr-border);
   border-radius: 8px;
 }
 
@@ -313,12 +327,12 @@
 }
 
 .icon-choice:hover {
-  background: #1e293b;
+  background: var(--clr-surface3);
 }
 
 .icon-choice.active {
-  background: rgba(255, 215, 0, 0.1);
-  border-color: #ffd700;
+  background: rgba(57,255,20,0.12);
+  border-color: var(--clr-primary);
 }
 
 .color-choice {
@@ -335,6 +349,6 @@
 }
 
 .color-choice.active {
-  border-color: #fff;
-  box-shadow: 0 0 0 2px #ffd700;
+  border-color: var(--clr-heading);
+  box-shadow: 0 0 0 2px var(--clr-primary);
 }

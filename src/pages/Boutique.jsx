@@ -456,7 +456,7 @@ export default function Boutique() {
                             <span className="store-card__price-promo">{product.promo.toLocaleString('fr-FR')} DH</span>
                           </>
                         ) : (
-                          <span className="store-card__price" style={{ color: 'var(--primary)' }}>{product.price.toLocaleString('fr-FR')} DH</span>
+                          <span className="store-card__price" style={{ color: 'var(--clr-primary)' }}>{product.price.toLocaleString('fr-FR')} DH</span>
                         )}
                       </div>
                     </div>
@@ -524,7 +524,7 @@ export default function Boutique() {
                         {cmd.items?.map(it => (
                           <li key={it.id}>
                             {it.product?.name || `Produit #${it.product_id}`} x{it.quantity} 
-                            <span style={{ color: 'var(--text-secondary)', marginLeft: '4px' }}>
+                            <span style={{ color: 'var(--clr-muted)', marginLeft: '4px' }}>
                               ({it.price} DH)
                             </span>
                           </li>
@@ -536,17 +536,17 @@ export default function Boutique() {
                       {cmd.payment_method === 'cash_on_delivery' ? (
                         <div>
                           <div>{cmd.address}</div>
-                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--clr-muted)' }}>
                             {cmd.postal_code} {cmd.city}
                           </div>
                         </div>
                       ) : (
-                        <span style={{ fontStyle: 'italic', color: 'var(--text-secondary)' }}>
+                        <span style={{ fontStyle: 'italic', color: 'var(--clr-muted)' }}>
                           {t('store.orders.pickupAtGym', 'Retrait au Club')}
                         </span>
                       )}
                     </td>
-                    <td style={{ fontWeight: 'bold', color: 'var(--primary)' }}>
+                    <td style={{ fontWeight: 'bold', color: 'var(--clr-primary)' }}>
                       {cmd.total_price.toLocaleString('fr-FR')} DH
                     </td>
                     <td>

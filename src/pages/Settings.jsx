@@ -246,12 +246,12 @@ export default function Settings() {
         {isSuperAdmin && (
           <section className="settings-card">
             <h2><ShieldCheck size={20} /> {t('settings.kioskPin.title', 'Sécurité Kiosque')}</h2>
-            <p style={{ color: '#94a3b8', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
+            <p style={{ color: 'var(--clr-muted)', fontSize: '0.85rem', marginBottom: '1.5rem' }}>
               {t('settings.kioskPin.desc', 'Configurez le code PIN à 6 chiffres pour déverrouiller le panneau de maintenance de la tablette kiosque.')}
             </p>
 
             {pinStatus.loading ? (
-              <p style={{ color: '#94a3b8' }}>Chargement...</p>
+              <p style={{ color: 'var(--clr-muted)' }}>Chargement...</p>
             ) : (
               <form onSubmit={handlePinSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {pinStatus.is_set ? (
@@ -357,8 +357,8 @@ export default function Settings() {
                       {act.icon}
                     </div>
                     <div className="activity-info" style={{ textAlign: 'left' }}>
-                      <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#fff' }}>{act.nom}</h3>
-                      <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: '#64748b' }}>{act.prix.mensuel} DH / mois • {act.prix.annuel} DH / an</p>
+                      <h3 style={{ margin: 0, fontSize: '1.1rem', color: 'var(--clr-heading)' }}>{act.nom}</h3>
+                      <p style={{ margin: '4px 0 0', fontSize: '0.85rem', color: 'var(--clr-muted)' }}>{act.prix.mensuel} DH / mois • {act.prix.annuel} DH / an</p>
                     </div>
                   </div>
                   <div className="activity-actions" style={{ display: 'flex', gap: '0.5rem', marginLeft: 'auto' }}>
@@ -368,7 +368,7 @@ export default function Settings() {
                 </div>
               ))
             ) : (
-              <p style={{ color: '#64748b', textAlign: 'center', padding: '2rem' }}>
+              <p style={{ color: 'var(--clr-muted)', textAlign: 'center', padding: '2rem' }}>
                 {t('settings.activities.noActivities', 'Aucune activité configurée.')}
               </p>
             )}
@@ -545,10 +545,10 @@ export default function Settings() {
           <div className="settings-modal scale-in success-modal" onClick={e => e.stopPropagation()}>
             <div style={{ textAlign: 'center', padding: '1rem' }}>
               <div className="success-icon">
-                <ShieldCheck size={48} color="#ffd700" />
+                <ShieldCheck size={48} color="#39ff14" />
               </div>
-              <h2 style={{ color: '#ffd700', marginBottom: '1rem' }}>{t('settings.success.title', 'Succès !')}</h2>
-              <p style={{ color: '#94a3b8', marginBottom: '2rem' }}>{successMsg}</p>
+              <h2 style={{ color: 'var(--clr-primary-h)', marginBottom: '1rem' }}>{t('settings.success.title', 'Succès !')}</h2>
+              <p style={{ color: 'var(--clr-muted)', marginBottom: '2rem' }}>{successMsg}</p>
               <button className="btn-primary" style={{ width: '100%' }} onClick={() => setShowSuccess(false)}>
                 {t('settings.success.continue', 'Continuer')}
               </button>
