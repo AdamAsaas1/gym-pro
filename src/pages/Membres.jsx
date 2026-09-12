@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { UserPlus, Search, Pencil, Trash2, ToggleLeft, ToggleRight, Filter, Eye, Download, User } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import Modal from '../components/Modal';
@@ -163,7 +163,7 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
         </div>
         <div className="form-group">
           <label>{t('members.form.activity', 'Activité')} *</label>
-          <select value={form.activite} onChange={(e) => set('activite', e.target.value)}>
+          <select value={form.activite} onChange={(e) => set('activite', e.target.value ? Number(e.target.value) : '')}>
             {activiteOpts.length > 0 ? (
               activiteOpts.map((a) => (
                 <option key={a.id} value={a.id}>{a.icon} {t(a.nom, a.nom)}</option>
@@ -361,6 +361,9 @@ function MemberDetails({ membre, activites, paiements, onClose, onSetEcheanceDay
   const initialDay = membre?.dateExpiration ? Number(membre.dateExpiration.split('-')[2]) : 15;
   const [payDay, setPayDay] = useState(clampDay(initialDay));
   const act = activites.find((a) => a.id === membre.activite);
+  const actLabel = act
+    ? t(act.nom, act.nom)
+    : typeof membre.activite === 'string' ? t(membre.activite, membre.activite) : '—';
   const badge = getSubscriptionBadge(membre);
   const items = [...paiements]
     .filter((p) => p.membreId === membre.id)
@@ -398,7 +401,7 @@ function MemberDetails({ membre, activites, paiements, onClose, onSetEcheanceDay
         <div className="member-info-grid">
           <div className="member-info-card">
             <div className="member-info-label">{t('members.details.activity', 'Activite')}</div>
-            <div className="member-info-value">{t(act?.nom || membre.activite, act?.nom || membre.activite)}</div>
+            <div className="member-info-value">{actLabel}</div>
           </div>
           <div className="member-info-card">
             <div className="member-info-label">{t('members.details.subscription', 'Abonnement')}</div>
@@ -508,17 +511,25 @@ export default function Membres() {
     setPage(1);
   }, [searchParams]);
 
+  // Members created before the dynamic-activities migration still carry the
+  // legacy enum string instead of an activity id.
+  const activiteLabelOf = useCallback((activite) => {
+    const act = activites.find((a) => a.id === activite);
+    if (act) return act.nom;
+    return typeof activite === 'string' ? activite : '';
+  }, [activites]);
+
   const filtered = useMemo(() => {
     return membres.filter((m) => {
       const q = query.toLowerCase();
-      const hay = `${m.nom} ${m.prenom} ${m.telephone} ${m.email} ${m.activite} ${m.abonnement} ${m.statut}`.toLowerCase();
+      const hay = `${m.nom} ${m.prenom} ${m.telephone} ${m.email} ${activiteLabelOf(m.activite)} ${m.abonnement} ${m.statut}`.toLowerCase();
       const matchQ = !q || hay.includes(q);
       const matchG = !fGenre  || m.genre    === fGenre;
       const matchA = !fAct    || m.activite === fAct;
       const matchS = !fStatut || m.statut   === fStatut;
       return matchQ && matchG && matchA && matchS;
     });
-  }, [membres, query, fGenre, fAct, fStatut]);
+  }, [membres, query, fGenre, fAct, fStatut, activiteLabelOf]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const paginated  = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
@@ -633,7 +644,7 @@ export default function Membres() {
               <option value="femme">{t('members.filters.women', 'Femmes')}</option>
               <option value="enfant">{t('members.filters.children', 'Enfants')}</option>
             </select>
-            <select value={fAct} onChange={(e) => { setFAct(e.target.value); setPage(1); }}>
+            <select value={fAct} onChange={(e) => { setFAct(e.target.value ? Number(e.target.value) : ''); setPage(1); }}>
               <option value="">{t('members.filters.allActivities', 'Toutes activites')}</option>
               {activites.map((a) => <option key={a.id} value={a.id}>{t(a.nom, a.nom)}</option>)}
             </select>
@@ -705,7 +716,7 @@ export default function Membres() {
                   <td><span className="genre-tag" style={{ color: gi.color, background: gi.color + '18' }}>{gi.label}</span></td>
                   <td>
                     <span className="act-tag" style={{ color: act?.couleur, background: act?.bg }}>
-                      {act?.icon} {act?.nom}
+                      {act ? `${act.icon} ${act.nom}` : typeof m.activite === 'string' ? m.activite : '—'}
                     </span>
                   </td>
                   <td><span className="abo-tag">{m.abonnement}</span></td>
