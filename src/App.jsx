@@ -21,6 +21,7 @@ import GestionAcces from './pages/GestionAcces';
 import Settings from './pages/Settings';
 import Boutique from './pages/Boutique';
 import LiveShow from './pages/LiveShow';
+import Shop from './pages/Shop';
 
 function RequireAuth({ children }) {
   const { isAuthenticated, loadingAuth } = useAuth();
@@ -93,6 +94,8 @@ export default function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/login" element={<PublicOnly><Login /></PublicOnly>} />
+              {/* Public online shop (linked from Instagram): no login required */}
+              <Route path="/shop" element={<Shop />} />
               <Route
                 path="*"
                 element={(

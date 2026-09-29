@@ -1,9 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ShoppingBag, Search, Pencil, Trash2, Plus, Image as ImageIcon, ClipboardList } from 'lucide-react';
+import { ShoppingBag, Search, Pencil, Trash2, Plus, Image as ImageIcon, ClipboardList, AlertTriangle, Settings2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import ShopSettingsModal from '../components/ShopSettingsModal';
 import Modal from '../components/Modal';
-import { getProducts, createProduct, updateProduct, deleteProduct, getCommandes, updateCommandeStatus } from '../api/client';
+import { getProducts, createProduct, updateProduct, deleteProduct } from '../api/client';
 import { useTranslation } from 'react-i18next';
+import OrdersPanel from '../components/OrdersPanel';
 import { useGym } from '../context/GymContext';
 import './Boutique.css';
 
@@ -256,7 +259,7 @@ function DeleteConfirm({ product, onConfirm, onClose }) {
 export default function Boutique() {
   const { t } = useTranslation();
   const location = useLocation();
-  const { commandes, setCommandes, fetchCommandes } = useGym();
+  const { commandes, setCommandes, fetchCommandes, gymSettings } = useGym();
   
   const [activeTab, setActiveTab] = useState(() => {
     if (location.state?.activeTab) return location.state.activeTab;
@@ -270,7 +273,6 @@ export default function Boutique() {
   const [query, setQuery] = useState('');
   const [modal, setModal] = useState(null); // 'add', 'edit', 'delete'
   const [selected, setSelected] = useState(null);
-  const [commandesLoading, setCommandesLoading] = useState(false);
 
   // Sync tab if location changes
   useEffect(() => {
@@ -296,11 +298,12 @@ export default function Boutique() {
     }
   };
 
-  const loadCommandes = async () => {
-    setCommandesLoading(true);
-    await fetchCommandes();
-    setCommandesLoading(false);
-  };
+  const loadCommandes = () => fetchCommandes();
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role === 'superadmin';
+  const [shopSettingsOpen, setShopSettingsOpen] = useState(false);
+  const pendingCount = commandes.filter((c) => c.status === 'pending').length;
+  const lowStock = products.filter((p) => p.stock <= 5);
 
   useEffect(() => {
     fetchProducts();
@@ -340,37 +343,9 @@ export default function Boutique() {
     }
   };
 
-  const handleStatusChange = async (orderId, newStatus) => {
-    try {
-      await updateCommandeStatus(orderId, newStatus);
-      setCommandes(prev => prev.map(cmd => cmd.id === orderId ? { ...cmd, status: newStatus } : cmd));
-    } catch (err) {
-      console.error('Failed to update order status', err);
-      alert(t('store.orders.errorStatus', 'Erreur lors de la mise à jour du statut'));
-    }
-  };
-
   const openAdd = () => { setSelected(null); setModal('add'); };
   const openEdit = (p) => { setSelected(p); setModal('edit'); };
   const openDelete = (p) => { setSelected(p); setModal('delete'); };
-
-  const getStatusLabel = (st) => {
-    const labels = {
-      pending: t('store.orders.status.pending', 'En attente'),
-      delivered: t('store.orders.status.delivered', 'Livré'),
-      collected: t('store.orders.status.collected', 'Récupéré'),
-      cancelled: t('store.orders.status.cancelled', 'Annulé')
-    };
-    return labels[st] || st;
-  };
-
-  const getPaymentMethodLabel = (pm) => {
-    const methods = {
-      cash_on_delivery: t('store.orders.payment.delivery', 'Paiement à la livraison'),
-      cash_at_gym: t('store.orders.payment.gym', 'Paiement au Club')
-    };
-    return methods[pm] || pm;
-  };
 
   return (
     <div className="page store-page fade-in">
@@ -383,6 +358,11 @@ export default function Boutique() {
           </p>
         </div>
         <div className="store-hero__actions">
+          {isSuperAdmin && (
+            <button className="btn btn--ghost" onClick={() => setShopSettingsOpen(true)}>
+              <Settings2 size={16} /> {t('orders.shopSettings', 'Réglages boutique')}
+            </button>
+          )}
           <button className="btn btn--primary" onClick={openAdd}>
             <Plus size={16} /> {t('store.newProduct', 'Nouveau Produit')}
           </button>
@@ -403,11 +383,18 @@ export default function Boutique() {
         >
           <ClipboardList size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
           {t('store.tabs.orders', 'Commandes')}
+          {pendingCount > 0 && <span className="store-tab-badge">{pendingCount}</span>}
         </button>
       </div>
 
       {activeTab === 'products' ? (
         <>
+          {lowStock.length > 0 && (
+            <div className="coach-alert" style={{ marginBottom: 16 }}>
+              <AlertTriangle size={18} />
+              <span>{t('orders.lowStockAlert', 'Stock faible :')} {lowStock.map((p) => `${p.name} (${p.stock})`).join(' · ')}</span>
+            </div>
+          )}
           <div className="card store-filters">
             <div className="toolbar__search">
               <Search size={16} className="toolbar__search-icon" />
@@ -482,96 +469,7 @@ export default function Boutique() {
           </div>
         </>
       ) : (
-        /* Orders Management Panel */
-        commandesLoading ? (
-          <div className="store-loading">{t('store.orders.loading', 'Chargement des commandes...')}</div>
-        ) : commandes.length === 0 ? (
-          <div className="store-empty">{t('store.orders.empty', 'Aucune commande trouvée.')}</div>
-        ) : (
-          <div className="orders-container fade-in">
-            <table className="orders-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>{t('store.orders.client', 'Client')}</th>
-                  <th>{t('store.orders.date', 'Date')}</th>
-                  <th>{t('store.orders.items', 'Articles')}</th>
-                  <th>{t('store.orders.paymentMethod', 'Paiement')}</th>
-                  <th>{t('store.orders.address', 'Adresse / Livraison')}</th>
-                  <th>{t('store.orders.table.total', 'Total')}</th>
-                  <th>{t('store.orders.table.status', 'Statut')}</th>
-                  <th>{t('store.orders.table.actions', 'Actions')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {commandes.map(cmd => (
-                  <tr key={cmd.id}>
-                    <td>#{cmd.id}</td>
-                    <td>
-                      <strong>{cmd.membre_prenom} {cmd.membre_nom}</strong>
-                    </td>
-                    <td>
-                      {new Date(cmd.created_at).toLocaleDateString('fr-FR', { 
-                        day: '2-digit', 
-                        month: '2-digit', 
-                        year: 'numeric', 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}
-                    </td>
-                    <td>
-                      <ul className="orders-items-list">
-                        {cmd.items?.map(it => (
-                          <li key={it.id}>
-                            {it.product?.name || `Produit #${it.product_id}`} x{it.quantity} 
-                            <span style={{ color: 'var(--clr-muted)', marginLeft: '4px' }}>
-                              ({it.price} DH)
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td>{getPaymentMethodLabel(cmd.payment_method)}</td>
-                    <td>
-                      {cmd.payment_method === 'cash_on_delivery' ? (
-                        <div>
-                          <div>{cmd.address}</div>
-                          <div style={{ fontSize: '0.8rem', color: 'var(--clr-muted)' }}>
-                            {cmd.postal_code} {cmd.city}
-                          </div>
-                        </div>
-                      ) : (
-                        <span style={{ fontStyle: 'italic', color: 'var(--clr-muted)' }}>
-                          {t('store.orders.pickupAtGym', 'Retrait au Club')}
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ fontWeight: 'bold', color: 'var(--clr-primary)' }}>
-                      {cmd.total_price.toLocaleString('fr-FR')} DH
-                    </td>
-                    <td>
-                      <span className={`order-status-badge order-status--${cmd.status}`}>
-                        {getStatusLabel(cmd.status)}
-                      </span>
-                    </td>
-                    <td>
-                      <select 
-                        className="order-select" 
-                        value={cmd.status} 
-                        onChange={(e) => handleStatusChange(cmd.id, e.target.value)}
-                      >
-                        <option value="pending">{t('store.orders.status.pending', 'En attente')}</option>
-                        <option value="delivered">{t('store.orders.status.delivered', 'Livré')}</option>
-                        <option value="collected">{t('store.orders.status.collected', 'Récupéré')}</option>
-                        <option value="cancelled">{t('store.orders.status.cancelled', 'Annulé')}</option>
-                      </select>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )
+        <OrdersPanel commandes={commandes} setCommandes={setCommandes} gymName={gymSettings?.name?.trim()} />
       )}
 
       {modal === 'add' || modal === 'edit' ? (
@@ -592,6 +490,7 @@ export default function Boutique() {
           <DeleteConfirm product={selected} onConfirm={handleDelete} onClose={() => setModal(null)} />
         </Modal>
       )}
+      {shopSettingsOpen && <ShopSettingsModal onClose={() => setShopSettingsOpen(false)} />}
     </div>
   );
 }
