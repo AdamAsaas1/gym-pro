@@ -1,10 +1,11 @@
 import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
-import { UserPlus, Search, Pencil, Trash2, ToggleLeft, ToggleRight, Filter, Eye, Download, User } from 'lucide-react';
+import { UserPlus, Search, Pencil, Trash2, ToggleLeft, ToggleRight, Filter, Eye, Download, User, Calendar, ScanFace, AlertTriangle } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import Modal from '../components/Modal';
 import { useGym } from '../context/GymContext';
 import { telechargerRecu } from '../api/client';
 import { useTranslation } from 'react-i18next';
+import ActivityIcon, { ActivitySelect } from '../components/ActivityIcon';
 
 // Removing hardcoded ACTIVITES_BY_GENRE as we now use the database
 
@@ -21,6 +22,166 @@ const EMPTY_FORM = {
   photoBase64: '',
   password: '',
 };
+
+const EMAIL_DOMAINS = ['gmail.com', 'hotmail.com', 'outlook.com', 'yahoo.com'];
+
+// Suggests "name@domain" completions for what has been typed so far (e.g. "adam" -> "adam@gmail.com").
+function emailSuggestions(value) {
+  const [local, domain = ''] = value.split('@');
+  if (!local || value.split('@').length > 2) return [];
+  return EMAIL_DOMAINS
+    .filter((d) => d.startsWith(domain.toLowerCase()) && d !== domain.toLowerCase())
+    .map((d) => `${local}@${d}`);
+}
+
+// Birth date picker: pick a year, then a month, then a day. Emits "YYYY-MM-DD".
+function BirthDatePicker({ value, onChange }) {
+  const { t, i18n } = useTranslation();
+  const lang = i18n.language || 'fr';
+  const today = new Date();
+  const maxYear = today.getFullYear();
+  const minYear = maxYear - 100;
+
+  const [open, setOpen] = useState(false);
+  const [view, setView] = useState('year');
+  const [draft, setDraft] = useState({ y: null, m: null });
+  const [yearPageStart, setYearPageStart] = useState(maxYear - 11);
+  const rootRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e) => { if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false); };
+    const onKey = (e) => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('mousedown', onDown);
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.removeEventListener('mousedown', onDown);
+      document.removeEventListener('keydown', onKey);
+    };
+  }, [open]);
+
+  const selected = value ? value.split('-').map(Number) : null; // [y, m, d]
+
+  const openPicker = () => {
+    const y = selected ? selected[0] : null;
+    const m = selected ? selected[1] - 1 : null;
+    setDraft({ y, m });
+    setYearPageStart(y ? y - ((y - minYear) % 12) : maxYear - 11);
+    setView(selected ? 'day' : 'year');
+    setOpen(true);
+  };
+
+  const monthFmt = new Intl.DateTimeFormat(lang, { month: 'short' });
+  const monthLongFmt = new Intl.DateTimeFormat(lang, { month: 'long', year: 'numeric' });
+  const weekdayFmt = new Intl.DateTimeFormat(lang, { weekday: 'narrow' });
+  const displayFmt = new Intl.DateTimeFormat(lang, { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const isFuture = (y, m, d) => new Date(y, m, d) > today;
+
+  const pickDay = (d) => {
+    const mm = String(draft.m + 1).padStart(2, '0');
+    const dd = String(d).padStart(2, '0');
+    onChange(`${draft.y}-${mm}-${dd}`);
+    setOpen(false);
+  };
+
+  const shiftMonth = (delta) => {
+    const dt = new Date(draft.y, draft.m + delta, 1);
+    if (dt.getFullYear() < minYear || dt > today) return;
+    setDraft({ y: dt.getFullYear(), m: dt.getMonth() });
+  };
+
+  let header;
+  let body;
+  if (view === 'year') {
+    const years = Array.from({ length: 12 }, (_, i) => yearPageStart + i);
+    header = (
+      <>
+        <button type="button" className="dp__nav" disabled={yearPageStart <= minYear} onClick={() => setYearPageStart(yearPageStart - 12)}>‹</button>
+        <span className="dp__title dp__title--static">{years[0]} – {years[11]}</span>
+        <button type="button" className="dp__nav" disabled={yearPageStart + 12 > maxYear} onClick={() => setYearPageStart(yearPageStart + 12)}>›</button>
+      </>
+    );
+    body = (
+      <div className="dp__grid dp__grid--3">
+        {years.map((y) => (
+          <button
+            type="button" key={y}
+            className={`dp__cell${selected?.[0] === y ? ' is-selected' : ''}`}
+            disabled={y < minYear || y > maxYear}
+            onClick={() => { setDraft({ y, m: null }); setView('month'); }}
+          >{y}</button>
+        ))}
+      </div>
+    );
+  } else if (view === 'month') {
+    header = (
+      <>
+        <button type="button" className="dp__nav" disabled={draft.y <= minYear} onClick={() => setDraft({ ...draft, y: draft.y - 1 })}>‹</button>
+        <button type="button" className="dp__title" onClick={() => setView('year')}>{draft.y}</button>
+        <button type="button" className="dp__nav" disabled={draft.y >= maxYear} onClick={() => setDraft({ ...draft, y: draft.y + 1 })}>›</button>
+      </>
+    );
+    body = (
+      <div className="dp__grid dp__grid--3">
+        {Array.from({ length: 12 }, (_, m) => (
+          <button
+            type="button" key={m}
+            className={`dp__cell${selected?.[0] === draft.y && selected?.[1] === m + 1 ? ' is-selected' : ''}`}
+            disabled={isFuture(draft.y, m, 1)}
+            onClick={() => { setDraft({ ...draft, m }); setView('day'); }}
+          >{monthFmt.format(new Date(2000, m, 1))}</button>
+        ))}
+      </div>
+    );
+  } else {
+    const daysInMonth = new Date(draft.y, draft.m + 1, 0).getDate();
+    const offset = (new Date(draft.y, draft.m, 1).getDay() + 6) % 7; // Monday first
+    header = (
+      <>
+        <button type="button" className="dp__nav" onClick={() => shiftMonth(-1)}>‹</button>
+        <button type="button" className="dp__title" onClick={() => setView('month')}>{monthLongFmt.format(new Date(draft.y, draft.m, 1))}</button>
+        <button type="button" className="dp__nav" disabled={isFuture(draft.y, draft.m + 1, 1)} onClick={() => shiftMonth(1)}>›</button>
+      </>
+    );
+    body = (
+      <div className="dp__grid dp__grid--7">
+        {Array.from({ length: 7 }, (_, i) => (
+          <span key={`w${i}`} className="dp__weekday">{weekdayFmt.format(new Date(2024, 0, 1 + i))}</span>
+        ))}
+        {Array.from({ length: offset }, (_, i) => <span key={`e${i}`} />)}
+        {Array.from({ length: daysInMonth }, (_, i) => i + 1).map((d) => (
+          <button
+            type="button" key={d}
+            className={`dp__cell dp__cell--day${selected?.[0] === draft.y && selected?.[1] === draft.m + 1 && selected?.[2] === d ? ' is-selected' : ''}`}
+            disabled={isFuture(draft.y, draft.m, d)}
+            onClick={() => pickDay(d)}
+          >{d}</button>
+        ))}
+      </div>
+    );
+  }
+
+  const stepLabel = { year: t('members.form.pickYear', "Choisissez l'année"), month: t('members.form.pickMonth', 'Choisissez le mois'), day: t('members.form.pickDay', 'Choisissez le jour') }[view];
+
+  return (
+    <div className="dp" ref={rootRef}>
+      <button type="button" className={`dp__trigger${open ? ' is-open' : ''}`} onClick={() => (open ? setOpen(false) : openPicker())}>
+        <span className={selected ? '' : 'dp__placeholder'}>
+          {selected ? displayFmt.format(new Date(selected[0], selected[1] - 1, selected[2])) : t('members.form.pickDate', 'Choisir une date')}
+        </span>
+        <Calendar size={16} />
+      </button>
+      {open && (
+        <div className="dp__popover">
+          <div className="dp__step">{stepLabel}</div>
+          <div className="dp__header">{header}</div>
+          {body}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function computeExpiration(dateInscription, abonnement, durations) {
   if (!dateInscription || !abonnement) return '';
@@ -163,18 +324,16 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
         </div>
         <div className="form-group">
           <label>{t('members.form.activity', 'Activité')} *</label>
-          <select value={form.activite} onChange={(e) => set('activite', e.target.value ? Number(e.target.value) : '')}>
-            {activiteOpts.length > 0 ? (
-              activiteOpts.map((a) => (
-                <option key={a.id} value={a.id}>{a.icon} {t(a.nom, a.nom)}</option>
-              ))
-            ) : (
-              <option value="">{t('members.form.noActivity', 'Aucune activité disponible')}</option>
-            )}
-          </select>
+          <ActivitySelect
+            value={form.activite}
+            options={activiteOpts}
+            onChange={(id) => set('activite', id)}
+            getLabel={(a) => t(a.nom, a.nom)}
+            emptyLabel={t('members.form.noActivity', 'Aucune activité disponible')}
+          />
           {activiteOpts.length === 0 && (
             <span className="form-error" style={{ fontSize: '0.7rem' }}>
-              {t('members.form.createActivityWarning', 'Veuillez créer une activité pour cette section dans les paramètres.')}
+              {t('members.form.createActivityWarning', 'Veuillez créer une activité pour cette section depuis la page Activités.')}
             </span>
           )}
         </div>
@@ -206,14 +365,17 @@ function MemberForm({ initial, onSave, onClose, activites, abonnementDurations, 
         </div>
         <div className="form-group">
           <label>{t('members.form.email', 'Email')}</label>
-          <input type="email" value={form.email} onChange={(e) => set('email', e.target.value)} placeholder="email@exemple.com" />
+          <input type="email" list="member-email-suggestions" autoComplete="off" value={form.email} onChange={(e) => set('email', e.target.value.trim())} placeholder="email@exemple.com" />
+          <datalist id="member-email-suggestions">
+            {emailSuggestions(form.email).map((s) => <option key={s} value={s} />)}
+          </datalist>
         </div>
       </div>
 
       <div className="form-row">
         <div className="form-group">
           <label>{t('members.form.birthDate', 'Date de naissance')} *</label>
-          <input type="date" value={form.dateNaissance} onChange={(e) => set('dateNaissance', e.target.value)} />
+          <BirthDatePicker value={form.dateNaissance} onChange={(v) => set('dateNaissance', v)} />
           {errors.dateNaissance && <span className="form-error">{errors.dateNaissance}</span>}
         </div>
         <div className="form-group">
@@ -498,7 +660,7 @@ export default function Membres() {
   const [searchParams] = useSearchParams();
   const [query,    setQuery]    = useState(searchParams.get('q') ?? '');
   const [fGenre,   setFGenre]   = useState('');
-  const [fAct,     setFAct]     = useState('');
+  const [fAct,     setFAct]     = useState(() => Number(searchParams.get('activite')) || '');
   const [fStatut,  setFStatut]  = useState('');
   const [page,     setPage]     = useState(1);
   const [modal,    setModal]    = useState(null); // null | 'add' | 'edit' | 'delete' | 'view'
@@ -545,6 +707,28 @@ export default function Membres() {
     setModal('photo');
   };
 
+  // Tells whether the photo could be used for face recognition at the entrance.
+  const [faceNotice, setFaceNotice] = useState(null); // { type: 'ok' | 'warn', text }
+  useEffect(() => {
+    if (!faceNotice) return;
+    const id = setTimeout(() => setFaceNotice(null), faceNotice.type === 'ok' ? 4000 : 8000);
+    return () => clearTimeout(id);
+  }, [faceNotice]);
+
+  const showFaceNotice = (saved, name) => {
+    const status = saved?.face_status;
+    if (!status) return;
+    const messages = {
+      ok: t('members.face.ok', '{{name}} sera reconnu(e) à l’entrée grâce à sa photo.', { name }),
+      no_face: t('members.face.noFace', 'Aucun visage trouvé sur la photo de {{name}} : la reconnaissance faciale ne marchera pas. Reprenez une photo de face, bien éclairée.', { name }),
+      multiple_faces: t('members.face.multiple', 'Plusieurs visages sur la photo de {{name}} : reprenez une photo où la personne est seule.', { name }),
+    };
+    setFaceNotice({
+      type: status === 'ok' ? 'ok' : 'warn',
+      text: messages[status] || t('members.face.unavailable', 'La photo n’a pas pu être utilisée pour la reconnaissance faciale.'),
+    });
+  };
+
   const setEcheanceDay = async (membre, day) => {
     const nextDate = getNextPaymentDate(day);
     await updateMembre({ ...membre, dateExpiration: nextDate });
@@ -553,9 +737,9 @@ export default function Membres() {
 
   const handleSave = async (data) => {
     try {
-      if (data.id) await updateMembre(data);
-      else          await addMembre(data);
+      const saved = data.id ? await updateMembre(data) : await addMembre(data);
       setModal(null);
+      showFaceNotice(saved, `${data.prenom} ${data.nom}`);
     } catch (err) {
       const detail = err?.response?.data?.detail;
       const msg = Array.isArray(detail)
@@ -716,7 +900,7 @@ export default function Membres() {
                   <td><span className="genre-tag" style={{ color: gi.color, background: gi.color + '18' }}>{gi.label}</span></td>
                   <td>
                     <span className="act-tag" style={{ color: act?.couleur, background: act?.bg }}>
-                      {act ? `${act.icon} ${act.nom}` : typeof m.activite === 'string' ? m.activite : '—'}
+                      {act ? <><ActivityIcon icon={act.icon} size={13} /> {act.nom}</> : typeof m.activite === 'string' ? m.activite : '—'}
                     </span>
                   </td>
                   <td><span className="abo-tag">{m.abonnement}</span></td>
@@ -805,6 +989,11 @@ export default function Membres() {
             <div className="photo-viewer__name">{selected.prenom} {selected.nom}</div>
           </div>
         </Modal>
+      )}
+      {faceNotice && (
+        <div className={`act-toast${faceNotice.type === 'warn' ? ' act-toast--warn' : ''}`} role="status">
+          {faceNotice.type === 'ok' ? <ScanFace size={18} /> : <AlertTriangle size={18} />} {faceNotice.text}
+        </div>
       )}
     </div>
   );

@@ -1,9 +1,31 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import Webcam from 'react-webcam';
-import { Camera, CheckCircle, XCircle, AlertCircle, History, UserPlus, QrCode } from 'lucide-react';
+import { Camera, CheckCircle, XCircle, AlertCircle, History, UserPlus, QrCode, Eye, User, ZoomIn, X } from 'lucide-react';
 import { checkAccess, getAccessHistory, getMembres, enrollMember } from '../api/client';
 import { useTranslation } from 'react-i18next';
+import Modal from '../components/Modal';
 import './GestionAcces.css';
+
+const getPhotoSrc = (base64) => {
+  if (!base64) return null;
+  return base64.startsWith('data:image') ? base64 : `data:image/jpeg;base64,${base64}`;
+};
+
+const isExpired = (dateExpiration) => {
+  if (!dateExpiration) return false;
+  const exp = new Date(dateExpiration);
+  if (Number.isNaN(exp.getTime())) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  exp.setHours(0, 0, 0, 0);
+  return exp < today;
+};
+
+const formatDate = (value) => {
+  if (!value) return '—';
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString();
+};
 
 const GestionAcces = () => {
   const { t } = useTranslation();
@@ -11,6 +33,8 @@ const GestionAcces = () => {
   const [accessResult, setAccessResult] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [history, setHistory] = useState([]);
+  const [selectedPassage, setSelectedPassage] = useState(null);
+  const [photoZoom, setPhotoZoom] = useState(false);
   const [membres, setMembres] = useState([]);
   const [selectedMembre, setSelectedMembre] = useState('');
   const [enrollMode, setEnrollMode] = useState(false);
@@ -56,6 +80,25 @@ const GestionAcces = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Escape closes only the enlarged photo, not the member sheet behind it
+  // (capture phase + stopPropagation so the Modal's own Escape handler stays put).
+  useEffect(() => {
+    if (!photoZoom) return undefined;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        setPhotoZoom(false);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => window.removeEventListener('keydown', onKeyDown, true);
+  }, [photoZoom]);
+
+  // Never leave the zoom open once the sheet changes or closes.
+  useEffect(() => {
+    if (!selectedPassage) setPhotoZoom(false);
+  }, [selectedPassage]);
 
   const selectedMembreObj = membres.find(m => String(m.id) === String(selectedMembre));
 
@@ -161,6 +204,11 @@ const GestionAcces = () => {
       setIsProcessing(false);
     }
   };
+
+  const passagePhoto = getPhotoSrc(selectedPassage?.membre?.photo_base64);
+  const passagePhotoName = selectedPassage?.membre
+    ? `${selectedPassage.membre.prenom} ${selectedPassage.membre.nom}`
+    : '';
 
   return (
     <div className="access-container">
@@ -335,9 +383,22 @@ const GestionAcces = () => {
                     </div>
                     <p className="access-history-reason">{t(`access.reasons.${item.reason}`, item.reason)}</p>
                   </div>
-                  <span className="access-history-time">
-                    {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                  </span>
+                  <div className="access-history-aside">
+                    <span className="access-history-time">
+                      {new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                    <button
+                      type="button"
+                      className={`access-history-view${item.membre ? '' : ' access-history-view--muted'}`}
+                      onClick={() => setSelectedPassage(item)}
+                      title={t('access.viewMember', 'Voir la fiche du membre')}
+                      aria-label={item.membre
+                        ? t('access.passageDetails.viewAria', 'Voir la fiche de {{prenom}} {{nom}}', { prenom: item.membre.prenom, nom: item.membre.nom })
+                        : t('access.passageDetails.title', 'Fiche du passage')}
+                    >
+                      <Eye size={16} />
+                    </button>
+                  </div>
                 </div>
               ))
             )}
@@ -345,6 +406,165 @@ const GestionAcces = () => {
         </div>
 
       </div>
+
+      {selectedPassage && (
+        <Modal
+          title={t('access.passageDetails.title', 'Fiche du passage')}
+          onClose={() => setSelectedPassage(null)}
+          size="lg"
+        >
+          <div className="access-passage">
+            <div className={`access-passage__banner ${selectedPassage.status === 'authorized' ? 'authorized' : 'denied'}`}>
+              {selectedPassage.status === 'authorized' ? <CheckCircle size={18} /> : <XCircle size={18} />}
+              <strong>
+                {selectedPassage.status === 'authorized'
+                  ? t('access.accessAuthorized', 'Accès Autorisé')
+                  : t('access.accessDenied', 'Accès Refusé')}
+              </strong>
+              <span className="access-passage__banner-reason">
+                {t(`access.reasons.${selectedPassage.reason}`, selectedPassage.reason)}
+              </span>
+              <span className="access-passage__banner-time">
+                {new Date(selectedPassage.timestamp).toLocaleString()}
+              </span>
+            </div>
+
+            {selectedPassage.membre ? (
+              <>
+                <div className="access-passage__top">
+                  <div className={`access-passage__photo${passagePhoto ? ' access-passage__photo--zoomable' : ''}`}>
+                    {passagePhoto ? (
+                      <button
+                        type="button"
+                        className="access-passage__photo-btn"
+                        onClick={() => setPhotoZoom(true)}
+                        title={t('access.passageDetails.zoomPhoto', 'Agrandir la photo')}
+                        aria-label={t('access.passageDetails.zoomPhoto', 'Agrandir la photo')}
+                      >
+                        <img src={passagePhoto} alt={t('members.form.photoAlt', 'Photo membre')} />
+                        <span className="access-passage__photo-zoom" aria-hidden="true">
+                          <ZoomIn size={24} />
+                        </span>
+                      </button>
+                    ) : (
+                      <div className="access-passage__photo-empty">
+                        <User size={44} />
+                        <span>{t('members.form.noPhoto', 'Aucune photo')}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="access-passage__identity">
+                    <h3>{selectedPassage.membre.prenom} {selectedPassage.membre.nom}</h3>
+                    <p className="access-passage__id">
+                      {t('access.passageDetails.memberId', 'ID membre')} #{selectedPassage.membre.id}
+                    </p>
+                    <div className="access-passage__tags">
+                      <span className={`access-passage__tag ${selectedPassage.membre.statut === 'actif' ? 'ok' : 'danger'}`}>
+                        {selectedPassage.membre.statut === 'actif'
+                          ? t('members.form.statusActive', 'Actif')
+                          : t('members.form.statusInactive', 'Inactif')}
+                      </span>
+                      <span className={`access-passage__tag ${isExpired(selectedPassage.membre.date_expiration) ? 'danger' : 'ok'}`}>
+                        {isExpired(selectedPassage.membre.date_expiration)
+                          ? t('access.passageDetails.expired', 'Abonnement expiré')
+                          : t('access.passageDetails.valid', 'Abonnement valide')}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <dl className="access-passage__grid">
+                  <div className="access-passage__row">
+                    <dt>{t('members.form.phone', 'Téléphone')}</dt>
+                    <dd>{selectedPassage.membre.telephone || '—'}</dd>
+                  </div>
+                  <div className="access-passage__row">
+                    <dt>{t('members.form.email', 'Email')}</dt>
+                    <dd>{selectedPassage.membre.email || '—'}</dd>
+                  </div>
+                  <div className="access-passage__row">
+                    <dt>{t('members.details.gender', 'Genre')}</dt>
+                    <dd>{t(`access.passageDetails.genre.${selectedPassage.membre.genre}`, selectedPassage.membre.genre)}</dd>
+                  </div>
+                  <div className="access-passage__row">
+                    <dt>{t('members.form.activity', 'Activité')}</dt>
+                    <dd>{selectedPassage.membre.activite_nom || selectedPassage.membre.activite || '—'}</dd>
+                  </div>
+                  <div className="access-passage__row">
+                    <dt>{t('members.form.subscription', 'Abonnement')}</dt>
+                    <dd>{t(`access.passageDetails.subscription.${selectedPassage.membre.abonnement}`, selectedPassage.membre.abonnement)}</dd>
+                  </div>
+                  <div className="access-passage__row">
+                    <dt>{t('members.form.birthDate', 'Date de naissance')}</dt>
+                    <dd>{formatDate(selectedPassage.membre.date_naissance)}</dd>
+                  </div>
+                  <div className="access-passage__row">
+                    <dt>{t('members.form.registrationDate', "Date d'inscription")}</dt>
+                    <dd>{formatDate(selectedPassage.membre.date_inscription)}</dd>
+                  </div>
+                  <div className="access-passage__row">
+                    <dt>{t('members.form.calculatedExpiration', "Date d'expiration")}</dt>
+                    <dd className={isExpired(selectedPassage.membre.date_expiration) ? 'is-danger' : undefined}>
+                      {formatDate(selectedPassage.membre.date_expiration)}
+                    </dd>
+                  </div>
+                  <div className="access-passage__row">
+                    <dt>{t('access.passageDetails.cardSerial', 'N° de carte')}</dt>
+                    <dd>{selectedPassage.membre.card_serial || '—'}</dd>
+                  </div>
+                  <div className="access-passage__row">
+                    <dt>{t('access.passageDetails.passageTime', 'Date & heure du passage')}</dt>
+                    <dd>{new Date(selectedPassage.timestamp).toLocaleString()}</dd>
+                  </div>
+                </dl>
+              </>
+            ) : (
+              <div className="access-passage__empty">
+                <AlertCircle size={44} />
+                <p>{t('access.passageDetails.noMember', 'Aucun membre associé à ce passage')}</p>
+                <span>{t('access.passageDetails.noMemberHint', "Le visage ou le code QR n'a pas pu être identifié.")}</span>
+              </div>
+            )}
+
+            <div className="access-passage__footer">
+              <button type="button" className="access-btn" onClick={() => setSelectedPassage(null)}>
+                {t('access.passageDetails.close', 'Fermer')}
+              </button>
+            </div>
+          </div>
+        </Modal>
+      )}
+
+      {photoZoom && passagePhoto && (
+        <div
+          className="access-zoom"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t('access.passageDetails.zoomTitle', 'Photo du membre')}
+          onClick={() => setPhotoZoom(false)}
+        >
+          <button
+            type="button"
+            className="access-zoom__close"
+            onClick={(e) => { e.stopPropagation(); setPhotoZoom(false); }}
+            aria-label={t('access.passageDetails.zoomClose', 'Fermer la photo')}
+            title={t('access.passageDetails.zoomClose', 'Fermer la photo')}
+          >
+            <X size={22} />
+          </button>
+
+          <figure className="access-zoom__figure" onClick={(e) => e.stopPropagation()}>
+            <img src={passagePhoto} alt={t('members.form.photoAlt', 'Photo membre')} />
+            <figcaption>
+              <span>{passagePhotoName}</span>
+              <span className="access-zoom__hint">
+                {t('access.passageDetails.zoomHint', "Cliquez à l'extérieur ou appuyez sur Échap pour fermer")}
+              </span>
+            </figcaption>
+          </figure>
+        </div>
+      )}
     </div>
   );
 };

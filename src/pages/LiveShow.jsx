@@ -3,6 +3,7 @@ import { useGym } from '../context/GymContext';
 import { useTranslation } from 'react-i18next';
 import { Camera, Tv, Play, Save, X, Edit3, ShieldAlert, CheckCircle2, AlertTriangle, Users, Upload } from 'lucide-react';
 import './LiveShow.css';
+import ActivityIcon from '../components/ActivityIcon';
 
 export default function LiveShow() {
   const { activites, updateActivity } = useGym();
@@ -30,9 +31,9 @@ export default function LiveShow() {
     if (typeof window !== 'undefined') {
       const host = window.location.hostname;
       const apiHost = host === '127.0.0.1' ? 'localhost' : host;
-      return `http://${apiHost}:5000`;
+      return `http://${apiHost}:8007`;
     }
-    return 'http://localhost:5000';
+    return 'http://localhost:8007';
   };
 
   const apiBase = getApiUrl();
@@ -198,7 +199,7 @@ export default function LiveShow() {
                 <div key={act.id} className="live-act-card" style={{ '--accent-color': act.couleur }}>
                   <div className="card-header-row">
                     <div className="activity-info-group">
-                      <span className="activity-icon">{act.icon}</span>
+                      <span className="activity-icon"><ActivityIcon icon={act.icon} size={22} color={act.couleur} /></span>
                       <div>
                         <h3>{act.nom}</h3>
                         <p>{act.coachNom && act.coachNom !== 'À définir' ? `${t('live.coach', 'Coach')}: ${act.coachNom}` : t('live.noCoach', 'Sans Coach')}</p>
