@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Bell, X, AlertTriangle, Clock, UserX, CheckCheck, ChevronRight, ShoppingBag, Globe } from 'lucide-react';
+import { Bell, X, AlertTriangle, Clock, UserX, CheckCheck, ChevronRight, ShoppingBag, Globe, KeyRound } from 'lucide-react';
 import { useGym } from '../context/GymContext';
 import PermissionRender from './PermissionRender';
 import { usePermissions } from '../context/PermissionContext';
@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import Modal from './Modal';
+import ChangePasswordModal from './ChangePasswordModal';
 
 const ROLE_LABELS = {
   superadmin: 'Super Admin',
@@ -49,6 +50,7 @@ export default function SidebarUserPanel() {
   const [langOpen, setLangOpen] = useState(false);
   const [filter, setFilter] = useState('all');
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [pwdOpen, setPwdOpen] = useState(false);
   const [notifPos, setNotifPos] = useState({ top: 0, left: 0 });
   const [langPos, setLangPos] = useState({ top: 0, left: 0 });
   const notifBtnRef = useRef(null);
@@ -271,9 +273,21 @@ export default function SidebarUserPanel() {
         </div>
       </div>
 
-      <button className="header-action header-action--ghost sidebar-user__logout" onClick={logout}>
-        {t('header.logout', 'Deconnexion')}
-      </button>
+      <div className="sidebar-user__actions">
+        <button className="header-action header-action--ghost sidebar-user__logout" onClick={logout}>
+          {t('header.logout', 'Deconnexion')}
+        </button>
+        <button
+          className="header-action header-action--ghost sidebar-user__pwd"
+          onClick={() => setPwdOpen(true)}
+          title={t('password.title', 'Changer mon mot de passe')}
+          aria-label={t('password.title', 'Changer mon mot de passe')}
+        >
+          <KeyRound size={16} />
+        </button>
+      </div>
+
+      {pwdOpen && createPortal(<ChangePasswordModal onClose={() => setPwdOpen(false)} />, document.body)}
 
       {selectedOrder && createPortal(
         <Modal

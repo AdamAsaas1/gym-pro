@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Shield, RotateCcw } from 'lucide-react';
 import { usePermissions } from '../context/PermissionContext';
 import { useTranslation } from 'react-i18next';
+import StaffAccounts from '../components/StaffAccounts';
 
 const ROLE_LABELS = {
   superadmin: 'Super Admin',
@@ -94,6 +95,8 @@ export default function Permissions() {
           </>
         )}
       </section>
+
+      <StaffAccounts />
     </div>
   );
 }

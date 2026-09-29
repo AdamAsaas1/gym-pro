@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -9,6 +10,7 @@ export default function Login() {
   const { t } = useTranslation()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -59,19 +61,35 @@ export default function Login() {
             />
 
             <label htmlFor="password">{t('login.password', 'Mot de passe')}</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              placeholder={t('login.placeholder.password', 'Entrez votre mot de passe')}
-              required
-            />
-
-            <p className="login-footnote" style={{ marginTop: 4 }}>
-              {t('login.testAccounts', 'Comptes de test: superadmin / superadmin123 ou admin / admin123')}
-            </p>
+            <div className="login-password-field">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                placeholder={t('login.placeholder.password', 'Entrez votre mot de passe')}
+                required
+              />
+              <button
+                type="button"
+                className="login-password-toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={
+                  showPassword
+                    ? t('login.hidePassword', 'Masquer le mot de passe')
+                    : t('login.showPassword', 'Afficher le mot de passe')
+                }
+                aria-pressed={showPassword}
+                title={
+                  showPassword
+                    ? t('login.hidePassword', 'Masquer le mot de passe')
+                    : t('login.showPassword', 'Afficher le mot de passe')
+                }
+              >
+                {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+              </button>
+            </div>
 
             {error && <div className="login-error">{error}</div>}
 
