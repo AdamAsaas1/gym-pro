@@ -1,6 +1,6 @@
 import { createContext, useContext, useMemo, useState, useEffect } from 'react';
 import * as apiClient from '../api/client';
-import { BASE_ACTIVITES, COACHES, FALLBACK_DURATIONS, FALLBACK_PRIX, PLANNING } from './gymStatic';
+import { BASE_ACTIVITES, FALLBACK_DURATIONS, FALLBACK_PRIX } from './gymStatic';
 import { useAuth } from './AuthContext';
 
 /* ── API converters (snake_case ↔ camelCase) ─────────── */
@@ -18,6 +18,7 @@ const fromApi = (m) => ({
   dateInscription: m.date_inscription,
   dateExpiration:  m.date_expiration,
   photoBase64:     m.photo_base64 || '',
+  faceEnrolled:    !!m.face_enrolled,
 });
 const toApi = (d) => ({
   nom:              d.nom,
@@ -44,6 +45,29 @@ const fromApiP = (p) => ({
 });
 
 /* ── helpers ─────────────────────────────────────────── */
+// API activity -> UI shape. Quarterly price is derived: 3 months with a 10% discount.
+const mapActivity = (a) => ({
+  id: a.id,
+  nom: a.name,
+  prix: {
+    mensuel: Number(a.price_month),
+    trimestriel: Math.round(Number(a.price_month) * 3 * 0.9),
+    annuel: Number(a.price_year),
+  },
+  inscription_fees: Number(a.inscription_fees),
+  assurance_first: Number(a.assurance_first_year),
+  assurance_next: Number(a.assurance_next_years),
+  max_capacity: a.max_capacity,
+  genre: a.genre || 'homme',
+  description: a.description || '',
+  coachNom: a.coach_name || 'À définir',
+  icon: a.icon || '🏋️',
+  bg: a.color ? `${a.color}15` : 'rgba(99, 102, 241, 0.1)',
+  couleur: a.color || '#6366f1',
+  camera_source: a.camera_source || '',
+  current_capacity: a.current_capacity || 0,
+});
+
 const fmt = (d) => d.toISOString().split('T')[0];
 
 const isNetworkFailure = (result) => {
@@ -78,6 +102,8 @@ export function GymProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState(false);
   const [commandes, setCommandes] = useState([]);
+  const [coaches, setCoaches] = useState([]);
+  const [seances, setSeances] = useState([]);
 
   /* ── Charger les données depuis l'API au démarrage ── */
   useEffect(() => {
@@ -125,27 +151,7 @@ export function GymProvider({ children }) {
         
         if (actsRes.status === 'fulfilled' && actsRes.value.length > 0) {
           // Map dynamic activities to UI format
-          const mapped = actsRes.value.map(a => ({
-            id: a.id,
-            nom: a.name,
-            prix: { 
-              mensuel: Number(a.price_month), 
-              trimestriel: Number(a.price_month) * 3 * 0.9, // Mock for now or add field
-              annuel: Number(a.price_year) 
-            },
-            inscription_fees: Number(a.inscription_fees),
-            assurance_first: Number(a.assurance_first_year),
-            assurance_next: Number(a.assurance_next_years),
-            max_capacity: a.max_capacity,
-            genre: a.genre || 'homme',
-            description: a.description || '',
-            coachNom: a.coach_name || 'À définir',
-            icon: a.icon || '🏋️', 
-            bg: a.color ? `${a.color}15` : 'rgba(99, 102, 241, 0.1)', 
-            couleur: a.color || '#6366f1',
-            camera_source: a.camera_source || '',
-            current_capacity: a.current_capacity || 0
-          }));
+          const mapped = actsRes.value.map(mapActivity);
           setActivites(mapped);
         } else {
           setActivites([]);
@@ -179,27 +185,7 @@ export function GymProvider({ children }) {
     const refreshActs = () => {
       apiClient.getActivities().then(data => {
         if (data && data.length > 0) {
-          const mapped = data.map(a => ({
-            id: a.id,
-            nom: a.name,
-            prix: { 
-              mensuel: Number(a.price_month), 
-              trimestriel: Number(a.price_month) * 3 * 0.9,
-              annuel: Number(a.price_year) 
-            },
-            inscription_fees: Number(a.inscription_fees),
-            assurance_first: Number(a.assurance_first_year),
-            assurance_next: Number(a.assurance_next_years),
-            max_capacity: a.max_capacity,
-            genre: a.genre || 'homme',
-            description: a.description || '',
-            coachNom: a.coach_name || 'À définir',
-            icon: a.icon || '🏋️', 
-            bg: a.color ? `${a.color}15` : 'rgba(99, 102, 241, 0.1)', 
-            couleur: a.color || '#6366f1',
-            camera_source: a.camera_source || '',
-            current_capacity: a.current_capacity || 0
-          }));
+          const mapped = data.map(mapActivity);
           setActivites(mapped);
         }
       }).catch(err => console.error('Error polling activities:', err));
@@ -217,6 +203,7 @@ export function GymProvider({ children }) {
   const addMembre = async (d) => {
     const m = await apiClient.createMembre(toApi(d));
     setMembres(prev => [...prev, fromApi(m)]);
+    return m;
   };
 
   const updateMembre = async (d) => {
@@ -281,52 +268,85 @@ export function GymProvider({ children }) {
     const a = await apiClient.createActivity(data);
     // Refresh activities
     const acts = await apiClient.getActivities();
-    setActivites(acts.map(ac => ({
-      id: ac.id,
-      nom: ac.name,
-      prix: { mensuel: Number(ac.price_month), annuel: Number(ac.price_year) },
-      inscription_fees: Number(ac.inscription_fees),
-      assurance_first: Number(ac.assurance_first_year),
-      assurance_next: Number(ac.assurance_next_years),
-      max_capacity: ac.max_capacity,
-      genre: ac.genre || 'homme',
-      description: ac.description || '',
-      coachNom: ac.coach_name || '',
-      icon: ac.icon || '🏋️', 
-      bg: ac.color ? `${ac.color}15` : 'rgba(99, 102, 241, 0.1)', 
-      couleur: ac.color || '#6366f1',
-      camera_source: ac.camera_source || '',
-      current_capacity: ac.current_capacity || 0
-    })));
+    setActivites(acts.map(mapActivity));
     return a;
   };
 
   const updateActivity = async (id, data) => {
     await apiClient.updateActivity(id, data);
     const acts = await apiClient.getActivities();
-    setActivites(acts.map(ac => ({
-      id: ac.id,
-      nom: ac.name,
-      prix: { mensuel: Number(ac.price_month), annuel: Number(ac.price_year) },
-      inscription_fees: Number(ac.inscription_fees),
-      assurance_first: Number(ac.assurance_first_year),
-      assurance_next: Number(ac.assurance_next_years),
-      max_capacity: ac.max_capacity,
-      genre: ac.genre || 'homme',
-      description: ac.description || '',
-      coachNom: ac.coach_name || '',
-      icon: ac.icon || '🏋️', 
-      bg: ac.color ? `${ac.color}15` : 'rgba(99, 102, 241, 0.1)', 
-      couleur: ac.color || '#6366f1',
-      camera_source: ac.camera_source || '',
-      current_capacity: ac.current_capacity || 0
-    })));
+    setActivites(acts.map(mapActivity));
   };
 
   const deleteActivity = async (id) => {
     await apiClient.deleteActivity(id);
     setActivites(prev => prev.filter(a => a.id !== id));
   };
+  /* ── Coaches ── */
+  useEffect(() => {
+    if (loadingAuth) return;
+    if (!isAuthenticated) { setCoaches([]); return; }
+    let ignore = false;
+    apiClient.getCoaches()
+      .then((data) => { if (!ignore) setCoaches(data || []); })
+      .catch((err) => { if (!ignore) setCoaches([]); console.error('Error loading coaches:', err); });
+    return () => { ignore = true; };
+  }, [isAuthenticated, loadingAuth]);
+
+  /* ── Planning (weekly sessions) ── */
+  useEffect(() => {
+    if (loadingAuth) return;
+    if (!isAuthenticated) { setSeances([]); return; }
+    let ignore = false;
+    apiClient.getSeances()
+      .then((data) => { if (!ignore) setSeances(data || []); })
+      .catch((err) => { if (!ignore) setSeances([]); console.error('Error loading planning:', err); });
+    return () => { ignore = true; };
+  }, [isAuthenticated, loadingAuth]);
+
+  const addSeance = async (data) => {
+    const s = await apiClient.createSeance(data);
+    setSeances((prev) => [...prev, s]);
+    return s;
+  };
+
+  const updateSeance = async (id, data) => {
+    const s = await apiClient.updateSeance(id, data);
+    setSeances((prev) => prev.map((x) => (x.id === id ? s : x)));
+    return s;
+  };
+
+  const deleteSeance = async (id) => {
+    await apiClient.deleteSeance(id);
+    setSeances((prev) => prev.filter((x) => x.id !== id));
+  };
+
+  // Saving a coach also updates the linked activity's coach name on the server.
+  const refreshActivities = async () => {
+    const acts = await apiClient.getActivities();
+    setActivites(acts.map(mapActivity));
+  };
+
+  const addCoach = async (data) => {
+    const c = await apiClient.createCoach(data);
+    setCoaches((prev) => [...prev, c]);
+    refreshActivities().catch(() => {});
+    return c;
+  };
+
+  const updateCoach = async (id, data) => {
+    const c = await apiClient.updateCoach(id, data);
+    setCoaches((prev) => prev.map((x) => (x.id === id ? c : x)));
+    refreshActivities().catch(() => {});
+    return c;
+  };
+
+  const deleteCoach = async (id) => {
+    await apiClient.deleteCoach(id);
+    setCoaches((prev) => prev.filter((x) => x.id !== id));
+    refreshActivities().catch(() => {});
+  };
+
   const stats = useMemo(() => {
     const actifs       = membres.filter((m) => m.statut === 'actif');
     const expiringSoon = membres.filter((m) => {
@@ -435,7 +455,7 @@ export function GymProvider({ children }) {
   }, [membres, paiements]);
 
   return (
-    <GymContext.Provider value={{ membres, paiements, coaches: COACHES, activites, gymSettings, planning: PLANNING, abonnementDurations, configFallback, stats, statsP, notifications, readIds, markRead, clearAll, unreadCount, loading, apiError, addMembre, updateMembre, deleteMembre, toggleStatut, enregistrerPaiement, enregistrerPaiementWorkflow, updateSettings, addActivity, updateActivity, deleteActivity, commandes, setCommandes, fetchCommandes }}>
+    <GymContext.Provider value={{ membres, paiements, coaches, addCoach, updateCoach, deleteCoach, activites, gymSettings, seances, addSeance, updateSeance, deleteSeance, abonnementDurations, configFallback, stats, statsP, notifications, readIds, markRead, clearAll, unreadCount, loading, apiError, addMembre, updateMembre, deleteMembre, toggleStatut, enregistrerPaiement, enregistrerPaiementWorkflow, updateSettings, addActivity, updateActivity, deleteActivity, commandes, setCommandes, fetchCommandes }}>
       {loading && isAuthenticated ? (
         <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', background:'#0f172a', color:'#94a3b8', fontSize:'1.1rem', gap:'12px' }}>
           <div style={{ width:28, height:28, border:'3px solid #334155', borderTop:'3px solid #6366f1', borderRadius:'50%', animation:'spin 0.8s linear infinite' }} />
@@ -445,7 +465,7 @@ export function GymProvider({ children }) {
         <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:'100vh', background:'#0f172a', color:'#f87171', fontSize:'1rem', gap:'8px' }}>
           <div style={{ fontSize:'2rem' }}>⚠️</div>
           <strong>Impossible de contacter l'API</strong>
-          <span style={{ color:'#64748b' }}>Vérifiez que le serveur backend tourne sur le port 5000</span>
+          <span style={{ color:'#64748b' }}>Vérifiez que le serveur backend tourne sur le port 8007</span>
           <button onClick={() => window.location.reload()} style={{ marginTop:12, padding:'8px 20px', background:'#6366f1', color:'white', border:'none', borderRadius:8, cursor:'pointer' }}>Réessayer</button>
         </div>
       ) : children}

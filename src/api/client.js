@@ -5,12 +5,12 @@ function resolveApiBaseUrl() {
   if (configuredUrl) return configuredUrl
 
   if (typeof window === 'undefined') {
-    return 'http://localhost:5000'
+    return 'http://localhost:8007'
   }
 
   const host = window.location.hostname
   const apiHost = host === '127.0.0.1' ? 'localhost' : host
-  return `http://${apiHost}:5000`
+  return `http://${apiHost}:8007`
 }
 
 const api = axios.create({
@@ -181,6 +181,30 @@ export const createActivity = (data) => api.post('/settings/activities', data).t
 export const updateActivity = (id, d) => api.put(`/settings/activities/${id}`, d).then(r => r.data)
 export const deleteActivity = (id) => api.delete(`/settings/activities/${id}`).then(r => r.data)
 
+// ─── Account ─────────────────────────────────────────────────────────────────
+export const changePassword = (data) => api.post('/auth/me/password', data).then(r => r.data)
+export const getStaffUsers = () => api.get('/permissions/users').then(r => r.data)
+export const resetStaffPassword = (id) => api.post(`/permissions/users/${id}/reset-password`).then(r => r.data)
+
+// ─── Online shop (public, no login) ───────────────────────────────────────────
+export const getShopInfo = () => api.get('/shop/info').then(r => r.data)
+export const getShopProducts = () => api.get('/shop/products').then(r => r.data)
+export const getShopProduct = (id) => api.get(`/shop/products/${id}`).then(r => r.data)
+export const createShopOrder = (data) => api.post('/shop/orders', data).then(r => r.data)
+export const updateCommande = (id, data) => api.patch(`/commandes/${id}/status`, data).then(r => r.data)
+
+// ─── Planning (weekly sessions) ───────────────────────────────────────────────
+export const getSeances = () => api.get('/seances').then(r => r.data)
+export const createSeance = (data) => api.post('/seances', data).then(r => r.data)
+export const updateSeance = (id, d) => api.put(`/seances/${id}`, d).then(r => r.data)
+export const deleteSeance = (id) => api.delete(`/seances/${id}`).then(r => r.data)
+
+// ─── Coaches ─────────────────────────────────────────────────────────────────
+export const getCoaches = () => api.get('/coaches').then(r => r.data)
+export const createCoach = (data) => api.post('/coaches', data).then(r => r.data)
+export const updateCoach = (id, d) => api.put(`/coaches/${id}`, d).then(r => r.data)
+export const deleteCoach = (id) => api.delete(`/coaches/${id}`).then(r => r.data)
+
 // ─── Paiements ────────────────────────────────────────────────────────────────
 export const getPaiements = () => requestWithFallback([
   () => api.get('/paiements/'),
@@ -214,6 +238,8 @@ export const getNotificationRecipients = (id) => api.get(`/notifications/${id}/r
 // ─── Access Control ──────────────────────────────────────────────────────────
 export const checkAccess = (imageBase64, qrOnly = false, cardSerial = null) => api.post('/access-control/check', { image_base64: imageBase64, qr_only: qrOnly, card_serial: cardSerial }).then(r => r.data)
 export const getAccessHistory = (limit = 50) => api.get('/access-control/history', { params: { limit } }).then(r => r.data)
+// Light version for live polling: no nested member/photo, only rows since `since` (ISO datetime).
+export const getAccessFeed = (since, limit = 500) => api.get('/access-control/history', { params: { since, limit, compact: true } }).then(r => r.data)
 export const enrollMember = (membreId, imageBase64) => api.post(`/access-control/enroll/${membreId}`, { image_base64: imageBase64 }).then(r => r.data)
 
 // ─── Boutique / Products ────────────────────────────────────────────────────────

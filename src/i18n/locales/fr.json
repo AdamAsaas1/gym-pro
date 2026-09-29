@@ -56,7 +56,6 @@
     "active": "Actifs",
     "toPay": "A regler"
   },
-
   "subscriptions": {
     "monthly": "Mensuel",
     "1month": "1 mois",
@@ -91,7 +90,38 @@
     "monthly": "Mensuel",
     "quarterly": "Trimestriel",
     "yearly": "Annuel",
-    "coach": "Coach"
+    "coach": "Coach",
+    "heroTitle": "Activités & Tarifs",
+    "new": "Nouvelle activité",
+    "createFirst": "Créer la première activité",
+    "filterAll": "Toutes",
+    "kpiRegistered": "Membres inscrits",
+    "kpiActive": "Membres actifs",
+    "kpiTop": "La plus populaire",
+    "capacity": "Remplissage",
+    "fees": "Inscription",
+    "insurance": "Assurance",
+    "delete": {
+      "title": "Supprimer l'activité",
+      "hasMembers": "{{count}} membre(s) sont encore inscrits à cette activité.",
+      "reassign": "Changez d'abord leur activité, puis vous pourrez la supprimer.",
+      "seeMembers": "Voir les membres",
+      "confirm": "Cette action est définitive. Voulez-vous vraiment supprimer cette activité ?",
+      "done": "L'activité \"{{name}}\" a été supprimée."
+    },
+    "form": {
+      "errName": "Nom obligatoire",
+      "errPrice": "Prix invalide",
+      "previewName": "Nom de l'activité",
+      "previewHint": "Aperçu de la carte",
+      "perMonth": "mois",
+      "unlimited": "0 = illimitée",
+      "quarterlyHint": "Trimestriel calculé : {{price}} DH (−10 %)",
+      "noCoach": "Aucun coach",
+      "manageCoaches": "Gérer les coachs"
+    },
+    "eyebrow": "Catalogue",
+    "kpiCount": "Activités"
   },
   "notifications": {
     "title": "Notifications Administrateur",
@@ -149,7 +179,99 @@
     }
   },
   "coaches": {
-    "description": "Notre équipe de coachs qualifiés assure un encadrement professionnel et personnalisé pour chaque section de la salle."
+    "description": "Notre équipe de coachs qualifiés assure un encadrement professionnel et personnalisé pour chaque section de la salle.",
+    "heroTitle": "Nos coachs",
+    "new": "Nouveau coach",
+    "createFirst": "Ajouter le premier coach",
+    "kpiActive": "Coachs actifs",
+    "kpiToday": "Disponibles aujourd'hui",
+    "kpiSupervised": "Membres encadrés",
+    "kpiExperience": "Expérience moyenne",
+    "years": "ans",
+    "uncovered": "Activités sans coach :",
+    "assignHint": "Ajouter un coach pour cette activité",
+    "search": "Rechercher un coach, un diplôme…",
+    "sortLabel": "Trier par",
+    "sort": {
+      "name": "Trier : nom",
+      "experience": "Trier : expérience",
+      "members": "Trier : membres"
+    },
+    "unassigned": "Sans activité",
+    "empty": "Aucun coach pour le moment.",
+    "noResults": "Aucun coach ne correspond à votre recherche.",
+    "today": "Présent aujourd'hui",
+    "notToday": "Pas de séance aujourd'hui",
+    "yearsExp": "ans d'exp.",
+    "activeMembers": "membres actifs",
+    "daysPerWeek": "jours / sem.",
+    "call": "Appeler",
+    "email": "Email",
+    "noContact": "Aucun contact renseigné",
+    "status": {
+      "active": "Actif",
+      "inactive": "Absent / en pause"
+    },
+    "toast": {
+      "created": "{{name}} a été ajouté à l'équipe.",
+      "updated": "{{name}} a été mis à jour.",
+      "deleted": "{{name}} a été supprimé."
+    },
+    "delete": {
+      "title": "Supprimer le coach",
+      "confirm": "Cette action est définitive. Voulez-vous vraiment supprimer ce coach ?",
+      "error": "Erreur lors de la suppression."
+    },
+    "form": {
+      "newTitle": "Nouveau coach",
+      "editTitle": "Modifier le coach",
+      "addPhoto": "Ajouter une photo",
+      "changePhoto": "Changer la photo",
+      "removePhoto": "Retirer",
+      "errPhoto": "Image illisible",
+      "errRequired": "Champ obligatoire",
+      "errEmail": "Email invalide",
+      "errExperience": "Entre 0 et 80 ans",
+      "errSave": "Erreur lors de l'enregistrement du coach.",
+      "noActivity": "Aucune activité",
+      "unassign": "Retirer de cette activité",
+      "experience": "Années d'expérience",
+      "diploma": "Diplôme / spécialité",
+      "diplomaPh": "Ex: Ceinture noire 3e Dan",
+      "availability": "Disponibilités",
+      "hours": "Horaires",
+      "hoursPh": "Ex: 17:00 – 20:00",
+      "bio": "Présentation",
+      "bioPh": "Quelques mots sur le coach…"
+    },
+    "daysShort": {
+      "Lundi": "L",
+      "Mardi": "M",
+      "Mercredi": "M",
+      "Jeudi": "J",
+      "Vendredi": "V",
+      "Samedi": "S",
+      "Dimanche": "D"
+    },
+    "daysAbbr": {
+      "Lundi": "Lun",
+      "Mardi": "Mar",
+      "Mercredi": "Mer",
+      "Jeudi": "Jeu",
+      "Vendredi": "Ven",
+      "Samedi": "Sam",
+      "Dimanche": "Dim"
+    },
+    "days": {
+      "Lundi": "Lundi",
+      "Mardi": "Mardi",
+      "Mercredi": "Mercredi",
+      "Jeudi": "Jeudi",
+      "Vendredi": "Vendredi",
+      "Samedi": "Samedi",
+      "Dimanche": "Dimanche"
+    },
+    "eyebrow": "Équipe"
   },
   "dashboard": {
     "performance": "Performance",
@@ -168,7 +290,7 @@
         "title": "Repartition par section",
         "subtitle": "Distribution des membres actifs par categorie."
       },
-      "detail": "Detail",
+      "detail": "Détail",
       "activities": {
         "title": "Activites prioritaires",
         "subtitle": "Top 4 par volume d'adhesion."
@@ -180,8 +302,8 @@
       },
       "daysAbbr": "j",
       "recent": {
-        "title": "Dernieres inscriptions",
-        "subtitle": "Nouveaux membres enregistres."
+        "title": "Dernières inscriptions",
+        "subtitle": "Nouveaux membres enregistrés."
       }
     },
     "status": {
@@ -207,6 +329,67 @@
       "expirations7days": "Expirations 7 jours",
       "inactiveMembers": "Membres inactifs",
       "estimatedRevenue": "Revenus estimes"
+    },
+    "v2": {
+      "new": "nouveau",
+      "morning": "Bonjour",
+      "afternoon": "Bon après-midi",
+      "evening": "Bonsoir",
+      "live": "En direct",
+      "period": "Période",
+      "p7": "7 jours",
+      "p30": "30 jours",
+      "p12": "12 mois",
+      "vsPrev": "vs période précédente",
+      "signupsUnit": "inscription(s)",
+      "revenue": "Encaissements",
+      "signups": "Nouvelles inscriptions",
+      "signupsShort": "Inscriptions",
+      "ofTotal": "du total",
+      "members": "membres",
+      "entriesToday": "Entrées aujourd'hui",
+      "vsYesterday": "vs hier à la même heure",
+      "toRenew": "À renouveler",
+      "overdue": "en retard",
+      "within7": "sous 7 jours",
+      "revenueTrend": "Évolution des encaissements",
+      "signupTrend": "Évolution des inscriptions",
+      "total": "total",
+      "showChart": "Voir le graphique",
+      "showTable": "Voir les données",
+      "month": "Mois",
+      "day": "Jour",
+      "currentMonth": "Mois en cours",
+      "todayLbl": "Aujourd'hui",
+      "attendance": "Fréquentation aujourd'hui",
+      "peak": "Pic à {{h}} · {{n}} entrée(s)",
+      "noEntries": "Aucune entrée pour l'instant",
+      "entriesUnit": "entrée(s)",
+      "latest": "Derniers passages",
+      "deniedToday": "refus aujourd'hui",
+      "unknown": "Inconnu",
+      "granted": "Entrée autorisée",
+      "todo": "À relancer",
+      "todoNone": "Tout est à jour 🎉",
+      "todoSub": "{{o}} en retard · {{s}} expirent sous 7 jours",
+      "lateBy": "{{n}} j de retard",
+      "todayShort": "Aujourd'hui",
+      "inDays": "dans {{n}} j",
+      "others": "autres",
+      "byActivity": "Membres actifs par activité",
+      "activeMembersLc": "membres actifs",
+      "yesterday": "Hier",
+      "daysAgo": "il y a {{n}} j",
+      "exportError": "Erreur lors de l'export",
+      "reasons": {
+        "face": "Visage non reconnu",
+        "noFace": "Aucun visage détecté",
+        "multiple": "Plusieurs visages détectés",
+        "expired": "Abonnement expiré",
+        "inactive": "Membre inactif",
+        "qr": "QR code invalide",
+        "unavailable": "Reconnaissance indisponible"
+      }
     }
   },
   "login": {
@@ -225,7 +408,8 @@
       "password": "Entrez votre mot de passe"
     },
     "password": "Mot de passe",
-    "testAccounts": "Comptes de test: superadmin / superadmin123 ou admin / admin123",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
     "submitting": "Connexion...",
     "submit": "Se connecter",
     "restrictedAccess": "Acces reserve au personnel autorise."
@@ -247,7 +431,7 @@
       "secChildren": "Enfants (6–14 ans)",
       "activity": "Activité",
       "noActivity": "Aucune activité disponible",
-      "createActivityWarning": "Veuillez créer une activité pour cette section dans les paramètres.",
+      "createActivityWarning": "Veuillez créer une activité pour cette section depuis la page Activités.",
       "subscription": "Abonnement",
       "subMonthly": "Mensuel (1 mois)",
       "subQuarterly": "Trimestriel (3 mois)",
@@ -343,6 +527,12 @@
       "confirmDeleteTitle": "Confirmer la Suppression",
       "viewMemberTitle": "Fiche membre",
       "photoTitle": "Photo du membre"
+    },
+    "face": {
+      "ok": "{{name}} sera reconnu(e) à l'entrée grâce à sa photo.",
+      "noFace": "Aucun visage trouvé sur la photo de {{name}} : la reconnaissance faciale ne marchera pas. Reprenez une photo de face, bien éclairée.",
+      "multiple": "Plusieurs visages sur la photo de {{name}} : reprenez une photo où la personne est seule.",
+      "unavailable": "La photo n'a pas pu être utilisée pour la reconnaissance faciale."
     }
   },
   "payments": {
@@ -417,6 +607,33 @@
     "recentHistory": "Historique Récent",
     "noPassage": "Aucun passage enregistré",
     "unknown": "Inconnu",
+    "viewMember": "Voir la fiche du membre",
+    "passageDetails": {
+      "title": "Fiche du passage",
+      "viewAria": "Voir la fiche de {{prenom}} {{nom}}",
+      "memberId": "ID membre",
+      "cardSerial": "N° de carte",
+      "passageTime": "Date & heure du passage",
+      "expired": "Abonnement expiré",
+      "valid": "Abonnement valide",
+      "noMember": "Aucun membre associé à ce passage",
+      "noMemberHint": "Le visage ou le code QR n'a pas pu être identifié.",
+      "close": "Fermer",
+      "zoomPhoto": "Agrandir la photo",
+      "zoomTitle": "Photo du membre",
+      "zoomClose": "Fermer la photo",
+      "zoomHint": "Cliquez à l'extérieur ou appuyez sur Échap pour fermer",
+      "genre": {
+        "homme": "Homme",
+        "femme": "Femme",
+        "enfant": "Enfant"
+      },
+      "subscription": {
+        "mensuel": "Mensuel",
+        "trimestriel": "Trimestriel",
+        "annuel": "Annuel"
+      }
+    },
     "errSelectMember": "Veuillez sélectionner un membre",
     "enrollSuccess": "Membre enrôlé avec succès !",
     "errorPrefix": "Erreur: ",
@@ -457,7 +674,51 @@
   "planning": {
     "men": "♂ Hommes",
     "women": "♀ Femmes",
-    "children": "👶 Enfants"
+    "children": "👶 Enfants",
+    "eyebrow": "Planning",
+    "heroTitle": "Emploi du temps",
+    "subtitle": "Les séances sont récurrentes chaque semaine. Cliquez sur une séance pour la modifier.",
+    "new": "Nouvelle séance",
+    "now": "En ce moment",
+    "nowNone": "Aucune séance en cours",
+    "next": "Prochaine séance",
+    "noneScheduled": "Aucune séance planifiée",
+    "kpiSlots": "Séances / semaine",
+    "kpiHours": "Heures de cours / semaine",
+    "kpiToday": "Séances aujourd'hui",
+    "kpiCoaches": "Coachs mobilisés",
+    "conflicts": "{{n}} séance(s) avec un coach réservé deux fois au même moment (marquées ⚠).",
+    "noSession": "Aucune séance",
+    "running": "En cours",
+    "empty": "Aucune séance planifiée pour le moment.",
+    "createFirst": "Créer la première séance",
+    "toast": {
+      "created": "Séance « {{name}} » ajoutée au planning.",
+      "updated": "Séance « {{name}} » mise à jour.",
+      "deleted": "Séance « {{name}} » supprimée."
+    },
+    "form": {
+      "newTitle": "Nouvelle séance",
+      "editTitle": "Modifier la séance",
+      "pickActivity": "Choisir une activité",
+      "label": "Nom de la séance",
+      "labelPh": "Ex: Cardio Matin",
+      "days": "Jours",
+      "start": "Début",
+      "end": "Fin",
+      "room": "Salle",
+      "roomPh": "Ex: Salle 1",
+      "coach": "Coach",
+      "noCoach": "Aucun coach",
+      "conflict": "Ce coach a déjà une séance au même moment :",
+      "confirmDelete": "Supprimer cette séance ?",
+      "errActivity": "Choisissez une activité",
+      "errLabel": "Donnez un nom à la séance",
+      "errDays": "Choisissez au moins un jour",
+      "errTime": "L'heure de fin doit être après le début",
+      "errSave": "Erreur lors de l'enregistrement de la séance.",
+      "errDelete": "Erreur lors de la suppression."
+    }
   },
   "settings": {
     "success": {
@@ -491,7 +752,9 @@
       "new": "Nouveau",
       "edit": "Modifier",
       "delete": "Supprimer",
-      "noActivities": "Aucune activité configurée."
+      "noActivities": "Aucune activité configurée.",
+      "movedDesc": "Les activités, leurs tarifs et leurs coachs se gèrent maintenant depuis la page Activités.",
+      "manage": "Gérer les activités"
     },
     "modal": {
       "editActivity": "Modifier l'activité",
@@ -636,5 +899,68 @@
       "realtimeFps": "Temps réel (10 FPS)",
       "closeBtn": "Fermer"
     }
+  },
+  "password": {
+    "title": "Changer mon mot de passe",
+    "current": "Mot de passe actuel",
+    "new": "Nouveau mot de passe",
+    "confirm": "Confirmer le nouveau mot de passe",
+    "hint": "Au moins 8 caractères. Mélangez lettres, chiffres et symboles.",
+    "weak": "Faible",
+    "medium": "Moyen",
+    "good": "Bon",
+    "strong": "Fort",
+    "errLength": "Le nouveau mot de passe doit contenir au moins 8 caractères.",
+    "errMatch": "Les deux mots de passe ne correspondent pas.",
+    "errCurrent": "Mot de passe actuel incorrect.",
+    "errSame": "Le nouveau mot de passe doit être différent de l'ancien.",
+    "errGeneric": "Impossible de changer le mot de passe. Réessayez.",
+    "success": "Mot de passe modifié !",
+    "successHint": "Utilisez votre nouveau mot de passe à la prochaine connexion."
+  },
+  "staff": {
+    "title": "Comptes du personnel",
+    "desc": "Si un admin a oublié son mot de passe, donnez-lui un mot de passe temporaire ici.",
+    "loading": "Chargement…",
+    "you": "vous",
+    "superShort": "Commande de secours",
+    "superHint": "Mot de passe oublié : utilisez la commande de secours sur le serveur.",
+    "resetBtnLong": "Réinitialiser le mot de passe",
+    "resetBtn": "Réinitialiser",
+    "resetTitle": "Réinitialiser le mot de passe",
+    "resetConfirm": "Un nouveau mot de passe temporaire va être créé. L'ancien ne fonctionnera plus.",
+    "resetError": "Impossible de réinitialiser ce mot de passe.",
+    "tempLabel": "Nouveau mot de passe temporaire :",
+    "copy": "Copier",
+    "copied": "Copié",
+    "tempWarn": "Notez-le maintenant : il ne sera plus affiché. Transmettez-le à la personne, qui devra le changer avec le bouton 🔑.",
+    "done": "C'est noté",
+    "rescue": "Superadmin qui a oublié son mot de passe : sur l'ordinateur du serveur, lancez"
+  },
+  "renewals": {
+    "title": "Renouvellements",
+    "subtitle": "Relancez les membres en retard ou bientôt expirés, et encaissez leur renouvellement en un clic.",
+    "prices": "Voir les tarifs",
+    "kpiRecover": "À récupérer",
+    "membersLate": "membre(s) en retard",
+    "kpiSoon": "Expirent sous 7 jours",
+    "within30": "sous 30 jours",
+    "kpiMrr": "Revenu mensuel récurrent",
+    "mrrHint": "abonnements à jour, ramenés au mois",
+    "kpiPlans": "Formules (membres à jour)",
+    "tabLate": "En retard",
+    "tabSoon": "Expire sous 30 j",
+    "tabOk": "À jour",
+    "tabInactive": "Inactifs",
+    "search": "Rechercher un membre…",
+    "noResult": "Aucun membre ne correspond.",
+    "noneLate": "Aucun membre en retard 🎉",
+    "noneHere": "Aucun membre dans cette catégorie.",
+    "renew": "Encaisser",
+    "whatsapp": "Relancer sur WhatsApp",
+    "contactedToday": "Relancé aujourd'hui",
+    "contactedAgo": "Relancé il y a {{n}} j",
+    "msgLate": "Bonjour {{prenom}}, c'est {{gym}} 👋 Votre abonnement {{formule}} {{activite}} a expiré le {{date}}. Passez à l'accueil pour le renouveler ({{montant}}). À très vite !",
+    "msgSoon": "Bonjour {{prenom}}, c'est {{gym}} 👋 Votre abonnement {{formule}} {{activite}} expire le {{date}}. Pensez à le renouveler ({{montant}}) pour continuer à vous entraîner sans interruption. À bientôt !"
   }
 }

@@ -56,7 +56,6 @@
     "active": "Active",
     "toPay": "To pay"
   },
-
   "subscriptions": {
     "monthly": "Monthly",
     "1month": "1 month",
@@ -91,7 +90,38 @@
     "monthly": "Monthly",
     "quarterly": "Quarterly",
     "yearly": "Yearly",
-    "coach": "Coach"
+    "coach": "Coach",
+    "heroTitle": "Activities & Pricing",
+    "new": "New activity",
+    "createFirst": "Create the first activity",
+    "filterAll": "All",
+    "kpiRegistered": "Registered members",
+    "kpiActive": "Active members",
+    "kpiTop": "Most popular",
+    "capacity": "Occupancy",
+    "fees": "Registration",
+    "insurance": "Insurance",
+    "delete": {
+      "title": "Delete activity",
+      "hasMembers": "{{count}} member(s) are still enrolled in this activity.",
+      "reassign": "Change their activity first, then you can delete it.",
+      "seeMembers": "See members",
+      "confirm": "This cannot be undone. Do you really want to delete this activity?",
+      "done": "The activity \"{{name}}\" has been deleted."
+    },
+    "form": {
+      "errName": "Name is required",
+      "errPrice": "Invalid price",
+      "previewName": "Activity name",
+      "previewHint": "Card preview",
+      "perMonth": "month",
+      "unlimited": "0 = unlimited",
+      "quarterlyHint": "Quarterly price: {{price}} DH (−10%)",
+      "noCoach": "No coach",
+      "manageCoaches": "Manage coaches"
+    },
+    "eyebrow": "Catalog",
+    "kpiCount": "Activities"
   },
   "notifications": {
     "title": "Admin Notifications",
@@ -149,7 +179,99 @@
     }
   },
   "coaches": {
-    "description": "Our team of qualified coaches ensures professional and personalized coaching for every section."
+    "description": "Our team of qualified coaches ensures professional and personalized coaching for every section.",
+    "heroTitle": "Our coaches",
+    "new": "New coach",
+    "createFirst": "Add the first coach",
+    "kpiActive": "Active coaches",
+    "kpiToday": "Available today",
+    "kpiSupervised": "Members coached",
+    "kpiExperience": "Average experience",
+    "years": "yrs",
+    "uncovered": "Activities without a coach:",
+    "assignHint": "Add a coach for this activity",
+    "search": "Search a coach, a diploma…",
+    "sortLabel": "Sort by",
+    "sort": {
+      "name": "Sort: name",
+      "experience": "Sort: experience",
+      "members": "Sort: members"
+    },
+    "unassigned": "No activity",
+    "empty": "No coaches yet.",
+    "noResults": "No coach matches your search.",
+    "today": "Working today",
+    "notToday": "No session today",
+    "yearsExp": "yrs exp.",
+    "activeMembers": "active members",
+    "daysPerWeek": "days / week",
+    "call": "Call",
+    "email": "Email",
+    "noContact": "No contact details",
+    "status": {
+      "active": "Active",
+      "inactive": "Away / on break"
+    },
+    "toast": {
+      "created": "{{name}} has joined the team.",
+      "updated": "{{name}} has been updated.",
+      "deleted": "{{name}} has been deleted."
+    },
+    "delete": {
+      "title": "Delete coach",
+      "confirm": "This cannot be undone. Do you really want to delete this coach?",
+      "error": "Error during deletion."
+    },
+    "form": {
+      "newTitle": "New coach",
+      "editTitle": "Edit coach",
+      "addPhoto": "Add a photo",
+      "changePhoto": "Change photo",
+      "removePhoto": "Remove",
+      "errPhoto": "Unreadable image",
+      "errRequired": "Required field",
+      "errEmail": "Invalid email",
+      "errExperience": "Between 0 and 80 years",
+      "errSave": "Error while saving the coach.",
+      "noActivity": "No activity",
+      "unassign": "Remove from this activity",
+      "experience": "Years of experience",
+      "diploma": "Diploma / specialty",
+      "diplomaPh": "e.g. Black belt 3rd Dan",
+      "availability": "Availability",
+      "hours": "Hours",
+      "hoursPh": "e.g. 17:00 – 20:00",
+      "bio": "About",
+      "bioPh": "A few words about the coach…"
+    },
+    "daysShort": {
+      "Lundi": "M",
+      "Mardi": "T",
+      "Mercredi": "W",
+      "Jeudi": "T",
+      "Vendredi": "F",
+      "Samedi": "S",
+      "Dimanche": "S"
+    },
+    "daysAbbr": {
+      "Lundi": "Mon",
+      "Mardi": "Tue",
+      "Mercredi": "Wed",
+      "Jeudi": "Thu",
+      "Vendredi": "Fri",
+      "Samedi": "Sat",
+      "Dimanche": "Sun"
+    },
+    "days": {
+      "Lundi": "Monday",
+      "Mardi": "Tuesday",
+      "Mercredi": "Wednesday",
+      "Jeudi": "Thursday",
+      "Vendredi": "Friday",
+      "Samedi": "Saturday",
+      "Dimanche": "Sunday"
+    },
+    "eyebrow": "Team"
   },
   "dashboard": {
     "performance": "Performance",
@@ -207,6 +329,67 @@
       "expirations7days": "7-day expirations",
       "inactiveMembers": "Inactive members",
       "estimatedRevenue": "Estimated revenue"
+    },
+    "v2": {
+      "new": "new",
+      "morning": "Good morning",
+      "afternoon": "Good afternoon",
+      "evening": "Good evening",
+      "live": "Live",
+      "period": "Period",
+      "p7": "7 days",
+      "p30": "30 days",
+      "p12": "12 months",
+      "vsPrev": "vs previous period",
+      "signupsUnit": "sign-up(s)",
+      "revenue": "Revenue",
+      "signups": "New sign-ups",
+      "signupsShort": "Sign-ups",
+      "ofTotal": "of total",
+      "members": "members",
+      "entriesToday": "Entries today",
+      "vsYesterday": "vs yesterday at the same time",
+      "toRenew": "To renew",
+      "overdue": "overdue",
+      "within7": "within 7 days",
+      "revenueTrend": "Revenue trend",
+      "signupTrend": "Sign-up trend",
+      "total": "total",
+      "showChart": "Show chart",
+      "showTable": "Show data",
+      "month": "Month",
+      "day": "Day",
+      "currentMonth": "Current month",
+      "todayLbl": "Today",
+      "attendance": "Attendance today",
+      "peak": "Peak at {{h}} · {{n}} entry(ies)",
+      "noEntries": "No entries yet",
+      "entriesUnit": "entry(ies)",
+      "latest": "Latest check-ins",
+      "deniedToday": "denied today",
+      "unknown": "Unknown",
+      "granted": "Entry granted",
+      "todo": "Follow up",
+      "todoNone": "All up to date 🎉",
+      "todoSub": "{{o}} overdue · {{s}} expire within 7 days",
+      "lateBy": "{{n}} d overdue",
+      "todayShort": "Today",
+      "inDays": "in {{n}} d",
+      "others": "more",
+      "byActivity": "Active members by activity",
+      "activeMembersLc": "active members",
+      "yesterday": "Yesterday",
+      "daysAgo": "{{n}} d ago",
+      "exportError": "Export failed",
+      "reasons": {
+        "face": "Face not recognized",
+        "noFace": "No face detected",
+        "multiple": "Several faces detected",
+        "expired": "Subscription expired",
+        "inactive": "Inactive member",
+        "qr": "Invalid QR code",
+        "unavailable": "Recognition unavailable"
+      }
     }
   },
   "login": {
@@ -225,7 +408,8 @@
       "password": "Enter your password"
     },
     "password": "Password",
-    "testAccounts": "Test accounts: superadmin / superadmin123 or admin / admin123",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
     "submitting": "Connecting...",
     "submit": "Log In",
     "restrictedAccess": "Access restricted to authorized personnel."
@@ -247,7 +431,7 @@
       "secChildren": "Children (6–14 years)",
       "activity": "Activity",
       "noActivity": "No activity available",
-      "createActivityWarning": "Please create an activity for this section in the settings.",
+      "createActivityWarning": "Please create an activity for this section from the Activities page.",
       "subscription": "Subscription",
       "subMonthly": "Monthly (1 month)",
       "subQuarterly": "Quarterly (3 months)",
@@ -343,6 +527,12 @@
       "confirmDeleteTitle": "Confirm Deletion",
       "viewMemberTitle": "Member profile",
       "photoTitle": "Member photo"
+    },
+    "face": {
+      "ok": "{{name}} will be recognized at the entrance from their photo.",
+      "noFace": "No face found on {{name}}'s photo: face recognition won't work. Retake a well-lit, front-facing photo.",
+      "multiple": "Several faces on {{name}}'s photo: retake a photo with the person alone.",
+      "unavailable": "The photo could not be used for face recognition."
     }
   },
   "payments": {
@@ -417,6 +607,33 @@
     "recentHistory": "Recent History",
     "noPassage": "No passage recorded",
     "unknown": "Unknown",
+    "viewMember": "View member details",
+    "passageDetails": {
+      "title": "Access record",
+      "viewAria": "View details for {{prenom}} {{nom}}",
+      "memberId": "Member ID",
+      "cardSerial": "Card serial",
+      "passageTime": "Date & time of entry",
+      "expired": "Subscription expired",
+      "valid": "Subscription valid",
+      "noMember": "No member linked to this entry",
+      "noMemberHint": "The face or QR code could not be identified.",
+      "close": "Close",
+      "zoomPhoto": "Enlarge photo",
+      "zoomTitle": "Member photo",
+      "zoomClose": "Close photo",
+      "zoomHint": "Click outside or press Escape to close",
+      "genre": {
+        "homme": "Man",
+        "femme": "Woman",
+        "enfant": "Child"
+      },
+      "subscription": {
+        "mensuel": "Monthly",
+        "trimestriel": "Quarterly",
+        "annuel": "Yearly"
+      }
+    },
     "errSelectMember": "Please select a member",
     "enrollSuccess": "Member enrolled successfully!",
     "errorPrefix": "Error: ",
@@ -457,7 +674,51 @@
   "planning": {
     "men": "♂ Men",
     "women": "♀ Women",
-    "children": "👶 Children"
+    "children": "👶 Children",
+    "eyebrow": "Planning",
+    "heroTitle": "Timetable",
+    "subtitle": "Sessions repeat every week. Click a session to edit it.",
+    "new": "New session",
+    "now": "Happening now",
+    "nowNone": "No session in progress",
+    "next": "Next session",
+    "noneScheduled": "No session scheduled",
+    "kpiSlots": "Sessions / week",
+    "kpiHours": "Class hours / week",
+    "kpiToday": "Sessions today",
+    "kpiCoaches": "Coaches involved",
+    "conflicts": "{{n}} session(s) where a coach is booked twice at the same time (marked ⚠).",
+    "noSession": "No session",
+    "running": "Live",
+    "empty": "No session scheduled yet.",
+    "createFirst": "Create the first session",
+    "toast": {
+      "created": "Session \"{{name}}\" added to the timetable.",
+      "updated": "Session \"{{name}}\" updated.",
+      "deleted": "Session \"{{name}}\" deleted."
+    },
+    "form": {
+      "newTitle": "New session",
+      "editTitle": "Edit session",
+      "pickActivity": "Choose an activity",
+      "label": "Session name",
+      "labelPh": "e.g. Morning Cardio",
+      "days": "Days",
+      "start": "Start",
+      "end": "End",
+      "room": "Room",
+      "roomPh": "e.g. Room 1",
+      "coach": "Coach",
+      "noCoach": "No coach",
+      "conflict": "This coach already has a session at the same time:",
+      "confirmDelete": "Delete this session?",
+      "errActivity": "Choose an activity",
+      "errLabel": "Give the session a name",
+      "errDays": "Choose at least one day",
+      "errTime": "End time must be after start time",
+      "errSave": "Error while saving the session.",
+      "errDelete": "Error during deletion."
+    }
   },
   "settings": {
     "success": {
@@ -491,7 +752,9 @@
       "new": "New",
       "edit": "Edit",
       "delete": "Delete",
-      "noActivities": "No activity configured."
+      "noActivities": "No activity configured.",
+      "movedDesc": "Activities, their prices and coaches are now managed from the Activities page.",
+      "manage": "Manage activities"
     },
     "modal": {
       "editActivity": "Edit activity",
@@ -636,5 +899,68 @@
       "realtimeFps": "Real-time (10 FPS)",
       "closeBtn": "Close"
     }
+  },
+  "password": {
+    "title": "Change my password",
+    "current": "Current password",
+    "new": "New password",
+    "confirm": "Confirm new password",
+    "hint": "At least 8 characters. Mix letters, numbers and symbols.",
+    "weak": "Weak",
+    "medium": "Medium",
+    "good": "Good",
+    "strong": "Strong",
+    "errLength": "The new password must be at least 8 characters long.",
+    "errMatch": "The two passwords do not match.",
+    "errCurrent": "Current password is incorrect.",
+    "errSame": "The new password must be different from the old one.",
+    "errGeneric": "Could not change the password. Please try again.",
+    "success": "Password changed!",
+    "successHint": "Use your new password next time you log in."
+  },
+  "staff": {
+    "title": "Staff accounts",
+    "desc": "If an admin forgot their password, give them a temporary one here.",
+    "loading": "Loading…",
+    "you": "you",
+    "superShort": "Rescue command",
+    "superHint": "Forgotten password: use the rescue command on the server.",
+    "resetBtnLong": "Reset password",
+    "resetBtn": "Reset",
+    "resetTitle": "Reset password",
+    "resetConfirm": "A new temporary password will be created. The old one will stop working.",
+    "resetError": "Could not reset this password.",
+    "tempLabel": "New temporary password:",
+    "copy": "Copy",
+    "copied": "Copied",
+    "tempWarn": "Write it down now: it will not be shown again. Give it to the person, who must change it with the 🔑 button.",
+    "done": "Got it",
+    "rescue": "Superadmin who forgot their password: on the server machine, run"
+  },
+  "renewals": {
+    "title": "Renewals",
+    "subtitle": "Follow up overdue or expiring members and collect their renewal in one click.",
+    "prices": "See prices",
+    "kpiRecover": "To recover",
+    "membersLate": "overdue member(s)",
+    "kpiSoon": "Expire within 7 days",
+    "within30": "within 30 days",
+    "kpiMrr": "Monthly recurring revenue",
+    "mrrHint": "paid-up subscriptions, per month",
+    "kpiPlans": "Plans (paid-up members)",
+    "tabLate": "Overdue",
+    "tabSoon": "Expires within 30 d",
+    "tabOk": "Up to date",
+    "tabInactive": "Inactive",
+    "search": "Search a member…",
+    "noResult": "No member matches.",
+    "noneLate": "No overdue member 🎉",
+    "noneHere": "No member in this category.",
+    "renew": "Collect",
+    "whatsapp": "Follow up on WhatsApp",
+    "contactedToday": "Contacted today",
+    "contactedAgo": "Contacted {{n}} d ago",
+    "msgLate": "Hello {{prenom}}, this is {{gym}} 👋 Your {{formule}} {{activite}} subscription expired on {{date}}. Drop by the front desk to renew it ({{montant}}). See you soon!",
+    "msgSoon": "Hello {{prenom}}, this is {{gym}} 👋 Your {{formule}} {{activite}} subscription expires on {{date}}. Remember to renew it ({{montant}}) to keep training without interruption. See you soon!"
   }
 }
