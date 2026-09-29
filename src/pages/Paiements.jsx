@@ -3,6 +3,7 @@ import {
   Banknote, TrendingUp, Users, AlertCircle, CheckCircle2,
   Search, ReceiptText, Clock, X, Download, Calendar,
 } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { useGym } from '../context/GymContext';
 import { telechargerRecu } from '../api/client';
 import { useTranslation } from 'react-i18next';
@@ -217,7 +218,9 @@ export default function Paiements() {
   const [search,     setSearch]     = useState('');
   const [filter,     setFilter]     = useState('tous');
   const [tab,        setTab]        = useState('membres');   // 'membres' | 'historique'
-  const [selected,   setSelected]   = useState(null);        // membre pour modal
+  const [searchParams] = useSearchParams();
+  // "/paiements?membre=12" opens the payment form for that member directly (used by Renouvellements).
+  const [selected,   setSelected]   = useState(() => membres.find((m) => m.id === Number(searchParams.get('membre'))) || null);
   const [moisHisto,  setMoisHisto]  = useState('');
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
   const [yearCursor, setYearCursor] = useState(() => new Date().getFullYear());
