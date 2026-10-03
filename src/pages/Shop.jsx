@@ -30,6 +30,8 @@ const safeRead = (key, fallback) => { try { return JSON.parse(localStorage.getIt
 const safeWrite = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private mode */ } };
 const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 const productLink = (id) => `${window.location.origin}/shop?p=${id}`;
+const cartKey = (productId, variantId) => (variantId ? `${productId}:${variantId}` : String(productId));
+const hasVariants = (p) => (p?.variants?.length || 0) > 0;
 
 // "0612..." -> "212612..." for wa.me links.
 const waNumber = (phone) => {
@@ -100,7 +102,7 @@ function ProductCard({ p, qty, fav, onFav, onOpen, onAdd, onQty, catLabel }) {
           <Heart size={18} />
         </button>
         {p.in_stock && !qty && (
-          <button className="ps-quickadd" onClick={(e) => onAdd(p, e.currentTarget)} aria-label={`${t('shop.addToCart', 'Ajouter au panier')} : ${p.name}`}>
+          <button className="ps-quickadd" onClick={(e) => (hasVariants(p) ? onOpen(p) : onAdd(p, e.currentTarget))} aria-label={hasVariants(p) ? `${t('shop.chooseFlavour', 'Choisir le goût')} : ${p.name}` : `${t('shop.addToCart', 'Ajouter au panier')} : ${p.name}`}>
             <Plus size={20} />
           </button>
         )}
@@ -108,12 +110,13 @@ function ProductCard({ p, qty, fav, onFav, onOpen, onAdd, onQty, catLabel }) {
       <div className="ps-card__body">
         {p.category && <span className="ps-card__cat">{catLabel(p.category)}</span>}
         <button className="ps-card__name" onClick={() => onOpen(p)}>{p.name}</button>
+        {hasVariants(p) && <span className="ps-card__flavours">{t('shop.nFlavours', '{{count}} goûts', { count: p.variants.length })}</span>}
         <div className="ps-card__foot">
           <Price p={p} />
           {p.in_stock && p.low_stock && <span className="ps-low">{t('shop.lowStock', 'Dernières pièces')}</span>}
         </div>
         {/* Once in the cart, the card becomes its own quantity control (down to zero removes it). */}
-        {p.in_stock && qty > 0 && <Stepper small value={qty} min={0} onChange={(v) => onQty(p.id, v)} />}
+        {p.in_stock && qty > 0 && !hasVariants(p) && <Stepper small value={qty} min={0} onChange={(v) => onQty(p.id, v)} />}
       </div>
     </article>
   );
@@ -223,7 +226,14 @@ export default function Shop() {
   const coaches = useMemo(() => activities.filter((a) => a.coach_name), [activities]);
 
   const lines = useMemo(() => Object.entries(cart)
-    .map(([id, qty]) => ({ product: byId[id], qty }))
+    .map(([key, qty]) => {
+      const [pid, vid] = key.split(':').map(Number);
+      const product = byId[pid];
+      const variant = vid ? product?.variants?.find((v) => v.id === vid) : null;
+      // A line whose flavour no longer exists, or a flavoured product saved without a flavour, is dropped.
+      if (!product || (hasVariants(product) ? !variant : vid)) return { product: null, qty };
+      return { key, product, variant, qty };
+    })
     .filter((l) => l.product && l.qty > 0), [cart, byId]);
   const count = lines.reduce((s, l) => s + l.qty, 0);
   const subtotal = lines.reduce((s, l) => s + unitPrice(l.product) * l.qty, 0);
@@ -262,8 +272,9 @@ export default function Shop() {
     };
   };
 
-  const add = (p, qty = 1, from) => {
-    setQty(p.id, (cart[p.id] || 0) + qty);
+  const add = (p, qty = 1, from, variant) => {
+    const key = cartKey(p.id, variant?.id);
+    setQty(key, (cart[key] || 0) + qty);
     fly(from);
     navigator.vibrate?.(12);
     showToast('added', p);
@@ -299,13 +310,13 @@ export default function Shop() {
   const filtersOn = category !== 'all' || query || onlyStock || onlyPromo || onlyFav || sort !== 'featured';
 
   const cartWaText = () => {
-    const rows = lines.map((l) => `• ${l.qty} × ${l.product.name} — ${fmt(unitPrice(l.product) * l.qty)}`).join('\n');
+    const rows = lines.map((l) => `• ${l.qty} × ${l.product.name}${l.variant ? ` (${l.variant.name})` : ''} — ${fmt(unitPrice(l.product) * l.qty)}`).join('\n');
     return `${t('shop.waCartIntro', 'Bonjour, je voudrais commander :')}\n${rows}\n${t('shop.subtotal', 'Sous-total')} : ${fmt(subtotal)}`;
   };
 
   const cardProps = (p) => ({
-    p, qty: cart[p.id], fav: favs.includes(p.id), onFav: toggleFav, onOpen: openProduct,
-    onAdd: (prod, el) => add(prod, 1, el), onQty: setQty, catLabel,
+    p, qty: cart[cartKey(p.id)], fav: favs.includes(p.id), onFav: toggleFav, onOpen: openProduct,
+    onAdd: (prod, el) => add(prod, 1, el), onQty: (id, v) => setQty(cartKey(id), v), catLabel,
   });
 
   const navLinks = [
@@ -602,7 +613,7 @@ export default function Shop() {
           related={products.filter((x) => x.category === detail.category && x.id !== detail.id).slice(0, 6)}
           onOpen={openProduct}
           onClose={() => setDetail(null)}
-          onAdd={(p, qty) => { add(p, qty); setDetail(null); }}
+          onAdd={(p, qty, variant) => { add(p, qty, null, variant); setDetail(null); }}
         />
       )}
 
@@ -683,14 +694,17 @@ function ProductDetail({ p, fav, onFav, onShare, wa, info, catLabel, related, on
   const [images, setImages] = useState(p.image_url ? [p.image_url] : []);
   const [current, setCurrent] = useState(0);
   const pct = discount(p);
+  const firstInStock = () => p.variants?.find((v) => v.in_stock) || null;
+  const [variant, setVariant] = useState(firstInStock);
+  const canBuy = p.in_stock && (!hasVariants(p) || variant?.in_stock);
   useEscape(onClose);
 
   useEffect(() => {
-    setQty(1); setCurrent(0); setImages(p.image_url ? [p.image_url] : []);
+    setQty(1); setCurrent(0); setImages(p.image_url ? [p.image_url] : []); setVariant(firstInStock());
     getShopProduct(p.id).then((d) => { if (d.images?.length) setImages(d.images); }).catch(() => {});
   }, [p.id, p.image_url]);
 
-  const waText = t('shop.waProduct', 'Bonjour, je voudrais commander : {{qty}} × {{name}} ({{price}}). {{link}}', { qty, name: p.name, price: fmt(unitPrice(p) * qty), link: productLink(p.id) });
+  const waText = t('shop.waProduct', 'Bonjour, je voudrais commander : {{qty}} × {{name}} ({{price}}). {{link}}', { qty, name: variant ? `${p.name} — ${variant.name}` : p.name, price: fmt(unitPrice(p) * qty), link: productLink(p.id) });
 
   return (
     <div className="ps-overlay ps-overlay--center" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
@@ -721,15 +735,33 @@ function ProductDetail({ p, fav, onFav, onShare, wa, info, catLabel, related, on
             </p>
             {p.description && <p className="ps-detail__desc">{p.description}</p>}
 
-            {p.in_stock && (
+            {hasVariants(p) && (
+              <fieldset className="ps-flavours">
+                <legend>{t('shop.flavour', 'Goût')}{variant ? <> : <b>{variant.name}</b></> : ''}</legend>
+                <div className="ps-flavours__list" role="radiogroup" aria-label={t('shop.flavour', 'Goût')}>
+                  {p.variants.map((v) => (
+                    <button
+                      key={v.id} type="button" role="radio" aria-checked={variant?.id === v.id} disabled={!v.in_stock}
+                      className={`ps-flavour${v.in_stock ? '' : ' is-out'}`} onClick={() => setVariant(v)}
+                    >
+                      {v.name}
+                      {!v.in_stock && <small>{t('shop.outOfStock', 'Rupture')}</small>}
+                      {v.in_stock && v.low_stock && <small className="is-low">{t('shop.fewLeft', 'Plus que quelques-uns')}</small>}
+                    </button>
+                  ))}
+                </div>
+              </fieldset>
+            )}
+
+            {canBuy && (
               <div className="ps-detail__buy">
                 <Stepper value={qty} onChange={setQty} />
-                <button className="ps-btn ps-btn--dark ps-btn--grow" onClick={() => onAdd(p, qty)}>
+                <button className="ps-btn ps-btn--dark ps-btn--grow" onClick={() => onAdd(p, qty, variant)}>
                   <ShoppingBag size={18} /> {t('shop.add', 'Ajouter')} · <span className="ps-nowrap">{fmt(unitPrice(p) * qty)}</span>
                 </button>
               </div>
             )}
-            {p.in_stock && wa && (
+            {canBuy && wa && (
               <a className="ps-btn ps-btn--wa ps-btn--block" href={waLink(wa, waText)} target="_blank" rel="noreferrer"><MessageCircle size={18} /> {t('shop.orderWa', 'Commander sur WhatsApp')}</a>
             )}
             <div className="ps-detail__actions">
@@ -792,17 +824,18 @@ function CartPanel({ lines, count, subtotal, info, wa, waText, setQty, onClose, 
       ) : (
         <>
           <ul className="ps-lines">
-            {lines.map(({ product: p, qty }) => (
-              <li key={p.id} className="ps-line">
+            {lines.map(({ key, product: p, variant, qty }) => (
+              <li key={key} className="ps-line">
                 <div className="ps-line__img"><ProductImage src={p.image_url} alt="" name="" category={p.category} /></div>
                 <div className="ps-line__info">
                   <strong>{p.name}</strong>
+                  {variant && <span className="ps-line__flavour">{t('shop.flavour', 'Goût')} : {variant.name}</span>}
                   <span>{fmt(unitPrice(p))}</span>
-                  <Stepper small value={qty} onChange={(v) => setQty(p.id, v)} />
+                  <Stepper small value={qty} onChange={(v) => setQty(key, v)} />
                 </div>
                 <div className="ps-line__end">
                   <strong>{fmt(unitPrice(p) * qty)}</strong>
-                  <button className="ps-iconbtn ps-iconbtn--quiet" onClick={() => setQty(p.id, 0)} aria-label={`${t('shop.remove', 'Retirer')} ${p.name}`}><Trash2 size={17} /></button>
+                  <button className="ps-iconbtn ps-iconbtn--quiet" onClick={() => setQty(key, 0)} aria-label={`${t('shop.remove', 'Retirer')} ${p.name}${variant ? ` ${variant.name}` : ''}`}><Trash2 size={17} /></button>
                 </div>
               </li>
             ))}
@@ -867,7 +900,7 @@ function CheckoutPanel({ lines, subtotal, info, onBack, onDone, onStockChanged }
         notes: form.notes.trim() || null,
         utm_source: safeRead(UTM_KEY, null),
         website: form.website,
-        items: lines.map((l) => ({ product_id: l.product.id, quantity: l.qty })),
+        items: lines.map((l) => ({ product_id: l.product.id, quantity: l.qty, ...(l.variant ? { variant_id: l.variant.id } : {}) })),
       });
       onDone(res);
     } catch (err) {
@@ -876,6 +909,9 @@ function CheckoutPanel({ lines, subtotal, info, onBack, onDone, onStockChanged }
         setSubmitError(t('shop.errStock', 'Stock insuffisant : {{list}}. Modifiez votre panier.', {
           list: d.products.map((p) => `${p.name} (${p.available} ${t('shop.left', 'dispo')})`).join(', '),
         }));
+        onStockChanged();
+      } else if (d?.code === 'variant_required') {
+        setSubmitError(t('shop.errFlavour', 'Choisissez un goût pour {{name}} : retirez-le du panier puis ajoutez-le depuis sa page.', { name: d.name }));
         onStockChanged();
       } else if (!err.response) {
         // No answer at all: the phone is offline or the server is down, the form itself is fine.
@@ -989,7 +1025,7 @@ function DonePanel({ order, info, onClose }) {
             <li><span>{pickup ? t('shop.stampReady', 'Prête à la salle') : t('shop.stampShipped', 'Expédiée')}</span><small>{t('shop.stampSoon', 'À venir')}</small></li>
           </ol>
           <div className="ps-done__lines">
-            {order.lines.map((l, i) => <div key={i} className="ps-sum"><span>{l.quantity} × {l.name}</span><span>{fmt(l.price * l.quantity)}</span></div>)}
+            {order.lines.map((l, i) => <div key={i} className="ps-sum"><span>{l.quantity} × {l.name}{l.variant ? ` — ${l.variant}` : ''}</span><span>{fmt(l.price * l.quantity)}</span></div>)}
             <div className="ps-sum"><span>{t('shop.shipping', 'Livraison')}</span><span>{order.shipping_fee ? fmt(order.shipping_fee) : t('shop.free', 'Gratuit')}</span></div>
             <div className="ps-sum ps-sum--total">
               <span>{pickup ? t('shop.totalPickup', 'Total à payer au retrait') : t('shop.totalCod', 'Total à payer à la réception')}</span>

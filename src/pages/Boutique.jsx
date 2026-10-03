@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ShoppingBag, Search, Pencil, Trash2, Plus, Image as ImageIcon, ClipboardList, AlertTriangle, Settings2 } from 'lucide-react';
+import { ShoppingBag, Search, Pencil, Trash2, Plus, Image as ImageIcon, ClipboardList, AlertTriangle, Settings2, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ShopSettingsModal from '../components/ShopSettingsModal';
 import Modal from '../components/Modal';
@@ -17,7 +17,8 @@ const EMPTY_PRODUCT = {
   stock: '',
   category: '',
   image_url: '',
-  promo: ''
+  promo: '',
+  variants: []
 };
 
 const getFirstImage = (url) => {
@@ -48,6 +49,16 @@ function ProductForm({ initial, onSave, onClose }) {
     }
   });
   const [urlInput, setUrlInput] = useState('');
+  // Flavours (same price as the product, each with its own stock). Empty = a product without flavours.
+  const [variants, setVariants] = useState(() => (initial?.variants || []).map((v) => ({ id: v.id, name: v.name, stock: String(v.stock) })));
+  const hasVariants = variants.length > 0;
+  const variantsTotal = variants.reduce((sum, v) => sum + (parseInt(v.stock, 10) || 0), 0);
+  const setVariant = (i, key, val) => {
+    setVariants((list) => list.map((v, idx) => (idx === i ? { ...v, [key]: val } : v)));
+    setErrors((e) => ({ ...e, variants: '' }));
+  };
+  const addVariant = () => setVariants((list) => [...list, { name: '', stock: '0' }]);
+  const removeVariant = (i) => setVariants((list) => list.filter((_, idx) => idx !== i));
 
   const set = (key, val) => {
     setForm(prev => ({ ...prev, [key]: val }));
@@ -92,7 +103,13 @@ function ProductForm({ initial, onSave, onClose }) {
     const e = {};
     if (!form.name.trim()) e.name = t('store.form.errName', 'Le nom est obligatoire');
     if (form.price === '' || isNaN(form.price)) e.price = t('store.form.errPrice', 'Prix invalide');
-    if (form.stock === '' || isNaN(form.stock)) e.stock = t('store.form.errStock', 'Stock invalide');
+    if (!hasVariants && (form.stock === '' || isNaN(form.stock))) e.stock = t('store.form.errStock', 'Stock invalide');
+    if (hasVariants) {
+      const names = variants.map((v) => v.name.trim().toLowerCase());
+      if (names.some((n) => !n)) e.variants = t('store.form.errVariantName', 'Donnez un nom à chaque goût (ou supprimez la ligne vide)');
+      else if (new Set(names).size !== names.length) e.variants = t('store.form.errVariantDup', 'Deux goûts ont le même nom');
+      else if (variants.some((v) => v.stock === '' || isNaN(v.stock) || parseInt(v.stock, 10) < 0)) e.variants = t('store.form.errVariantStock', 'Le stock de chaque goût doit être un nombre positif');
+    }
     
     if (form.promo !== '' && form.promo !== null && form.promo !== undefined) {
       if (isNaN(form.promo) || parseFloat(form.promo) < 0) {
@@ -113,7 +130,9 @@ function ProductForm({ initial, onSave, onClose }) {
     const data = {
       ...form,
       price: parseFloat(form.price),
-      stock: parseInt(form.stock, 10),
+      stock: hasVariants ? variantsTotal : parseInt(form.stock, 10),
+      // Always sent: an empty list removes the flavours of a product that had some.
+      variants: variants.map((v) => ({ ...(v.id ? { id: v.id } : {}), name: v.name.trim(), stock: parseInt(v.stock, 10) || 0 })),
       promo: form.promo !== '' && form.promo !== null && form.promo !== undefined ? parseFloat(form.promo) : null
     };
     
@@ -143,14 +162,28 @@ function ProductForm({ initial, onSave, onClose }) {
 
       <div className="form-row">
         <div className="form-group">
-          <label>{t('store.form.stock', 'Stock')} *</label>
-          <input type="number" value={form.stock} onChange={e => set('stock', e.target.value)} placeholder="0" />
+          <label>{hasVariants ? t('store.form.stockTotal', 'Stock total (somme des goûts)') : <>{t('store.form.stock', 'Stock')} *</>}</label>
+          <input type="number" value={hasVariants ? variantsTotal : form.stock} onChange={e => set('stock', e.target.value)} placeholder="0" disabled={hasVariants} />
           {errors.stock && <span className="form-error">{errors.stock}</span>}
         </div>
         <div className="form-group">
           <label>{t('store.form.category', 'Catégorie')}</label>
           <input value={form.category || ''} onChange={e => set('category', e.target.value)} placeholder="Ex: Suppléments, Vêtements..." />
         </div>
+      </div>
+
+      <div className="form-group store-variants">
+        <label>{t('store.form.variants', 'Goûts (optionnel)')}</label>
+        <p className="store-variants__hint">{t('store.form.variantsHint', 'Même prix pour tous les goûts. Chaque goût a son propre stock, et le client choisit son goût sur le site et dans l’application.')}</p>
+        {variants.map((v, i) => (
+          <div key={v.id || `new-${i}`} className="store-variants__row">
+            <input value={v.name} onChange={(e) => setVariant(i, 'name', e.target.value)} placeholder={t('store.form.variantNamePh', 'Ex : Chocolat')} aria-label={t('store.form.variantName', 'Nom du goût')} maxLength={60} />
+            <input type="number" min="0" value={v.stock} onChange={(e) => setVariant(i, 'stock', e.target.value)} aria-label={t('store.form.variantStock', 'Stock du goût')} />
+            <button type="button" className="btn btn--ghost btn--sm" onClick={() => removeVariant(i)} aria-label={t('store.form.removeVariant', 'Supprimer ce goût')}><X size={16} /></button>
+          </div>
+        ))}
+        {errors.variants && <span className="form-error">{errors.variants}</span>}
+        <button type="button" className="btn btn--ghost btn--sm store-variants__add" onClick={addVariant}><Plus size={16} /> {t('store.form.addVariant', 'Ajouter un goût')}</button>
       </div>
 
       <div className="form-group">
@@ -450,6 +483,11 @@ export default function Boutique() {
                     <div className="store-card__meta">
                       {product.category && <span className="store-card__category">{product.category}</span>}
                       <span className="store-card__stock">{t('store.form.stock', 'Stock')}: {product.stock}</span>
+                      {product.variants?.length > 0 && (
+                        <span className="store-card__variants">
+                          {product.variants.map((v) => <span key={v.id} className={v.stock === 0 ? 'is-out' : v.stock <= 3 ? 'is-low' : ''}>{v.name} ({v.stock})</span>)}
+                        </span>
+                      )}
                     </div>
                     {product.description && (
                       <p className="store-card__description">{product.description}</p>

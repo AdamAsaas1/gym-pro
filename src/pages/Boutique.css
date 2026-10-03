@@ -381,3 +381,13 @@
   border-color: var(--clr-primary);
 }
 
+
+/* Flavour editor in the product form and flavour stock on the product card */
+.store-variants__hint { margin: 2px 0 8px; font-size: 0.8rem; color: var(--clr-muted); line-height: 1.45; }
+.store-variants__row { display: grid; grid-template-columns: 1fr 96px 40px; gap: 8px; margin-bottom: 8px; }
+.store-variants__row .btn { min-height: 40px; padding: 0; justify-content: center; }
+.store-variants__add { align-self: flex-start; }
+.store-card__variants { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-top: 6px; }
+.store-card__variants span { padding: 2px 8px; border-radius: 6px; background: var(--clr-surface2); font-size: 0.74rem; font-weight: 600; color: var(--clr-text); }
+.store-card__variants span.is-low { color: #a85a06; }
+.store-card__variants span.is-out { color: var(--w-stamp); text-decoration: line-through; }

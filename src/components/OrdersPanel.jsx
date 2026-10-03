@@ -111,7 +111,7 @@ export default function OrdersPanel({ commandes, setCommandes, gymName }) {
   const customerName = (c) => c.customer_name || `${c.membre_prenom || ''} ${c.membre_nom || ''}`.trim() || t('orders.unknown', 'Client');
 
   const waMessage = (c) => {
-    const items = (c.items || []).map((it) => `• ${it.quantity} × ${it.product?.name || `#${it.product_id}`}`).join('\n');
+    const items = (c.items || []).map((it) => `• ${it.quantity} × ${(it.product?.name || `#${it.product_id}`) + (it.variant_name ? ` — ${it.variant_name}` : '')}`).join('\n');
     const where = c.payment_method === 'cash_on_delivery'
       ? t('orders.waDelivery', 'Livraison : {{address}}, {{city}}', { address: c.address || '', city: c.city || '' })
       : t('orders.waPickup', 'Retrait à la salle');
@@ -213,7 +213,7 @@ export default function OrdersPanel({ commandes, setCommandes, gymName }) {
                     <div className="ord-card__label">{t('orders.items', 'Articles')}</div>
                     <ul className="ord-items">
                       {(c.items || []).map((it) => (
-                        <li key={it.id}><span>{it.quantity} × {it.product?.name || `#${it.product_id}`}</span><span>{fmt(it.price * it.quantity)}</span></li>
+                        <li key={it.id}><span>{it.quantity} × {(it.product?.name || `#${it.product_id}`) + (it.variant_name ? ` — ${it.variant_name}` : '')}</span><span>{fmt(it.price * it.quantity)}</span></li>
                       ))}
                     </ul>
                     <div className="ord-total">
