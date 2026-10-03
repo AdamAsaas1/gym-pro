@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Camera, Tv, Play, Save, X, Edit3, ShieldAlert, CheckCircle2, AlertTriangle, Users, Upload } from 'lucide-react';
 import './LiveShow.css';
 import ActivityIcon from '../components/ActivityIcon';
+import { getAccessToken } from '../api/client';
 
 export default function LiveShow() {
   const { activites, updateActivity } = useGym();
@@ -118,8 +119,11 @@ export default function LiveShow() {
     formData.append('file', file);
 
     try {
+      // fetch (not the axios client) for the multipart upload, so the staff token is added by hand.
+      const token = getAccessToken();
       const response = await fetch(`${apiBase}/live/upload-video`, {
         method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         body: formData,
       });
 
