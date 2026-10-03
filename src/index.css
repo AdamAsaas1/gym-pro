@@ -4415,8 +4415,9 @@ table, .stat-card__value, .dash2-bars__val { font-variant-numeric: tabular-nums;
 
 /* Dialogs are passes with an ink strip. */
 .modal-overlay, .modal-backdrop { background: rgba(21, 23, 26, 0.5); backdrop-filter: none; }
-.modal { background: var(--w-card); border: none; border-radius: var(--w-radius); box-shadow: var(--w-shadow-up); overflow: hidden; }
-.modal__header { background: var(--w-ink); border-bottom: none; }
+/* Long forms must scroll inside the dialog; the ink header stays pinned while they do. */
+.modal { background: var(--w-card); border: none; border-radius: var(--w-radius); box-shadow: var(--w-shadow-up); max-height: 90vh; max-height: 90dvh; overflow-y: auto; overscroll-behavior: contain; }
+.modal__header { background: var(--w-ink); border-bottom: none; position: sticky; top: 0; z-index: 2; }
 .modal__title { color: #fff; font-weight: 800; font-stretch: 112%; text-transform: uppercase; letter-spacing: 0.06em; font-size: 0.85rem; }
 .modal__close { color: rgba(255, 255, 255, 0.8); background: transparent; }
 .modal__close:hover { color: #fff; background: rgba(255, 255, 255, 0.14); }
