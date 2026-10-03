@@ -37,9 +37,9 @@
 }
 
 .live-pane {
-  background: linear-gradient(180deg, rgba(57,255,20,0.03), rgba(0,0,0,0.15)), var(--clr-surface);
+  background: var(--clr-surface);
   border-radius: var(--radius);
-  border: 1px solid rgba(57,255,20,0.18);
+  border: 1px solid rgba(35,64,216,0.18);
   padding: 20px;
 }
 
@@ -92,7 +92,7 @@
 .live-act-card:hover {
   transform: translateY(-2px);
   border-color: var(--accent-color, var(--clr-primary));
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--w-shadow);
 }
 
 .card-header-row {
@@ -155,19 +155,19 @@
 }
 
 .btn-edit:hover {
-  background-color: rgba(57,255,20,0.14);
+  background-color: rgba(35,64,216,0.14);
   color: var(--clr-primary-h);
 }
 
 .btn-play {
-  background-color: rgba(57,255,20,0.12);
-  border: 1px solid rgba(57,255,20,0.3);
+  background-color: rgba(35,64,216,0.12);
+  border: 1px solid rgba(35,64,216,0.3);
   color: var(--clr-primary-h);
 }
 
 .btn-play:hover {
   background-color: var(--clr-primary);
-  color: #061109;
+  color: #fff;
 }
 
 .card-body-row {
@@ -190,7 +190,7 @@
 .source-code {
   font-family: monospace;
   background-color: var(--clr-surface3);
-  color: #ef4444;
+  color: var(--w-stamp);
   padding: 2px 8px;
   border-radius: 4px;
   font-size: 0.8rem;
@@ -344,9 +344,9 @@
 }
 
 .btn-save {
-  background: linear-gradient(135deg, #39ff14, #12b981);
+  background: var(--w-ink);
   border: none;
-  color: #061109;
+  color: #fff;
   font-weight: 600;
 }
 
@@ -371,12 +371,12 @@
 
 .live-modal {
   background: var(--clr-surface);
-  border: 1px solid rgba(57,255,20,0.18);
+  border: 1px solid rgba(35,64,216,0.18);
   border-radius: 16px;
   width: 90%;
   max-width: 960px;
   overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--w-shadow);
   border-top: 4px solid var(--accent-color, var(--clr-primary));
 }
 
@@ -464,13 +464,13 @@
   gap: 6px;
   letter-spacing: 0.5px;
   color: var(--clr-text);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(21,23,26, 0.1);
 }
 
 .live-dot {
   width: 8px;
   height: 8px;
-  background-color: #ef4444;
+  background-color: var(--w-stamp);
   border-radius: 50%;
   animation: pulse 1.2s infinite;
 }
@@ -507,16 +507,16 @@
 
 .status-led.connected {
   background-color: var(--clr-primary);
-  box-shadow: 0 0 8px var(--clr-primary);
+  box-shadow: none;
 }
 
 .status-led.connecting {
-  background-color: #f97316;
+  background-color: #c2410c;
   animation: pulse 1s infinite;
 }
 
 .status-led.disconnected {
-  background-color: #ef4444;
+  background-color: var(--w-stamp);
 }
 
 .ws-status-text {
@@ -631,12 +631,12 @@
 }
 
 .btn-upload-video:hover {
-  background-color: rgba(57,255,20,0.1);
+  background-color: rgba(35,64,216,0.1);
   border-color: var(--clr-primary);
 }
 
 .upload-error-msg {
-  color: #ef4444;
+  color: var(--w-stamp);
   font-size: 0.78rem;
   margin-top: 2px;
 }

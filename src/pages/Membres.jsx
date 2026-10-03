@@ -546,7 +546,7 @@ function MemberDetails({ membre, activites, paiements, onClose, onSetEcheanceDay
     <div className="member-details">
       <div className="member-details__info">
         <div className="member-profile">
-          <div className="member-profile__avatar" style={{ background: act?.couleur ? `${act.couleur}22` : 'rgba(255, 255, 255, 0.1)', color: act?.couleur || 'var(--clr-muted)' }}>
+          <div className="member-profile__avatar" style={{ background: act?.couleur ? `${act.couleur}22` : 'rgba(21,23,26, 0.1)', color: act?.couleur || 'var(--clr-muted)' }}>
             {membre.photoBase64 ? (
               <img src={getPhotoSrc(membre.photoBase64)} alt="Photo membre" />
             ) : (
@@ -750,9 +750,9 @@ export default function Membres() {
   };
 
   const GENRE_INFO = {
-    homme: { label: 'Homme', color: '#39ff14' },
-    femme: { label: 'Femme', color: '#1fdf8f' },
-    enfant: { label: 'Enfant', color: '#15c47e' },
+    homme: { label: 'Homme', color: 'var(--w-blue)' },
+    femme: { label: 'Femme', color: 'var(--w-green)' },
+    enfant: { label: 'Enfant', color: 'var(--w-green)' },
   };
 
   const stats = useMemo(() => {
@@ -879,7 +879,7 @@ export default function Membres() {
                       <button
                         type="button"
                         className={`td-avatar${m.photoBase64 ? ' td-avatar--clickable' : ''}`}
-                        style={{ background: act?.couleur ? `${act.couleur}22` : 'rgba(255, 255, 255, 0.1)', color: act?.couleur || 'var(--clr-muted)' }}
+                        style={{ background: act?.couleur ? `${act.couleur}22` : 'rgba(21,23,26, 0.1)', color: act?.couleur || 'var(--clr-muted)' }}
                         onClick={() => openPhoto(m)}
                         aria-label={t('members.list.viewPhotoAria', 'Voir la photo de {{prenom}} {{nom}}', { prenom: m.prenom, nom: m.nom })}
                         disabled={!m.photoBase64}

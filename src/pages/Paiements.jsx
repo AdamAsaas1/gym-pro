@@ -32,11 +32,11 @@ function buildMonthValue(year, monthIndex) {
 
 function getAccess(m) {
   const days = Math.ceil((new Date(m.dateExpiration) - new Date()) / 86400000);
-  if (m.statut === 'inactif') return { key: 'inactif', label: 'Inactif',    color: '#64748b', bg: 'rgba(100,116,139,0.1)' };
-  if (days < 0)               return { key: 'expire',  label: 'Expiré',     color: '#ef4444', bg: 'rgba(239,68,68,0.1)'  };
-  if (days === 0)             return { key: 'expire',  label: "Expire aujourd'hui", color: '#ef4444', bg: 'rgba(239,68,68,0.1)' };
-  if (days <= 7)              return { key: 'bientot', label: `Expire dans ${days}j`, color: '#f97316', bg: 'rgba(249,115,22,0.1)' };
-  return                             { key: 'ok',      label: 'Autorisé',   color: '#22c55e', bg: 'rgba(34,197,94,0.1)'  };
+  if (m.statut === 'inactif') return { key: 'inactif', label: 'Inactif',    color: 'var(--w-ink-2)', bg: 'rgba(100,116,139,0.1)' };
+  if (days < 0)               return { key: 'expire',  label: 'Expiré',     color: 'var(--w-stamp)', bg: 'rgba(200,36,59,0.1)'  };
+  if (days === 0)             return { key: 'expire',  label: "Expire aujourd'hui", color: 'var(--w-stamp)', bg: 'rgba(200,36,59,0.1)' };
+  if (days <= 7)              return { key: 'bientot', label: `Expire dans ${days}j`, color: '#c2410c', bg: 'rgba(249,115,22,0.1)' };
+  return                             { key: 'ok',      label: 'Autorisé',   color: 'var(--w-green)', bg: 'rgba(34,197,94,0.1)'  };
 }
 
 function getPrix(activites, activite, abonnement) {

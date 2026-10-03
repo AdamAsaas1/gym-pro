@@ -198,7 +198,7 @@ function ProductForm({ initial, onSave, onClose }) {
         {images.length > 0 && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '10px', backgroundColor: 'rgba(0,0,0,0.1)', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
             {images.map((img, idx) => (
-              <div key={idx} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
+              <div key={idx} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(21,23,26,0.1)' }}>
                 <img src={img} alt={`Preview ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => e.target.style.display = 'none'} />
                 <button
                   type="button"
@@ -207,7 +207,7 @@ function ProductForm({ initial, onSave, onClose }) {
                     position: 'absolute',
                     top: '2px',
                     right: '2px',
-                    backgroundColor: 'rgba(239, 68, 68, 0.9)',
+                    backgroundColor: 'rgba(200,36,59, 0.9)',
                     color: '#fff',
                     border: 'none',
                     borderRadius: '50%',

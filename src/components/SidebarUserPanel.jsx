@@ -16,10 +16,10 @@ const ROLE_LABELS = {
 };
 
 const TYPE_CFG = {
-  danger:  { color: '#ef4444', bg: 'rgba(239,68,68,0.09)',   label: 'Urgent',    Icon: AlertTriangle },
-  warning: { color: '#f97316', bg: 'rgba(249,115,22,0.09)',  label: 'Attention', Icon: Clock         },
-  info:    { color: '#94a3b8', bg: 'rgba(148,163,184,0.07)', label: 'Inactif',   Icon: UserX         },
-  order:   { color: '#3b82f6', bg: 'rgba(59,130,246,0.09)',  label: 'Commande',  Icon: ShoppingBag   },
+  danger:  { color: 'var(--w-stamp)', bg: 'rgba(200,36,59,0.09)',   label: 'Urgent',    Icon: AlertTriangle },
+  warning: { color: '#c2410c', bg: 'rgba(249,115,22,0.09)',  label: 'Attention', Icon: Clock         },
+  info:    { color: 'var(--w-ink-3)', bg: 'rgba(148,163,184,0.07)', label: 'Inactif',   Icon: UserX         },
+  order:   { color: 'var(--w-blue)', bg: 'rgba(59,130,246,0.09)',  label: 'Commande',  Icon: ShoppingBag   },
 };
 
 const GENRE_ICONS = { homme: 'H', femme: 'F', enfant: 'E' };
@@ -295,7 +295,7 @@ export default function SidebarUserPanel() {
           onClose={() => setSelectedOrder(null)}
         >
           <div className="order-details-modal">
-            <div className="order-details-header" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem' }}>
+            <div className="order-details-header" style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(21,23,26,0.1)', paddingBottom: '1rem' }}>
               <div>
                 <h3 style={{ margin: 0, fontSize: '1.25rem', color: 'var(--clr-primary)', fontWeight: 'bold' }}>
                   {t('header.orders.number', 'Commande')} #{selectedOrder.id}
@@ -311,18 +311,18 @@ export default function SidebarUserPanel() {
                   fontSize: '0.85rem',
                   fontWeight: 'bold',
                   textTransform: 'uppercase',
-                  backgroundColor: selectedOrder.status === 'pending' ? 'rgba(245, 158, 11, 0.15)' :
+                  backgroundColor: selectedOrder.status === 'pending' ? 'rgba(168,90,6, 0.15)' :
                                    selectedOrder.status === 'delivered' ? 'rgba(53, 208, 127, 0.15)' :
                                    selectedOrder.status === 'collected' ? 'rgba(59, 130, 246, 0.15)' :
-                                   'rgba(239, 68, 68, 0.15)',
-                  color: selectedOrder.status === 'pending' ? '#f59e0b' :
-                         selectedOrder.status === 'delivered' ? '#35d07f' :
-                         selectedOrder.status === 'collected' ? '#3b82f6' :
-                         '#ef4444',
-                  border: selectedOrder.status === 'pending' ? '1px solid rgba(245, 158, 11, 0.3)' :
+                                   'rgba(200,36,59, 0.15)',
+                  color: selectedOrder.status === 'pending' ? '#a85a06' :
+                         selectedOrder.status === 'delivered' ? 'var(--w-green)' :
+                         selectedOrder.status === 'collected' ? 'var(--w-blue)' :
+                         'var(--w-stamp)',
+                  border: selectedOrder.status === 'pending' ? '1px solid rgba(168,90,6, 0.3)' :
                           selectedOrder.status === 'delivered' ? '1px solid rgba(53, 208, 127, 0.3)' :
                           selectedOrder.status === 'collected' ? '1px solid rgba(59, 130, 246, 0.3)' :
-                          '1px solid rgba(239, 68, 68, 0.3)'
+                          '1px solid rgba(200,36,59, 0.3)'
                 }}
               >
                 {selectedOrder.status === 'pending' ? t('store.orders.status.pending', 'En attente') :
@@ -332,7 +332,7 @@ export default function SidebarUserPanel() {
               </span>
             </div>
 
-            <div className="order-details-client" style={{ marginBottom: '1.5rem', backgroundColor: 'rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '8px' }}>
+            <div className="order-details-client" style={{ marginBottom: '1.5rem', backgroundColor: 'rgba(21,23,26,0.03)', padding: '1rem', borderRadius: '8px' }}>
               <h4 style={{ margin: '0 0 0.5rem 0', fontSize: '0.95rem', textTransform: 'uppercase', color: 'var(--clr-muted)', letterSpacing: '0.05em' }}>
                 {t('store.orders.client', 'Client')}
               </h4>
@@ -359,7 +359,7 @@ export default function SidebarUserPanel() {
               </h4>
               <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                 {selectedOrder.items?.map((item) => (
-                  <li key={item.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <li key={item.id} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.5rem 0', borderBottom: '1px solid rgba(21,23,26,0.05)' }}>
                     <span>
                       {item.product?.name || `Produit #${item.product_id}`} <strong style={{ color: 'var(--clr-primary)' }}>x{item.quantity}</strong>
                     </span>
@@ -371,7 +371,7 @@ export default function SidebarUserPanel() {
               </ul>
             </div>
 
-            <div className="order-details-total" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', marginBottom: '2rem' }}>
+            <div className="order-details-total" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: 'rgba(21,23,26,0.05)', padding: '1rem', borderRadius: '8px', marginBottom: '2rem' }}>
               <span style={{ fontWeight: 'bold', fontSize: '1.1rem' }}>{t('store.orders.table.total', 'Total')}</span>
               <span style={{ fontWeight: 'bold', fontSize: '1.4rem', color: 'var(--clr-primary)' }}>
                 {selectedOrder.total_price.toLocaleString('fr-FR')} DH

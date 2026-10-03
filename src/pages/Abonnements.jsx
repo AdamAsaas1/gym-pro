@@ -210,15 +210,15 @@ export default function Abonnements() {
             <div key={m.id} className="renew-row">
               <div className="renew-row__who">
                 {m.photoBase64
-                  ? <img className="dash2-avatar dash2-avatar--img" src={m.photoBase64} alt="" style={{ '--tc': act?.couleur || '#9fb3ad' }} />
-                  : <span className="dash2-avatar" style={{ '--tc': act?.couleur || '#9fb3ad' }}>{m.prenom?.[0]}{m.nom?.[0]}</span>}
+                  ? <img className="dash2-avatar dash2-avatar--img" src={m.photoBase64} alt="" style={{ '--tc': act?.couleur || 'var(--w-ink-2)' }} />
+                  : <span className="dash2-avatar" style={{ '--tc': act?.couleur || 'var(--w-ink-2)' }}>{m.prenom?.[0]}{m.nom?.[0]}</span>}
                 <span className="renew-row__name">
                   {m.prenom} {m.nom}
                   <small>{m.telephone || '—'}{contacted && <em className="renew-row__contacted"><Check size={11} /> {contacted}</em>}</small>
                 </span>
               </div>
               <div className="renew-row__plan">
-                <span className="renew-row__act" style={{ '--tc': act?.couleur || '#9fb3ad' }}><ActivityIcon icon={act?.icon} size={13} /> {act?.nom || '—'}</span>
+                <span className="renew-row__act" style={{ '--tc': act?.couleur || 'var(--w-ink-2)' }}><ActivityIcon icon={act?.icon} size={13} /> {act?.nom || '—'}</span>
                 <small>{planLabel(m.abonnement)} · {fmtDH(price)}</small>
               </div>
               <div className="renew-row__exp">

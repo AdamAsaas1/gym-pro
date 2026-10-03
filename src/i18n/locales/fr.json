@@ -394,13 +394,13 @@
   },
   "login": {
     "system": "ASAAS PRO SYSTEM",
-    "title": "Pilotez votre salle en toute simplicite.",
-    "subtitle": "Acces rapide, propre et securise.",
+    "title": "Pilotez votre salle en toute simplicité.",
+    "subtitle": "Accès rapide, propre et sécurisé.",
     "secureConnection": "Connexion securisee",
     "welcome": "Bienvenue",
-    "instruction": "Connecte-toi pour acceder au tableau de bord.",
+    "instruction": "Connectez-vous pour accéder au tableau de bord.",
     "error": {
-      "failed": "Connexion impossible. Verifiez vos identifiants."
+      "failed": "Connexion impossible. Vérifiez vos identifiants."
     },
     "username": "Nom d'utilisateur",
     "placeholder": {
@@ -412,7 +412,7 @@
     "hidePassword": "Masquer le mot de passe",
     "submitting": "Connexion...",
     "submit": "Se connecter",
-    "restrictedAccess": "Acces reserve au personnel autorise."
+    "restrictedAccess": "Accès réservé au personnel autorisé."
   },
   "members": {
     "form": {

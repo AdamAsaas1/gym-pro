@@ -15,10 +15,10 @@ import { exportMembresPDF, getAccessFeed } from '../api/client';
 import ActivityIcon from '../components/ActivityIcon';
 
 /* Chart tokens: series green validated for the dark surface (L band + 3:1); neon only for the one highlighted mark. */
-const SERIES = '#19a824';
-const HIGHLIGHT = '#39ff14';
-const GRID = '#1c262b';
-const AXIS = '#7d8f89';
+const SERIES = 'var(--w-green)';
+const HIGHLIGHT = 'var(--w-blue)';
+const GRID = 'var(--w-card-2)';
+const AXIS = 'var(--w-ink-3)';
 const DAY = 86400000;
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -403,7 +403,7 @@ export default function Dashboard() {
                     allowDecimals={false}
                     tickFormatter={(v) => (metric === 'revenue' && v >= 1000 ? `${Math.round(v / 100) / 10}k` : v)}
                   />
-                  <Tooltip cursor={{ fill: 'rgba(255,255,255,0.04)' }} content={<ChartTooltip format={metricFormat} />} />
+                  <Tooltip cursor={{ fill: 'rgba(21,23,26,0.04)' }} content={<ChartTooltip format={metricFormat} />} />
                   <Bar dataKey={metric} radius={[4, 4, 0, 0]} maxBarSize={36}>
                     {series.rows.map((r) => <Cell key={r.key} fill={r.key === lastKey ? HIGHLIGHT : SERIES} />)}
                   </Bar>
@@ -435,7 +435,7 @@ export default function Dashboard() {
                   <CartesianGrid vertical={false} stroke={GRID} />
                   <XAxis dataKey="label" tickLine={false} axisLine={{ stroke: GRID }} tick={{ fill: AXIS, fontSize: 10 }} interval={2} />
                   <YAxis hide allowDecimals={false} />
-                  <Tooltip cursor={{ fill: 'rgba(255,255,255,0.04)' }} content={<ChartTooltip format={(v) => `${v} ${t('dashboard.v2.entriesUnit', 'entrée(s)')}`} />} />
+                  <Tooltip cursor={{ fill: 'rgba(21,23,26,0.04)' }} content={<ChartTooltip format={(v) => `${v} ${t('dashboard.v2.entriesUnit', 'entrée(s)')}`} />} />
                   <Bar dataKey="count" radius={[4, 4, 0, 0]}>
                     {today.hours.map((x) => <Cell key={x.h} fill={x.h === hour ? HIGHLIGHT : SERIES} />)}
                   </Bar>
@@ -496,7 +496,7 @@ export default function Dashboard() {
                 const late = days < 0;
                 return (
                   <div key={m.id} className="dash2-list__row">
-                    <span className="dash2-avatar" style={{ '--tc': act?.couleur || '#9fb3ad' }}>{m.prenom?.[0]}{m.nom?.[0]}</span>
+                    <span className="dash2-avatar" style={{ '--tc': act?.couleur || 'var(--w-ink-2)' }}>{m.prenom?.[0]}{m.nom?.[0]}</span>
                     <span className="dash2-list__who">
                       {m.prenom} {m.nom}
                       <small>{act?.nom || '—'}</small>
@@ -564,8 +564,8 @@ export default function Dashboard() {
               return (
                 <div key={m.id} className="dash2-list__row">
                   {m.photoBase64
-                    ? <img className="dash2-avatar dash2-avatar--img" src={m.photoBase64} alt="" style={{ '--tc': act?.couleur || '#9fb3ad' }} />
-                    : <span className="dash2-avatar" style={{ '--tc': act?.couleur || '#9fb3ad' }}>{m.prenom?.[0]}{m.nom?.[0]}</span>}
+                    ? <img className="dash2-avatar dash2-avatar--img" src={m.photoBase64} alt="" style={{ '--tc': act?.couleur || 'var(--w-ink-2)' }} />
+                    : <span className="dash2-avatar" style={{ '--tc': act?.couleur || 'var(--w-ink-2)' }}>{m.prenom?.[0]}{m.nom?.[0]}</span>}
                   <span className="dash2-list__who">
                     {m.prenom} {m.nom}
                     <small><ActivityIcon icon={act?.icon} size={12} color={act?.couleur} /> {act?.nom || '—'}</small>

@@ -226,7 +226,7 @@ export default function Settings() {
                 </div>
 
                 {pinError && (
-                  <p style={{ color: '#f87171', fontSize: '0.85rem', margin: 0 }}>{pinError}</p>
+                  <p style={{ color: 'var(--w-stamp)', fontSize: '0.85rem', margin: 0 }}>{pinError}</p>
                 )}
 
                 <button type="submit" className="btn-primary" disabled={isSavingPin} style={{ alignSelf: 'flex-start', marginTop: '0.5rem' }}>
@@ -264,7 +264,7 @@ export default function Settings() {
           <div className="settings-modal scale-in success-modal" onClick={e => e.stopPropagation()}>
             <div style={{ textAlign: 'center', padding: '1rem' }}>
               <div className="success-icon">
-                <ShieldCheck size={48} color="#39ff14" />
+                <ShieldCheck size={48} color="var(--w-blue)" />
               </div>
               <h2 style={{ color: 'var(--clr-primary-h)', marginBottom: '1rem' }}>{t('settings.success.title', 'Succès !')}</h2>
               <p style={{ color: 'var(--clr-muted)', marginBottom: '2rem' }}>{successMsg}</p>

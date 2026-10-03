@@ -261,7 +261,7 @@ export default function Coaches() {
         <div className="coaches-grid coaches-grid--v2">
           {visible.map((coach) => {
             const act = actById[coach.activity_id];
-            const color = act?.couleur || '#9fb3ad';
+            const color = act?.couleur || 'var(--w-ink-2)';
             const effectif = activeByActivity[coach.activity_id] || 0;
             const initials = `${coach.prenom?.[0] || ''}${coach.nom?.[0] || ''}`.toUpperCase();
             const worksToday = coach.is_active && (coach.jours || []).includes(TODAY);

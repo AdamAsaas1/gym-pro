@@ -6,7 +6,7 @@ import Modal from './Modal';
 import ActivityIcon from './ActivityIcon';
 
 const ICONS = ['🏋️', '🥋', '🥊', '🧘', '🚴', '🏊', '🏃', '💃', '⚽', '🎾', '🥇', '🥤'];
-const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', '#ef4444', '#f97316', '#f59e0b', '#10b981', '#14b8a6', '#06b6d4'];
+const COLORS = ['#6366f1', '#8b5cf6', '#ec4899', 'var(--w-stamp)', '#c2410c', '#a85a06', 'var(--w-green)', '#14b8a6', '#06b6d4'];
 
 function toForm(act) {
   if (!act) {

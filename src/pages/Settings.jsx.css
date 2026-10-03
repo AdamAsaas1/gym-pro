@@ -32,11 +32,11 @@
 }
 
 .settings-card {
-  background: linear-gradient(180deg, rgba(57,255,20,0.03), rgba(0,0,0,0.15)), var(--clr-surface);
+  background: var(--clr-surface);
   border-radius: var(--radius);
   padding: 2rem;
-  border: 1px solid rgba(57,255,20,0.18);
-  box-shadow: 0 14px 34px rgba(0,0,0,0.35);
+  border: 1px solid rgba(35,64,216,0.18);
+  box-shadow: var(--w-shadow);
 }
 
 .settings-card h2 {
@@ -73,7 +73,7 @@
 .form-control:focus {
   outline: none;
   border-color: var(--clr-primary);
-  box-shadow: 0 0 0 2px rgba(57,255,20,0.12);
+  box-shadow: 0 0 0 2px rgba(35,64,216,0.12);
 }
 
 .logo-preview {
@@ -101,8 +101,8 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #39ff14, #12b981);
-  color: #061109;
+  background: var(--w-ink);
+  color: #fff;
   border: none;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
@@ -112,12 +112,12 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  box-shadow: 0 8px 20px rgba(57,255,20,0.25);
+  box-shadow: 0 8px 20px rgba(35,64,216,0.25);
 }
 
 .btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 12px 28px rgba(57,255,20,0.4);
+  box-shadow: 0 12px 28px rgba(35,64,216,0.4);
 }
 
 .btn-primary:disabled {
@@ -127,9 +127,9 @@
 }
 
 .btn-secondary {
-  background: rgba(57,255,20,0.06);
+  background: rgba(35,64,216,0.06);
   color: var(--clr-primary-h);
-  border: 1px solid rgba(57,255,20,0.3);
+  border: 1px solid rgba(35,64,216,0.3);
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   font-weight: 600;
@@ -138,7 +138,7 @@
 }
 
 .btn-secondary:hover {
-  background: rgba(57,255,20,0.14);
+  background: rgba(35,64,216,0.14);
 }
 
 /* Activities List */
@@ -165,7 +165,7 @@
 
 .activity-item:hover {
   background: var(--clr-surface3);
-  border-color: rgba(57,255,20,0.35);
+  border-color: rgba(35,64,216,0.35);
   transform: translateX(4px);
 }
 
@@ -223,8 +223,8 @@
 }
 
 .action-btn.delete:hover {
-  color: #f87171;
-  border-color: #f87171;
+  color: var(--w-stamp);
+  border-color: var(--w-stamp);
 }
 
 /* Modal Styling */
@@ -250,8 +250,8 @@
   overflow-y: auto;
   border-radius: 16px;
   padding: 2rem;
-  border: 1px solid rgba(57,255,20,0.18);
-  box-shadow: 0 24px 80px rgba(0,0,0,0.7);
+  border: 1px solid rgba(35,64,216,0.18);
+  box-shadow: var(--w-shadow);
 }
 
 .modal-header {
@@ -286,19 +286,19 @@
 
 .success-modal {
   max-width: 400px;
-  border-color: rgba(57,255,20,0.4);
+  border-color: rgba(35,64,216,0.4);
 }
 
 .success-icon {
   width: 80px;
   height: 80px;
-  background: rgba(57,255,20,0.1);
+  background: rgba(35,64,216,0.1);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5rem;
-  border: 1px solid rgba(57,255,20,0.25);
+  border: 1px solid rgba(35,64,216,0.25);
 }
 
 .icon-selector,
@@ -331,7 +331,7 @@
 }
 
 .icon-choice.active {
-  background: rgba(57,255,20,0.12);
+  background: rgba(35,64,216,0.12);
   border-color: var(--clr-primary);
 }
 

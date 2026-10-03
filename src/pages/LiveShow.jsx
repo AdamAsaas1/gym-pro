@@ -159,16 +159,16 @@ export default function LiveShow() {
 
   // Determine status color/tag
   const getCapacityStatus = (current, max) => {
-    if (!max || max <= 0) return { label: t('live.status.unknown', 'Inconnu'), color: '#94a3b8', percentage: 0 };
+    if (!max || max <= 0) return { label: t('live.status.unknown', 'Inconnu'), color: 'var(--w-ink-3)', percentage: 0 };
     const ratio = current / max;
     const percentage = Math.round(ratio * 100);
     
     if (ratio >= 0.8) {
-      return { label: t('live.status.crowded', 'Surchargé'), color: '#ef4444', percentage };
+      return { label: t('live.status.crowded', 'Surchargé'), color: 'var(--w-stamp)', percentage };
     } else if (ratio >= 0.5) {
-      return { label: t('live.status.moderate', 'Modéré'), color: '#f97316', percentage };
+      return { label: t('live.status.moderate', 'Modéré'), color: '#c2410c', percentage };
     }
-    return { label: t('live.status.calm', 'Calme'), color: '#22c55e', percentage };
+    return { label: t('live.status.calm', 'Calme'), color: 'var(--w-green)', percentage };
   };
 
   return (
