@@ -1784,8 +1784,8 @@ input, select, button, textarea { font-family: inherit; }
   border-color: rgba(35,64,216,0.35);
 }
 .month-chip--active {
-  background: rgba(35,64,216,0.3);
-  border-color: rgba(35,64,216,0.55);
+  background: var(--w-blue);
+  border-color: var(--w-blue);
   color: #fff;
 }
 .month-picker__foot {
@@ -3556,7 +3556,7 @@ input, select, button, textarea { font-family: inherit; }
   font-family: var(--font-display);
   font-size: 1.4rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--w-ink);
 }
 
 .act-card__desc {
@@ -3584,7 +3584,7 @@ input, select, button, textarea { font-family: inherit; }
 .act-stat__val {
   font-size: 1rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--w-ink);
 }
 
 .act-stat__lbl {
@@ -3602,7 +3602,7 @@ input, select, button, textarea { font-family: inherit; }
 .tarif-title {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--w-ink);
   margin-bottom: 4px;
 }
 

@@ -310,7 +310,7 @@
 }
 
 .access-result-text .membre-info strong {
-  color: #fff;
+  color: var(--w-ink);
 }
 
 /* History Column */
