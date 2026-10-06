@@ -84,11 +84,12 @@
   border-color: var(--clr-primary);
 }
 
+/* Product photos are shown whole (contain), never cropped: square frame on white, like the shop. */
 .store-card__image-container {
-  height: 200px;
+  aspect-ratio: 1 / 1;
   width: 100%;
   position: relative;
-  background: rgba(21,23,26, 0.03);
+  background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -99,7 +100,8 @@
 .store-card__image {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  padding: 8%;
   transition: transform 0.5s ease;
 }
 
