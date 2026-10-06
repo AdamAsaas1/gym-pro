@@ -21,7 +21,7 @@
 .notifs-title h1 {
   font-size: 1.8rem;
   font-weight: 700;
-  color: white;
+  color: var(--w-ink);
   margin: 0;
 }
 
@@ -79,7 +79,7 @@
 .notif-stat-value {
   font-size: 1.5rem;
   font-weight: 700;
-  color: white;
+  color: var(--w-ink);
 }
 
 .notifs-content.card {
@@ -140,7 +140,7 @@
 .notifs-table td {
   padding: 1.2rem 1.5rem;
   border-bottom: 1px solid rgba(21,23,26, 0.05);
-  color: #e5e5e7;
+  color: var(--w-ink);
   font-size: 0.95rem;
 }
 
@@ -213,7 +213,7 @@
 .notifs-page .modal-header h2 {
   font-size: 1.4rem;
   margin: 0;
-  color: white;
+  color: var(--w-ink);
 }
 
 .notifs-page .modal-close {
@@ -225,7 +225,7 @@
 }
 
 .notifs-page .modal-close:hover {
-  color: white;
+  color: var(--w-ink);
 }
 
 .notifs-page .modal-form {
@@ -253,7 +253,7 @@
   border: 1px solid rgba(21,23,26, 0.1);
   border-radius: 10px;
   padding: 0.8rem 1rem;
-  color: white;
+  color: var(--w-ink);
   font-size: 1rem;
   transition: border-color 0.2s;
 }
@@ -275,8 +275,8 @@
 }
 
 .notifs-page .btn-primary {
-  background: #a85a06;
-  color: black;
+  background: var(--w-ink);
+  color: #fff;
   border: none;
   padding: 0.8rem 1.5rem;
   border-radius: 10px;
@@ -289,7 +289,7 @@
 }
 
 .notifs-page .btn-primary:hover {
-  background: #a85a06;
+  background: var(--w-blue);
   transform: scale(1.02);
 }
 
@@ -300,7 +300,7 @@
 
 .notifs-page .btn-secondary {
   background: rgba(21,23,26, 0.05);
-  color: white;
+  color: var(--w-ink);
   border: 1px solid rgba(21,23,26, 0.1);
   padding: 0.8rem 1.5rem;
   border-radius: 10px;
@@ -402,7 +402,7 @@
 
 .notifs-page .form-group select option {
   background: var(--w-card-2);
-  color: white;
+  color: var(--w-ink);
 }
 
 /* Multi-select Member List */
@@ -453,7 +453,7 @@
 }
 
 .member-name-text {
-  color: white;
+  color: var(--w-ink);
   font-size: 0.9rem;
   font-weight: 500;
 }
@@ -513,8 +513,8 @@
 }
 
 .target-type-btn.active {
-  background: #a85a06;
-  color: black;
+  background: var(--w-ink);
+  color: #fff;
   box-shadow: 0 4px 12px rgba(168,90,6, 0.2);
 }
 
@@ -561,8 +561,8 @@
 }
 
 .activity-item.selected .activity-icon-wrapper {
-  background: #a85a06;
-  color: black;
+  background: var(--w-ink);
+  color: #fff;
 }
 
 .activity-name {
@@ -573,7 +573,7 @@
 }
 
 .activity-item.selected .activity-name {
-  color: white;
+  color: var(--w-ink);
 }
 
 .activity-count {
@@ -614,7 +614,7 @@
 .day-number {
   font-size: 1.2rem;
   font-weight: 700;
-  color: white;
+  color: var(--w-ink);
 }
 
 .day-label {
@@ -673,7 +673,7 @@
 
 .notifs-page .btn-confirm-no {
   background: rgba(21,23,26, 0.1);
-  color: #fff;
+  color: var(--w-ink);
   border: none;
   padding: 0.3rem 0.4rem;
   border-radius: 6px;
