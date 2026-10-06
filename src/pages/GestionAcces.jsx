@@ -307,8 +307,8 @@ const GestionAcces = () => {
                   <button
                     onClick={() => handleVerify(true)}
                     disabled={isProcessing || scanPaused}
-                    className="access-btn-primary"
-                    style={{ width: '100%', backgroundColor: '#d4af37', color: '#000' }}
+                    className="access-btn-primary access-btn-primary--alt"
+                    style={{ width: '100%' }}
                   >
                     <QrCode size={26} />
                     {t('access.verifyQr', "Verify with QR Code")}
