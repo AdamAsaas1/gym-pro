@@ -470,7 +470,34 @@
 .pform__seg button[aria-checked="true"] { background: #fff; color: var(--w-ink); box-shadow: var(--w-shadow); }
 .pform__stock input { max-width: 220px; }
 .pform__variants { display: flex; flex-direction: column; gap: 8px; }
-.pform__vhead, .pform__vrow { display: grid; grid-template-columns: 1fr 110px 44px; gap: 8px; align-items: center; }
+.pform__vhead, .pform__vrow { display: grid; grid-template-columns: 48px 1fr 110px 44px; gap: 8px; align-items: center; }
+/* Flavour photo: the packaging shown when the customer picks this flavour. */
+.pform__vphoto {
+  width: 48px; height: 48px; padding: 3px; display: flex; align-items: center; justify-content: center; overflow: hidden;
+  border: 1.5px dashed var(--w-rule); border-radius: 12px; background: #fff; color: var(--w-ink-3); cursor: pointer;
+}
+.pform__vphoto img { width: 100%; height: 100%; object-fit: contain; }
+.pform__vphoto img.is-default { opacity: 0.35; filter: grayscale(1); }
+.pform__vphoto.has-photo { border-style: solid; border-color: var(--w-ink); }
+.pform__vphoto.is-open { outline: 2px solid var(--w-ink); outline-offset: 2px; }
+.pform__vphoto:disabled { cursor: not-allowed; background: var(--w-card-2); }
+.pform__vpicker {
+  grid-column: 1 / -1; order: 10; display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; border-radius: 14px;
+  background: var(--w-card-2); border: 1px solid var(--w-rule);
+}
+.pform__vpicker button {
+  position: relative; width: 64px; height: 64px; padding: 4px; border: 1.5px solid var(--w-rule); border-radius: 12px;
+  background: #fff; cursor: pointer;
+}
+.pform__vpicker button img { width: 100%; height: 100%; object-fit: contain; }
+.pform__vpicker button.is-on { border: 2px solid var(--w-ink); }
+.pform__vpicker button span {
+  position: absolute; top: -6px; inset-inline-end: -6px; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; background: var(--w-ink); color: #fff;
+}
+.pform__vpicker .pform__vpicker-none { width: auto; padding: 0 14px; font-size: 0.82rem; font-weight: 700; color: var(--w-ink); }
+.pform__hint--photo { margin-top: -2px; }
+@media (max-width: 480px) { .pform__vhead, .pform__vrow { grid-template-columns: 48px 1fr 72px 44px; } }
 .pform__vhead span { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--w-ink-3); }
 .pform__vremove {
   width: 44px; height: 44px; border-radius: 10px; border: 1.5px solid var(--w-rule); background: #fff; color: var(--w-ink-3); cursor: pointer;

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ShoppingBag, Search, Pencil, Trash2, Plus, Image as ImageIcon, ClipboardList, AlertTriangle, Settings2, X } from 'lucide-react';
+import { ShoppingBag, Search, Pencil, Trash2, Plus, Image as ImageIcon, ClipboardList, AlertTriangle, Settings2, X, Check } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ShopSettingsModal from '../components/ShopSettingsModal';
 import Modal from '../components/Modal';
@@ -41,6 +41,8 @@ const SHOP_CATEGORIES = [
   { value: 'clothing', label: 'Vêtements' },
 ];
 const DESCRIPTION_MAX = 255; // products.description is VARCHAR(255)
+// Clothing and accessories come in sizes; everything else (supplements) in flavours. Same rule as the public shop.
+const SIZED_CATEGORIES = ['clothing', 'accessories'];
 
 const parseImages = (url) => {
   if (!url) return [];
@@ -59,13 +61,21 @@ function ProductForm({ initial, onSave, onClose }) {
   const [saving, setSaving] = useState(false);
   const [images, setImages] = useState(() => parseImages(initial?.image_url));
   const [urlInput, setUrlInput] = useState('');
-  // Flavours (same price as the product, each with its own stock).
-  const [variants, setVariants] = useState(() => (initial?.variants || []).map((v) => ({ id: v.id, name: v.name, stock: String(v.stock) })));
+  // Flavours (same price as the product, each with its own stock and, optionally, the photo of its packaging).
+  // The photo is kept as the image itself so it follows the photo when photos are reordered or removed.
+  const [variants, setVariants] = useState(() => {
+    const photos = parseImages(initial?.image_url);
+    return (initial?.variants || []).map((v) => ({ id: v.id, name: v.name, stock: String(v.stock), photo: v.image_index != null ? photos[v.image_index] || null : null }));
+  });
+  const [photoPicker, setPhotoPicker] = useState(null); // index of the flavour whose photo is being chosen
   const [stockMode, setStockMode] = useState(() => ((initial?.variants || []).length ? 'variants' : 'single'));
   const knownCategory = SHOP_CATEGORIES.some((c) => c.value === form.category);
   const [customCategory, setCustomCategory] = useState(() => !!initial?.category && !SHOP_CATEGORIES.some((c) => c.value === initial.category));
 
   const useVariants = stockMode === 'variants';
+  const sized = SIZED_CATEGORIES.includes(form.category);
+  // Variant wording: "Goût" for flavours, "Taille" for sizes (the translation key gets a "Size" suffix).
+  const vt = (key, flavour, size, opts) => (sized ? t(`${key}Size`, size, opts) : t(key, flavour, opts));
   const variantsTotal = variants.reduce((sum, v) => sum + (parseInt(v.stock, 10) || 0), 0);
   const price = parseFloat(form.price);
   const promo = parseFloat(form.promo);
@@ -79,12 +89,13 @@ function ProductForm({ initial, onSave, onClose }) {
     setVariants((list) => list.map((v, idx) => (idx === i ? { ...v, [key]: val } : v)));
     setErrors((e) => ({ ...e, variants: '' }));
   };
-  const addVariant = () => setVariants((list) => [...list, { name: '', stock: '0' }]);
-  const removeVariant = (i) => setVariants((list) => list.filter((_, idx) => idx !== i));
+  const addVariant = () => setVariants((list) => [...list, { name: '', stock: '0', photo: null }]);
+  const removeVariant = (i) => { setVariants((list) => list.filter((_, idx) => idx !== i)); setPhotoPicker(null); };
+  const pickPhoto = (i, photo) => { setVariant(i, 'photo', photo); setPhotoPicker(null); };
   const chooseStockMode = (mode) => {
     setStockMode(mode);
     setErrors((e) => ({ ...e, stock: '', variants: '' }));
-    if (mode === 'variants' && variants.length === 0) setVariants([{ name: '', stock: form.stock || '0' }]);
+    if (mode === 'variants' && variants.length === 0) setVariants([{ name: '', stock: form.stock || '0', photo: null }]);
   };
 
   const addImages = (list) => setImages((prev) => [...prev, ...list]);
@@ -107,7 +118,12 @@ function ProductForm({ initial, onSave, onClose }) {
     setUrlInput('');
     setErrors((e) => ({ ...e, images: '' }));
   };
-  const removeImage = (index) => setImages((prev) => prev.filter((_, idx) => idx !== index));
+  const removeImage = (index) => {
+    const removed = images[index];
+    setImages((prev) => prev.filter((_, idx) => idx !== index));
+    // A flavour linked to this photo goes back to the main photo.
+    setVariants((list) => list.map((v) => (v.photo === removed ? { ...v, photo: null } : v)));
+  };
   const makeMain = (index) => setImages((prev) => [prev[index], ...prev.filter((_, idx) => idx !== index)]);
 
   const validate = () => {
@@ -121,10 +137,10 @@ function ProductForm({ initial, onSave, onClose }) {
     if (!useVariants && (form.stock === '' || isNaN(form.stock) || parseInt(form.stock, 10) < 0)) e.stock = t('store.form.errStock', 'Indiquez un stock (0 ou plus)');
     if (useVariants) {
       const names = variants.map((v) => v.name.trim().toLowerCase());
-      if (!variants.length) e.variants = t('store.form.errVariantNone', 'Ajoutez au moins un goût, ou choisissez « Un seul stock »');
-      else if (names.some((n) => !n)) e.variants = t('store.form.errVariantName', 'Donnez un nom à chaque goût (ou supprimez la ligne vide)');
-      else if (new Set(names).size !== names.length) e.variants = t('store.form.errVariantDup', 'Deux goûts ont le même nom');
-      else if (variants.some((v) => v.stock === '' || isNaN(v.stock) || parseInt(v.stock, 10) < 0)) e.variants = t('store.form.errVariantStock', 'Le stock de chaque goût doit être un nombre positif');
+      if (!variants.length) e.variants = vt('store.form.errVariantNone', 'Ajoutez au moins un goût, ou choisissez « Un seul stock »', 'Ajoutez au moins une taille, ou choisissez « Un seul stock »');
+      else if (names.some((n) => !n)) e.variants = vt('store.form.errVariantName', 'Donnez un nom à chaque goût (ou supprimez la ligne vide)', 'Donnez un nom à chaque taille (ou supprimez la ligne vide)');
+      else if (new Set(names).size !== names.length) e.variants = vt('store.form.errVariantDup', 'Deux goûts ont le même nom', 'Deux tailles ont le même nom');
+      else if (variants.some((v) => v.stock === '' || isNaN(v.stock) || parseInt(v.stock, 10) < 0)) e.variants = vt('store.form.errVariantStock', 'Le stock de chaque goût doit être un nombre positif', 'Le stock de chaque taille doit être un nombre positif');
     }
     if ((form.description || '').length > DESCRIPTION_MAX) e.description = t('store.form.errDescription', 'Description trop longue');
     return e;
@@ -148,7 +164,10 @@ function ProductForm({ initial, onSave, onClose }) {
       promo: promo > 0 ? promo : null,
       stock: useVariants ? variantsTotal : parseInt(form.stock, 10),
       // Always sent: an empty list removes the flavours of a product that had some.
-      variants: useVariants ? variants.map((v) => ({ ...(v.id ? { id: v.id } : {}), name: v.name.trim(), stock: parseInt(v.stock, 10) || 0 })) : [],
+      variants: useVariants ? variants.map((v) => {
+        const photoIndex = v.photo ? images.indexOf(v.photo) : -1;
+        return { ...(v.id ? { id: v.id } : {}), name: v.name.trim(), stock: parseInt(v.stock, 10) || 0, image_index: photoIndex >= 0 ? photoIndex : null };
+      }) : [],
     };
     setSaving(true);
     try {
@@ -263,7 +282,7 @@ function ProductForm({ initial, onSave, onClose }) {
         <h3 className="pform__title">{t('store.form.sectionStock', 'Stock')}</h3>
         <div className="pform__seg" role="radiogroup" aria-label={t('store.form.sectionStock', 'Stock')}>
           <button type="button" role="radio" aria-checked={!useVariants} onClick={() => chooseStockMode('single')}>{t('store.form.stockSingle', 'Un seul stock')}</button>
-          <button type="button" role="radio" aria-checked={useVariants} onClick={() => chooseStockMode('variants')}>{t('store.form.stockVariants', 'Plusieurs goûts')}</button>
+          <button type="button" role="radio" aria-checked={useVariants} onClick={() => chooseStockMode('variants')}>{vt('store.form.stockVariants', 'Plusieurs goûts', 'Plusieurs tailles')}</button>
         </div>
 
         {!useVariants ? (
@@ -274,18 +293,43 @@ function ProductForm({ initial, onSave, onClose }) {
           </div>
         ) : (
           <div className="pform__variants">
-            <p className="pform__hint">{t('store.form.variantsHint', 'Même prix pour tous les goûts. Chaque goût a son propre stock, et le client choisit son goût sur le site et dans l’application.')}</p>
-            <div className="pform__vhead" aria-hidden="true"><span>{t('store.form.variantName', 'Goût')}</span><span>{t('store.form.variantStock', 'Stock')}</span><span /></div>
+            <p className="pform__hint">{vt('store.form.variantsHint', 'Même prix pour tous les goûts. Chaque goût a son propre stock, et le client choisit son goût sur le site et dans l’application.', 'Même prix pour toutes les tailles. Chaque taille a son propre stock, et le client choisit sa taille sur le site et dans l’application.')}</p>
+            {images.length > 1 && <p className="pform__hint pform__hint--photo">{vt('store.form.variantPhotoHint', 'Touchez le carré photo de chaque goût pour choisir la photo de son emballage : le client verra le bon paquet en choisissant son goût.', 'Touchez le carré photo de chaque taille pour choisir sa photo : le client verra la bonne photo en choisissant sa taille.')}</p>}
+            <div className="pform__vhead" aria-hidden="true"><span>{t('store.form.variantPhoto', 'Photo')}</span><span>{vt('store.form.variantName', 'Goût', 'Taille')}</span><span>{t('store.form.variantStock', 'Stock')}</span><span /></div>
             {variants.map((v, i) => (
               <div key={v.id || `new-${i}`} className="pform__vrow">
-                <input value={v.name} onChange={(e) => setVariant(i, 'name', e.target.value)} placeholder={t('store.form.variantNamePh', 'Ex : Chocolat')} aria-label={`${t('store.form.variantName', 'Goût')} ${i + 1}`} maxLength={60} aria-invalid={!!errors.variants && !v.name.trim()} />
+                <button
+                  type="button"
+                  className={`pform__vphoto${v.photo ? ' has-photo' : ''}${photoPicker === i ? ' is-open' : ''}`}
+                  onClick={() => setPhotoPicker(photoPicker === i ? null : i)}
+                  disabled={!images.length}
+                  aria-expanded={photoPicker === i}
+                  aria-label={`${t('store.form.variantPhoto', 'Photo')} : ${v.name || vt('store.form.variantName', 'Goût', 'Taille')}`}
+                  title={images.length ? t('store.form.variantPhotoChoose', 'Choisir la photo') : t('store.form.variantPhotoNone', 'Ajoutez d’abord des photos en haut')}
+                >
+                  {v.photo ? <img src={v.photo} alt="" /> : (images[0] ? <img src={images[0]} alt="" className="is-default" /> : <ImageIcon size={18} />)}
+                </button>
+                <input value={v.name} onChange={(e) => setVariant(i, 'name', e.target.value)} placeholder={vt('store.form.variantNamePh', 'Ex : Chocolat', 'Ex : M')} aria-label={`${vt('store.form.variantName', 'Goût', 'Taille')} ${i + 1}`} maxLength={60} aria-invalid={!!errors.variants && !v.name.trim()} />
                 <input type="number" inputMode="numeric" min="0" step="1" value={v.stock} onChange={(e) => setVariant(i, 'stock', e.target.value)} aria-label={`${t('store.form.variantStock', 'Stock')} ${v.name || i + 1}`} />
-                <button type="button" className="pform__vremove" onClick={() => removeVariant(i)} aria-label={t('store.form.removeVariant', 'Supprimer ce goût')}><Trash2 size={16} /></button>
+                {photoPicker === i && (
+                  <div className="pform__vpicker" role="group" aria-label={t('store.form.variantPhotoChoose', 'Choisir la photo')}>
+                    {images.map((img, idx) => (
+                      <button key={`${idx}-${img.slice(-24)}`} type="button" className={v.photo === img ? 'is-on' : ''} onClick={() => pickPhoto(i, img)} aria-pressed={v.photo === img}>
+                        <img src={img} alt="" />
+                        {v.photo === img && <span><Check size={14} /></span>}
+                      </button>
+                    ))}
+                    <button type="button" className={`pform__vpicker-none${!v.photo ? ' is-on' : ''}`} onClick={() => pickPhoto(i, null)} aria-pressed={!v.photo}>
+                      {t('store.form.variantPhotoMain', 'Photo principale')}
+                    </button>
+                  </div>
+                )}
+                <button type="button" className="pform__vremove" onClick={() => removeVariant(i)} aria-label={vt('store.form.removeVariant', 'Supprimer ce goût', 'Supprimer cette taille')}><Trash2 size={16} /></button>
               </div>
             ))}
             {err('variants')}
             <div className="pform__vfoot">
-              <button type="button" className="btn btn--ghost btn--sm" onClick={addVariant}><Plus size={16} /> {t('store.form.addVariant', 'Ajouter un goût')}</button>
+              <button type="button" className="btn btn--ghost btn--sm" onClick={addVariant}><Plus size={16} /> {vt('store.form.addVariant', 'Ajouter un goût', 'Ajouter une taille')}</button>
               <span className="pform__total">{t('store.form.stockTotalShort', 'Total : {{count}}', { count: variantsTotal })}</span>
             </div>
           </div>

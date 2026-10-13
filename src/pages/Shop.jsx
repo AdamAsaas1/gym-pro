@@ -2,10 +2,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ShoppingBag, Plus, Minus, X, Search, Truck, Store, Phone, MessageCircle, Instagram, Trash2, ChevronLeft, ArrowRight,
   Menu, MapPin, Heart, Share2, Check, Wallet, Dumbbell, Shirt, FlaskConical, LayoutGrid, Package, SlidersHorizontal, Clock3,
+  ChevronRight, SearchX, CornerDownLeft,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'qrcode';
-import { getShopInfo, getShopProducts, getShopProduct, createShopOrder, getActivities } from '../api/client';
+import { getShopInfo, getShopProducts, getShopProduct, createShopOrder } from '../api/client';
+import { createSearch, fold, highlight } from './shopSearch';
 import './Shop.css';
 
 const CART_KEY = 'asaas_shop_cart_v1';
@@ -13,6 +15,22 @@ const UTM_KEY = 'asaas_shop_utm_v1';
 const FAV_KEY = 'asaas_shop_favs_v1';
 const RECENT_KEY = 'asaas_shop_recent_v1';
 const LANG_KEY = 'asaas_shop_lang_v1';
+const SEARCHES_KEY = 'asaas_shop_searches_v1';
+// Search shortcuts by need; each one only shows when it finds products.
+const SEARCH_GOALS = [
+  ['proteins', 'Protéines', 'protéine'],
+  ['creatine', 'Créatine', 'créatine'],
+  ['mass', 'Prise de masse', 'prise de masse'],
+  ['preworkout', 'Pré-workout', 'pré-workout'],
+  ['aminos', 'BCAA & acides aminés', 'bcaa'],
+  ['vitamins', 'Vitamines', 'vitamine'],
+  ['omega', 'Oméga-3', 'oméga'],
+  ['collagen', 'Collagène', 'collagène'],
+  ['burner', 'Brûle-graisse', 'brûleur'],
+  ['gloves', 'Gants', 'gants'],
+  ['belt', 'Ceinture', 'ceinture'],
+  ['shaker', 'Shaker', 'shaker'],
+];
 const CITIES = [
   'Tanger', 'Casablanca', 'Rabat', 'Marrakech', 'Fès', 'Meknès', 'Agadir', 'Tétouan', 'Oujda', 'Kénitra', 'Salé',
   'Témara', 'Mohammedia', 'El Jadida', 'Nador', 'Larache', 'Asilah', 'Al Hoceima', 'Chefchaouen', 'Safi',
@@ -32,6 +50,26 @@ const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce
 const productLink = (id) => `${window.location.origin}/shop?p=${id}`;
 const cartKey = (productId, variantId) => (variantId ? `${productId}:${variantId}` : String(productId));
 const hasVariants = (p) => (p?.variants?.length || 0) > 0;
+// Clothing and accessories come in sizes; everything else (supplements) in flavours.
+const SIZED_CATEGORIES = ['clothing', 'accessories'];
+const VARIANT_TEXT = {
+  flavour: {
+    one: ['shop.flavour', 'Goût'],
+    count: ['shop.nFlavours', '{{count}} goûts'],
+    choose: ['shop.chooseFlavour', 'Choisir le goût'],
+    required: ['shop.errFlavour', 'Choisissez un goût pour {{name}} : retirez-le du panier puis ajoutez-le depuis sa page.'],
+  },
+  size: {
+    one: ['shop.size', 'Taille'],
+    count: ['shop.nSizes', '{{count}} tailles'],
+    choose: ['shop.chooseSize', 'Choisir la taille'],
+    required: ['shop.errSize', 'Choisissez une taille pour {{name}} : retirez-le du panier puis ajoutez-le depuis sa page.'],
+  },
+};
+const variantText = (t, p, which, opts) => {
+  const [key, fallback] = VARIANT_TEXT[SIZED_CATEGORIES.includes(p?.category) ? 'size' : 'flavour'][which];
+  return t(key, fallback, opts);
+};
 
 // "0612..." -> "212612..." for wa.me links.
 const waNumber = (phone) => {
@@ -102,7 +140,7 @@ function ProductCard({ p, qty, fav, onFav, onOpen, onAdd, onQty, catLabel }) {
           <Heart size={18} />
         </button>
         {p.in_stock && !qty && (
-          <button className="ps-quickadd" onClick={(e) => (hasVariants(p) ? onOpen(p) : onAdd(p, e.currentTarget))} aria-label={hasVariants(p) ? `${t('shop.chooseFlavour', 'Choisir le goût')} : ${p.name}` : `${t('shop.addToCart', 'Ajouter au panier')} : ${p.name}`}>
+          <button className="ps-quickadd" onClick={(e) => (hasVariants(p) ? onOpen(p) : onAdd(p, e.currentTarget))} aria-label={hasVariants(p) ? `${variantText(t, p, 'choose')} : ${p.name}` : `${t('shop.addToCart', 'Ajouter au panier')} : ${p.name}`}>
             <Plus size={20} />
           </button>
         )}
@@ -110,7 +148,7 @@ function ProductCard({ p, qty, fav, onFav, onOpen, onAdd, onQty, catLabel }) {
       <div className="ps-card__body">
         {p.category && <span className="ps-card__cat">{catLabel(p.category)}</span>}
         <button className="ps-card__name" onClick={() => onOpen(p)}>{p.name}</button>
-        {hasVariants(p) && <span className="ps-card__flavours">{t('shop.nFlavours', '{{count}} goûts', { count: p.variants.length })}</span>}
+        {hasVariants(p) && <span className="ps-card__flavours">{variantText(t, p, 'count', { count: p.variants.length })}</span>}
         <div className="ps-card__foot">
           <Price p={p} />
           {p.in_stock && p.low_stock && <span className="ps-low">{t('shop.lowStock', 'Dernières pièces')}</span>}
@@ -126,7 +164,6 @@ export default function Shop() {
   const { t, i18n } = useTranslation();
   const [info, setInfo] = useState(null);
   const [products, setProducts] = useState([]);
-  const [activities, setActivities] = useState([]);
   const [loaded, setLoaded] = useState(false);
   const [loadError, setLoadError] = useState(false);
   const [category, setCategory] = useState('all');
@@ -138,7 +175,11 @@ export default function Shop() {
   const [cart, setCart] = useState(() => safeRead(CART_KEY, {})); // { productId: qty }
   const [favs, setFavs] = useState(() => safeRead(FAV_KEY, []));
   const [recent, setRecent] = useState(() => safeRead(RECENT_KEY, []));
+  const [searches, setSearches] = useState(() => safeRead(SEARCHES_KEY, []));
   const [detail, setDetail] = useState(null);
+  const [detailVariant, setDetailVariant] = useState(null); // flavour to preselect, e.g. found by a search
+  // All photos of the products opened in this visit, so a cart line can show its flavour's packaging.
+  const [photos, setPhotos] = useState({});
   const [panel, setPanel] = useState(null); // null | 'cart' | 'checkout' | 'done'
   const [order, setOrder] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -157,10 +198,6 @@ export default function Shop() {
     if (saved && saved !== i18n.language) i18n.changeLanguage(saved);
     getShopInfo().then(setInfo).catch(() => setLoadError(true));
     loadProducts();
-    // Only public facts are shown: name, description, monthly price, coach.
-    getActivities()
-      .then((list) => setActivities((list || []).map(({ id, name, description, price_month, coach_name, color }) => ({ id, name, description, price_month, coach_name, color }))))
-      .catch(() => {});
     // Remember where the visitor came from (e.g. ?utm_source=instagram on the ad link).
     const src = new URLSearchParams(window.location.search).get('utm_source');
     if (src) safeWrite(UTM_KEY, src.slice(0, 50));
@@ -169,6 +206,7 @@ export default function Shop() {
   useEffect(() => { safeWrite(CART_KEY, cart); }, [cart]);
   useEffect(() => { safeWrite(FAV_KEY, favs); }, [favs]);
   useEffect(() => { safeWrite(RECENT_KEY, recent); }, [recent]);
+  useEffect(() => { safeWrite(SEARCHES_KEY, searches); }, [searches]);
   useEffect(() => { if (info?.name) document.title = `${info.name.trim()} — ${t('shop.title', 'Boutique en ligne')}`; }, [info, t]);
 
   // A shared link (/shop?p=12) opens that product directly.
@@ -202,12 +240,13 @@ export default function Shop() {
   const categories = useMemo(() => [...new Set(products.map((p) => p.category).filter(Boolean))]
     .sort((a, b) => (b === 'supplements') - (a === 'supplements')), [products]);
   const catLabel = useCallback((c) => t(`shop.categories.${c}`, CATEGORY_LABELS[c] || c), [t]);
-  const matches = useCallback((p, q) => !q || norm(`${p.name} ${p.description || ''} ${catLabel(p.category)}`).includes(q), [catLabel]);
+  const engine = useMemo(() => createSearch(products, catLabel), [products, catLabel]);
 
   const visible = useMemo(() => {
-    const q = norm(query);
+    // With a search, the catalogue keeps only what the search finds, best matches first.
+    const rank = query.trim() ? new Map(engine.search(query).map((r, i) => [r.p.id, i])) : null;
     const list = products.filter((p) => (category === 'all' || p.category === category)
-      && matches(p, q)
+      && (!rank || rank.has(p.id))
       && (!onlyStock || p.in_stock)
       && (!onlyPromo || discount(p) > 0)
       && (!onlyFav || favs.includes(p.id)));
@@ -215,15 +254,23 @@ export default function Shop() {
     if (sort === 'price-asc') sorted.sort((a, b) => unitPrice(a) - unitPrice(b));
     if (sort === 'price-desc') sorted.sort((a, b) => unitPrice(b) - unitPrice(a));
     if (sort === 'discount') sorted.sort((a, b) => discount(b) - discount(a));
-    if (sort === 'featured') sorted.sort((a, b) => (b.in_stock - a.in_stock) || (discount(b) > 0) - (discount(a) > 0));
+    if (sort === 'featured') {
+      sorted.sort(rank
+        ? (a, b) => rank.get(a.id) - rank.get(b.id)
+        : (a, b) => (b.in_stock - a.in_stock) || (discount(b) > 0) - (discount(a) > 0));
+    }
     return sorted;
-  }, [products, category, query, matches, onlyStock, onlyPromo, onlyFav, favs, sort]);
+  }, [products, category, query, engine, onlyStock, onlyPromo, onlyFav, favs, sort]);
 
   const onSale = useMemo(() => products.filter((p) => p.in_stock && discount(p) > 0).sort((a, b) => discount(b) - discount(a)), [products]);
   const bestPct = onSale.length ? discount(onSale[0]) : 0;
   const hero = useMemo(() => onSale.find((p) => p.image_url) || products.find((p) => p.image_url && p.in_stock) || onSale[0] || products[0], [onSale, products]);
+  // Hero product: an in-stock product with a real photo, biggest discount first (old seed paths /assets/... have no file).
+  const showcase = useMemo(() => products
+    .filter((p) => p.in_stock && p.image_url && !p.image_url.startsWith('/assets/'))
+    .sort((a, b) => discount(b) - discount(a))
+    .slice(0, 1), [products]);
   const recentProducts = useMemo(() => recent.map((id) => byId[id]).filter(Boolean), [recent, byId]);
-  const coaches = useMemo(() => activities.filter((a) => a.coach_name), [activities]);
 
   const lines = useMemo(() => Object.entries(cart)
     .map(([key, qty]) => {
@@ -232,9 +279,10 @@ export default function Shop() {
       const variant = vid ? product?.variants?.find((v) => v.id === vid) : null;
       // A line whose flavour no longer exists, or a flavoured product saved without a flavour, is dropped.
       if (!product || (hasVariants(product) ? !variant : vid)) return { product: null, qty };
-      return { key, product, variant, qty };
+      const photo = variant?.image_index != null ? photos[pid]?.[variant.image_index] : null;
+      return { key, product, variant, qty, photo: photo || product.image_url };
     })
-    .filter((l) => l.product && l.qty > 0), [cart, byId]);
+    .filter((l) => l.product && l.qty > 0), [cart, byId, photos]);
   const count = lines.reduce((s, l) => s + l.qty, 0);
   const subtotal = lines.reduce((s, l) => s + unitPrice(l.product) * l.qty, 0);
 
@@ -279,8 +327,14 @@ export default function Shop() {
     navigator.vibrate?.(12);
     showToast('added', p);
   };
+  const rememberSearch = (q) => {
+    const v = q.trim();
+    if (v.length < 2) return;
+    setSearches((list) => [v, ...list.filter((x) => fold(x) !== fold(v))].slice(0, 6));
+  };
   const toggleFav = (id) => setFavs((f) => (f.includes(id) ? f.filter((x) => x !== id) : [id, ...f]));
-  const openProduct = (p) => {
+  const openProduct = (p, variantId = null) => {
+    setDetailVariant(variantId);
     setDetail(p);
     setRecent((r) => [p.id, ...r.filter((x) => x !== p.id)].slice(0, 10));
   };
@@ -373,19 +427,8 @@ export default function Shop() {
               <li><Store size={18} /> {t('shop.factPickup', 'Retrait gratuit à la salle')}</li>
             </ul>
           </div>
-          {hero && (
-            <div className="ps-hero__visual">
-              <span className="ps-hero__disc" aria-hidden="true" />
-              <button className="ps-hero__img" onClick={() => openProduct(hero)} aria-label={hero.name}>
-                <ProductImage src={hero.image_url} alt={hero.name} name={hero.name} category={hero.category} />
-              </button>
-              <div className="ps-hero__tag">
-                {discount(hero) > 0 && <span className="ps-badge ps-badge--inline">-{discount(hero)}%</span>}
-                <strong>{hero.name}</strong>
-                <Price p={hero} />
-                {hero.in_stock && <button className="ps-btn ps-btn--dark ps-btn--sm" onClick={(e) => add(hero, 1, e.currentTarget)}><Plus size={16} /> {t('shop.add', 'Ajouter')}</button>}
-              </div>
-            </div>
+          {(showcase.length > 0 || hero) && (
+            <HeroProducts items={showcase.length ? showcase : [hero]} onOpen={openProduct} />
           )}
         </section>
 
@@ -509,19 +552,8 @@ export default function Shop() {
             <h2>{t('shop.aboutTitle', 'Une vraie salle derrière la boutique.')}</h2>
             <p>{t('shop.aboutP1', '{{name}} est une salle de sport à {{city}}. Les compléments et accessoires de cette boutique sont choisis par les coachs de la salle.', { name: shopName, city })}</p>
             <p>{t('shop.aboutP2', 'Vous vous entraînez chez nous ? Retirez votre commande gratuitement à l’accueil. Ailleurs au Maroc ? Nous livrons chez vous.')}</p>
-            {wa && <a className="ps-btn ps-btn--wa" href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer"><MessageCircle size={18} /> {t('shop.aboutCta', 'Écrire aux coachs')}</a>}
+            {wa && <a className="ps-btn ps-btn--wa" href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer"><MessageCircle size={18} /> {t('shop.aboutCtaWa', 'Nous écrire sur WhatsApp')}</a>}
           </div>
-          {coaches.length > 0 && (
-            <ul className="ps-coaches">
-              {coaches.map((a) => (
-                <li key={a.id} style={{ '--c': a.color || '#0e0f0c' }}>
-                  <span className="ps-coaches__avatar" aria-hidden="true">{a.coach_name.split(' ').map((w) => w[0]).join('').slice(0, 2)}</span>
-                  <span className="ps-coaches__who"><b>{a.coach_name}</b><small>{a.name}</small></span>
-                  {Number(a.price_month) > 0 && <span className="ps-coaches__price">{fmt(Number(a.price_month))}<small>{t('shop.perMonth', '/ mois')}</small></span>}
-                </li>
-              ))}
-            </ul>
-          )}
         </section>
       </main>
 
@@ -598,18 +630,20 @@ export default function Shop() {
 
       {searchOpen && (
         <SearchOverlay
-          products={products} catLabel={catLabel} matches={matches} categories={categories} onSale={onSale}
+          engine={engine} products={products} catLabel={catLabel} categories={categories} onSale={onSale}
+          recentProducts={recentProducts} searches={searches} onForget={() => setSearches([])} wa={wa}
           initial={query}
           onClose={() => setSearchOpen(false)}
-          onPick={(p) => { setSearchOpen(false); openProduct(p); }}
-          onSubmit={(q) => { setQuery(q); setCategory('all'); setOnlyFav(false); goTo('catalogue'); }}
+          onPick={(p, q, v) => { rememberSearch(q); setSearchOpen(false); openProduct(p, v?.id); }}
+          onSubmit={(q) => { rememberSearch(q); setQuery(q); setCategory('all'); setOnlyFav(false); goTo('catalogue'); }}
           onCategory={openCategory}
+          onAdd={(p, el, q) => { rememberSearch(q); add(p, 1, el); }}
         />
       )}
 
       {detail && (
         <ProductDetail
-          p={detail} fav={favs.includes(detail.id)} onFav={toggleFav} onShare={share} wa={wa} catLabel={catLabel} info={info}
+          p={detail} initialVariant={detailVariant} onPhotos={(id, list) => setPhotos((m) => ({ ...m, [id]: list }))} fav={favs.includes(detail.id)} onFav={toggleFav} onShare={share} wa={wa} catLabel={catLabel} info={info}
           related={products.filter((x) => x.category === detail.category && x.id !== detail.id).slice(0, 6)}
           onOpen={openProduct}
           onClose={() => setDetail(null)}
@@ -639,70 +673,335 @@ export default function Shop() {
   );
 }
 
-function SearchOverlay({ products, catLabel, matches, categories, onSale, initial, onClose, onPick, onSubmit, onCategory }) {
+// Product photos arrive with wide white margins of different sizes; cropping them to the product
+// lets every hero product fill its space the same way. Photos a browser may not read (other sites
+// without CORS) are kept as they are.
+const trimmed = new Map();
+function useTrimmedPhoto(src) {
+  const [out, setOut] = useState(() => trimmed.get(src) || null);
+  useEffect(() => {
+    if (!src) return undefined;
+    if (trimmed.has(src)) { setOut(trimmed.get(src)); return undefined; }
+    let alive = true;
+    const done = (value) => { trimmed.set(src, value); if (alive) setOut(value); };
+    const img = new Image();
+    if (!src.startsWith('data:')) img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const k = Math.min(1, 400 / Math.max(img.naturalWidth, img.naturalHeight));
+        const w = Math.max(1, Math.round(img.naturalWidth * k));
+        const h = Math.max(1, Math.round(img.naturalHeight * k));
+        const probe = document.createElement('canvas');
+        probe.width = w; probe.height = h;
+        const ctx = probe.getContext('2d', { willReadFrequently: true });
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, w, h); ctx.drawImage(img, 0, 0, w, h);
+        const px = ctx.getImageData(0, 0, w, h).data;
+        let top = h; let left = w; let right = -1; let bottom = -1;
+        for (let y = 0; y < h; y++) {
+          for (let x = 0; x < w; x++) {
+            const i = (y * w + x) * 4;
+            if (px[i] < 236 || px[i + 1] < 236 || px[i + 2] < 236) {
+              if (x < left) left = x; if (x > right) right = x;
+              if (y < top) top = y; if (y > bottom) bottom = y;
+            }
+          }
+        }
+        if (right <= left || bottom <= top) { done(src); return; }
+        const sx = Math.max(0, left / k - 2); const sy = Math.max(0, top / k - 2);
+        const sw = Math.min(img.naturalWidth - sx, (right - left + 1) / k + 4);
+        const sh = Math.min(img.naturalHeight - sy, (bottom - top + 1) / k + 4);
+        const scale = Math.min(1, 900 / Math.max(sw, sh));
+        const crop = document.createElement('canvas');
+        crop.width = Math.round(sw * scale); crop.height = Math.round(sh * scale);
+        const c = crop.getContext('2d');
+        c.fillStyle = '#fff'; c.fillRect(0, 0, crop.width, crop.height);
+        c.drawImage(img, sx, sy, sw, sh, 0, 0, crop.width, crop.height);
+        done(crop.toDataURL('image/jpeg', 0.92));
+      } catch {
+        done(src);
+      }
+    };
+    img.onerror = () => done(src);
+    img.src = src;
+    return () => { alive = false; };
+  }, [src]);
+  return out;
+}
+
+function HeroProduct({ p, lead, solo, onOpen }) {
+  const photo = useTrimmedPhoto(p.image_url);
+  const pct = discount(p);
+  return (
+    <button className={`ps-hero__prod${lead ? ' is-lead' : ''}`} onClick={() => onOpen(p)} aria-label={p.name}>
+      <span className={`ps-hero__prodimg${photo ? ' is-ready' : ''}`}>
+        {photo && <img src={photo} alt={p.name} decoding="async" />}
+      </span>
+      {solo && <span className="ps-hero__prodname">{p.name}</span>}
+      <span className="ps-hero__prodprice">
+        {pct > 0 && <em>-{pct}%</em>}
+        <b>{fmt(unitPrice(p))}</b>
+        {pct > 0 && <s>{fmt(p.price)}</s>}
+      </span>
+    </button>
+  );
+}
+
+// Hero: one real product (up to three if asked) standing straight on the white page, no panel, no disc.
+// It opens its product page.
+function HeroProducts({ items, onOpen }) {
+  const { t } = useTranslation();
+  // Middle slot for the lead product: [2nd, 1st, 3rd].
+  const placed = items.length === 3 ? [items[1], items[0], items[2]] : items;
+  return (
+    <div className={`ps-hero__products is-${items.length}`} aria-label={t('shop.featured', 'Produits à la une')}>
+      {placed.map((p) => <HeroProduct key={p.id} p={p} lead={p === items[0]} solo={items.length === 1} onOpen={onOpen} />)}
+    </div>
+  );
+}
+
+// Search sheet: smart results as you type (typos, synonyms, flavours, Arabic), highlighted matches,
+// quick add, filters by category, recent searches, shortcuts by need, and a way out when nothing is found.
+function SearchOverlay({ engine, products, catLabel, categories, onSale, recentProducts, searches, onForget, wa, initial, onClose, onPick, onSubmit, onCategory, onAdd }) {
   const { t } = useTranslation();
   const [q, setQ] = useState(initial || '');
+  const [tab, setTab] = useState('all');
+  const [added, setAdded] = useState(null);
   const input = useRef(null);
+  const list = useRef(null);
+  const addedTimer = useRef(null);
   useEscape(onClose);
-  useEffect(() => { input.current?.focus(); }, []);
-  const nq = norm(q);
-  const found = nq ? products.filter((p) => matches(p, nq)) : [];
+  useEffect(() => { input.current?.focus(); return () => clearTimeout(addedTimer.current); }, []);
+  useEffect(() => { setTab('all'); }, [q]);
+
+  const typed = q.trim();
+  const results = useMemo(() => (typed ? engine.search(typed) : []), [engine, typed]);
+  const suggestion = useMemo(() => (typed && !results.length ? engine.suggest(typed) : null), [engine, typed, results.length]);
+  const goals = useMemo(() => SEARCH_GOALS
+    .map(([key, label, query]) => ({ key, label: t(`shop.goals.${key}`, label), query, count: engine.search(query).length }))
+    .filter((g) => g.count > 0), [engine, t]);
+  const catCounts = useMemo(() => Object.fromEntries(categories.map((c) => [c, products.filter((p) => p.category === c).length])), [categories, products]);
+
+  const resultCats = [...new Set(results.map((r) => r.p.category).filter(Boolean))];
+  const promoCount = results.filter((r) => discount(r.p) > 0).length;
+  const shown = results.filter((r) => (tab === 'all' ? true : tab === 'promo' ? discount(r.p) > 0 : r.p.category === tab));
+
+  const fill = (value) => { setQ(value); input.current?.focus(); };
+  const quickAdd = (p, el) => {
+    onAdd(p, el, typed);
+    setAdded(p.id);
+    clearTimeout(addedTimer.current);
+    addedTimer.current = setTimeout(() => setAdded(null), 1600);
+  };
+  // Arrow keys walk from the field through the results and back.
+  const onKeyDown = (e) => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    const items = [input.current, ...(list.current?.querySelectorAll('.ps-res__main') || [])];
+    const at = items.indexOf(document.activeElement);
+    if (at === -1) return;
+    e.preventDefault();
+    items[Math.max(0, Math.min(items.length - 1, at + (e.key === 'ArrowDown' ? 1 : -1)))]?.focus();
+  };
+
   return (
     <div className="ps-overlay ps-overlay--top" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
-      <div className="ps-search" role="dialog" aria-modal="true" aria-label={t('shop.search', 'Rechercher')}>
-        <form className="ps-search__bar" role="search" onSubmit={(e) => { e.preventDefault(); onSubmit(q.trim()); }}>
-          <Search size={20} />
-          <input ref={input} type="search" enterKeyHint="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('shop.searchPh', 'Rechercher un produit')} aria-label={t('shop.searchPh', 'Rechercher un produit')} />
-          {q && <button type="button" className="ps-iconbtn" onClick={() => { setQ(''); input.current?.focus(); }} aria-label={t('shop.clear', 'Effacer')}><X size={18} /></button>}
+      <div className="ps-search" role="dialog" aria-modal="true" aria-label={t('shop.search', 'Rechercher')} onKeyDown={onKeyDown}>
+        <form className="ps-search__bar" role="search" onSubmit={(e) => { e.preventDefault(); if (typed) onSubmit(typed); }}>
+          <span className="ps-search__field">
+            <Search size={20} aria-hidden="true" />
+            <input
+              ref={input} type="search" enterKeyHint="search" autoComplete="off" spellCheck="false" value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={t('shop.searchHint', 'Whey, créatine, gainer, goût…')}
+              aria-label={t('shop.searchPh', 'Rechercher un produit')}
+            />
+            {q && <button type="button" className="ps-search__clear" onClick={() => fill('')} aria-label={t('shop.clear', 'Effacer')}><X size={16} /></button>}
+          </span>
           <button type="button" className="ps-search__close" onClick={onClose}>{t('shop.cancel', 'Annuler')}</button>
         </form>
+
+        {typed && results.length > 0 && (resultCats.length > 1 || promoCount > 0) && (
+          <div className="ps-search__tabs" role="group" aria-label={t('shop.filter', 'Filtrer')}>
+            <button className={tab === 'all' ? 'is-on' : ''} aria-pressed={tab === 'all'} onClick={() => setTab('all')}>{t('shop.all', 'Tout')} <span>{results.length}</span></button>
+            {resultCats.length > 1 && resultCats.map((c) => (
+              <button key={c} className={tab === c ? 'is-on' : ''} aria-pressed={tab === c} onClick={() => setTab(c)}>
+                {catLabel(c)} <span>{results.filter((r) => r.p.category === c).length}</span>
+              </button>
+            ))}
+            {promoCount > 0 && (
+              <button className={`is-promo${tab === 'promo' ? ' is-on' : ''}`} aria-pressed={tab === 'promo'} onClick={() => setTab('promo')}>
+                {t('shop.navPromos', 'Promotions')} <span>{promoCount}</span>
+              </button>
+            )}
+          </div>
+        )}
+
         <div className="ps-search__body">
-          {!nq && (
+          <p className="ps-sr" aria-live="polite">
+            {typed ? t('shop.nResults', '{{count}} produit(s)', { count: results.length }) : ''}
+          </p>
+
+          {!typed && (
             <>
-              <p className="ps-menu__label">{t('shop.navCategories', 'Catégories')}</p>
-              <div className="ps-search__quick">
-                {categories.map((c) => <button key={c} onClick={() => onCategory(c)}>{catLabel(c)}</button>)}
-              </div>
-              {onSale.length > 0 && <p className="ps-menu__label">{t('shop.navPromos', 'Promotions')}</p>}
-              {onSale.slice(0, 4).map((p) => <SearchRow key={p.id} p={p} onPick={onPick} catLabel={catLabel} />)}
+              {searches.length > 0 && (
+                <section className="ps-search__sec">
+                  <div className="ps-search__head">
+                    <h3>{t('shop.recentSearches', 'Recherches récentes')}</h3>
+                    <button onClick={onForget}>{t('shop.clearHistory', 'Effacer')}</button>
+                  </div>
+                  <div className="ps-search__chips">
+                    {searches.map((s) => <button key={s} className="ps-chip ps-chip--recent" onClick={() => fill(s)}><Clock3 size={15} aria-hidden="true" /> {s}</button>)}
+                  </div>
+                </section>
+              )}
+
+              {goals.length > 0 && (
+                <section className="ps-search__sec">
+                  <h3>{t('shop.byNeed', 'Recherches par besoin')}</h3>
+                  <div className="ps-search__chips">
+                    {goals.map((g) => <button key={g.key} className="ps-chip" onClick={() => fill(g.query)}>{g.label} <span>{g.count}</span></button>)}
+                  </div>
+                </section>
+              )}
+
+              <section className="ps-search__sec">
+                <h3>{t('shop.navCategories', 'Catégories')}</h3>
+                <div className="ps-search__cats">
+                  {categories.map((c) => {
+                    const Icon = CATEGORY_ICONS[c] || Package;
+                    return (
+                      <button key={c} onClick={() => onCategory(c)}>
+                        <span className="ps-search__caticon"><Icon size={22} strokeWidth={1.6} /></span>
+                        <b>{catLabel(c)}</b>
+                        <small>{t('shop.nProducts', '{{count}} produits', { count: catCounts[c] })}</small>
+                      </button>
+                    );
+                  })}
+                </div>
+              </section>
+
+              {recentProducts.length > 0 ? (
+                <section className="ps-search__sec">
+                  <h3>{t('shop.recent', 'Vus récemment')}</h3>
+                  <div className="ps-search__rail">
+                    {recentProducts.slice(0, 8).map((p) => (
+                      <button key={p.id} className="ps-search__mini" onClick={() => onPick(p, '')}>
+                        <span className="ps-search__miniimg"><ProductImage src={p.image_url} alt="" name="" category={p.category} /></span>
+                        <span className="ps-search__mininame">{p.name}</span>
+                        <Price p={p} />
+                      </button>
+                    ))}
+                  </div>
+                </section>
+              ) : onSale.length > 0 && (
+                <section className="ps-search__sec">
+                  <h3>{t('shop.navPromos', 'Promotions')}</h3>
+                  <ul className="ps-res-list">
+                    {onSale.slice(0, 4).map((p) => <SearchRow key={p.id} p={p} q="" catLabel={catLabel} onPick={onPick} onAdd={quickAdd} added={added === p.id} />)}
+                  </ul>
+                </section>
+              )}
             </>
           )}
-          {nq && found.length === 0 && <p className="ps-search__none">{t('shop.noResultFor', 'Aucun produit pour « {{q}} ».', { q })}</p>}
-          {found.slice(0, 6).map((p) => <SearchRow key={p.id} p={p} onPick={onPick} catLabel={catLabel} />)}
-          {found.length > 0 && (
-            <button className="ps-btn ps-btn--dark ps-btn--block" onClick={() => onSubmit(q.trim())}>{t('shop.seeResults', 'Voir les {{count}} résultats', { count: found.length })} <ArrowRight size={17} className="flip-rtl" /></button>
+
+          {typed && results.length === 0 && (
+            <div className="ps-search__empty">
+              <span className="ps-search__emptyicon"><SearchX size={28} strokeWidth={1.6} /></span>
+              <p className="ps-search__emptytitle">{t('shop.noResultFor', 'Aucun produit pour « {{q}} ».', { q: typed })}</p>
+              {suggestion ? (
+                <p>{t('shop.didYouMean', 'Vouliez-vous dire')} <button className="ps-search__fix" onClick={() => fill(suggestion)}>{suggestion}</button> ?</p>
+              ) : (
+                <p>{t('shop.searchTip', "Vérifiez l'orthographe ou essayez un mot plus simple.")}</p>
+              )}
+              {goals.length > 0 && (
+                <div className="ps-search__chips ps-search__chips--center">
+                  {goals.slice(0, 6).map((g) => <button key={g.key} className="ps-chip" onClick={() => fill(g.query)}>{g.label}</button>)}
+                </div>
+              )}
+              {wa && (
+                <a className="ps-btn ps-btn--wa ps-btn--sm" href={waLink(wa, t('shop.waAsk', 'Bonjour, avez-vous « {{q}} » ?', { q: typed }))} target="_blank" rel="noreferrer">
+                  <MessageCircle size={17} /> {t('shop.askWa', 'Demandez-le-nous sur WhatsApp')}
+                </a>
+              )}
+            </div>
+          )}
+
+          {shown.length > 0 && (
+            <ul className="ps-res-list" ref={list}>
+              {shown.slice(0, 8).map((r) => (
+                <SearchRow key={r.p.id} p={r.p} q={typed} variant={r.variant} catLabel={catLabel} onPick={onPick} onAdd={quickAdd} added={added === r.p.id} />
+              ))}
+            </ul>
           )}
         </div>
+
+        {results.length > 0 && (
+          <div className="ps-search__foot">
+            <button className="ps-btn ps-btn--dark ps-btn--block" onClick={() => onSubmit(typed)}>
+              {results.length === 1 ? t('shop.seeResult', 'Voir le résultat') : t('shop.seeResults', 'Voir les {{count}} résultats', { count: results.length })} <ArrowRight size={17} className="flip-rtl" />
+            </button>
+            <span className="ps-search__kbd" aria-hidden="true"><CornerDownLeft size={13} /> {t('shop.enterHint', 'Entrée')}</span>
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
-function SearchRow({ p, onPick, catLabel }) {
+function SearchRow({ p, q, variant, catLabel, onPick, onAdd, added }) {
+  const { t } = useTranslation();
+  const pct = discount(p);
+  const parts = highlight(p.name, q);
+  let meta = catLabel(p.category);
+  if (variant) meta = `${variantText(t, p, 'one')} : ${variant.name}`;
+  else if (hasVariants(p)) meta = `${meta} · ${variantText(t, p, 'count', { count: p.variants.length })}`;
   return (
-    <button className="ps-searchrow" onClick={() => onPick(p)}>
-      <span className="ps-searchrow__img"><ProductImage src={p.image_url} alt="" name="" category={p.category} /></span>
-      <span className="ps-searchrow__txt"><b>{p.name}</b><small>{catLabel(p.category)}</small></span>
-      <Price p={p} />
-    </button>
+    <li className={`ps-res${p.in_stock ? '' : ' is-out'}`}>
+      <button className="ps-res__main" onClick={() => onPick(p, q, variant)}>
+        <span className="ps-res__img">
+          <ProductImage src={p.image_url} alt="" name="" category={p.category} />
+          {pct > 0 && <span className="ps-res__pct">-{pct}%</span>}
+        </span>
+        <span className="ps-res__txt">
+          <b>{parts.map((part, i) => (part.hit ? <mark key={i}>{part.text}</mark> : <span key={i}>{part.text}</span>))}</b>
+          <small className={variant ? 'is-variant' : ''}>{variant && <Check size={13} aria-hidden="true" />}{meta}</small>
+          {!p.in_stock
+            ? <small className="ps-res__stock is-out">{t('shop.outOfStock', 'Rupture')}</small>
+            : p.low_stock && <small className="ps-res__stock">{t('shop.lowStock', 'Dernières pièces')}</small>}
+        </span>
+        <Price p={p} />
+      </button>
+      {p.in_stock && (hasVariants(p) ? (
+        <button className="ps-res__add" onClick={() => onPick(p, q, variant)} aria-label={`${variantText(t, p, 'choose')} : ${p.name}`}><ChevronRight size={18} className="flip-rtl" /></button>
+      ) : (
+        <button className={`ps-res__add${added ? ' is-done' : ''}`} onClick={(e) => onAdd(p, e.currentTarget)} aria-label={`${t('shop.addToCart', 'Ajouter au panier')} : ${p.name}`}>
+          {added ? <Check size={18} /> : <Plus size={18} />}
+        </button>
+      ))}
+    </li>
   );
 }
 
-function ProductDetail({ p, fav, onFav, onShare, wa, info, catLabel, related, onOpen, onClose, onAdd }) {
+function ProductDetail({ p, initialVariant, onPhotos, fav, onFav, onShare, wa, info, catLabel, related, onOpen, onClose, onAdd }) {
   const { t } = useTranslation();
   const [qty, setQty] = useState(1);
   const [images, setImages] = useState(p.image_url ? [p.image_url] : []);
   const [current, setCurrent] = useState(0);
   const pct = discount(p);
-  const firstInStock = () => p.variants?.find((v) => v.in_stock) || null;
+  const firstInStock = () => p.variants?.find((v) => v.id === initialVariant && v.in_stock) || p.variants?.find((v) => v.in_stock) || null;
   const [variant, setVariant] = useState(firstInStock);
   const canBuy = p.in_stock && (!hasVariants(p) || variant?.in_stock);
   useEscape(onClose);
 
   useEffect(() => {
     setQty(1); setCurrent(0); setImages(p.image_url ? [p.image_url] : []); setVariant(firstInStock());
-    getShopProduct(p.id).then((d) => { if (d.images?.length) setImages(d.images); }).catch(() => {});
+    getShopProduct(p.id).then((d) => { if (d.images?.length) { setImages(d.images); onPhotos?.(p.id, d.images); } }).catch(() => {});
   }, [p.id, p.image_url]);
+  // Picking a flavour shows the photo of its packaging, when one is linked to it.
+  const photoOf = (v) => (v?.image_index != null ? images[v.image_index] : null);
+  useEffect(() => {
+    if (variant?.image_index != null && variant.image_index < images.length) setCurrent(variant.image_index);
+  }, [variant, images]);
+  const flavourPhotos = hasVariants(p) && p.variants.some((v) => photoOf(v));
 
   const waText = t('shop.waProduct', 'Bonjour, je voudrais commander : {{qty}} × {{name}} ({{price}}). {{link}}', { qty, name: variant ? `${p.name} — ${variant.name}` : p.name, price: fmt(unitPrice(p) * qty), link: productLink(p.id) });
 
@@ -737,13 +1036,18 @@ function ProductDetail({ p, fav, onFav, onShare, wa, info, catLabel, related, on
 
             {hasVariants(p) && (
               <fieldset className="ps-flavours">
-                <legend>{t('shop.flavour', 'Goût')}{variant ? <> : <b>{variant.name}</b></> : ''}</legend>
-                <div className="ps-flavours__list" role="radiogroup" aria-label={t('shop.flavour', 'Goût')}>
+                <legend>{variantText(t, p, 'one')}{variant ? <> : <b>{variant.name}</b></> : ''}</legend>
+                <div className="ps-flavours__list" role="radiogroup" aria-label={variantText(t, p, 'one')}>
                   {p.variants.map((v) => (
                     <button
                       key={v.id} type="button" role="radio" aria-checked={variant?.id === v.id} disabled={!v.in_stock}
-                      className={`ps-flavour${v.in_stock ? '' : ' is-out'}`} onClick={() => setVariant(v)}
+                      className={`ps-flavour${v.in_stock ? '' : ' is-out'}${flavourPhotos ? ' has-photo' : ''}`} onClick={() => setVariant(v)}
                     >
+                      {flavourPhotos && (
+                        <span className="ps-flavour__img" aria-hidden="true">
+                          <ProductImage src={photoOf(v) || images[0]} alt="" name="" category={p.category} />
+                        </span>
+                      )}
                       {v.name}
                       {!v.in_stock && <small>{t('shop.outOfStock', 'Rupture')}</small>}
                       {v.in_stock && v.low_stock && <small className="is-low">{t('shop.fewLeft', 'Plus que quelques-uns')}</small>}
@@ -824,12 +1128,12 @@ function CartPanel({ lines, count, subtotal, info, wa, waText, setQty, onClose, 
       ) : (
         <>
           <ul className="ps-lines">
-            {lines.map(({ key, product: p, variant, qty }) => (
+            {lines.map(({ key, product: p, variant, qty, photo }) => (
               <li key={key} className="ps-line">
-                <div className="ps-line__img"><ProductImage src={p.image_url} alt="" name="" category={p.category} /></div>
+                <div className="ps-line__img"><ProductImage src={photo} alt="" name="" category={p.category} /></div>
                 <div className="ps-line__info">
                   <strong>{p.name}</strong>
-                  {variant && <span className="ps-line__flavour">{t('shop.flavour', 'Goût')} : {variant.name}</span>}
+                  {variant && <span className="ps-line__flavour">{variantText(t, p, 'one')} : {variant.name}</span>}
                   <span>{fmt(unitPrice(p))}</span>
                   <Stepper small value={qty} onChange={(v) => setQty(key, v)} />
                 </div>
@@ -911,7 +1215,8 @@ function CheckoutPanel({ lines, subtotal, info, onBack, onDone, onStockChanged }
         }));
         onStockChanged();
       } else if (d?.code === 'variant_required') {
-        setSubmitError(t('shop.errFlavour', 'Choisissez un goût pour {{name}} : retirez-le du panier puis ajoutez-le depuis sa page.', { name: d.name }));
+        const product = lines.find((l) => l.product.name === d.name)?.product;
+        setSubmitError(variantText(t, product, 'required', { name: d.name }));
         onStockChanged();
       } else if (!err.response) {
         // No answer at all: the phone is offline or the server is down, the form itself is fine.
