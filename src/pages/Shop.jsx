@@ -264,7 +264,13 @@ export default function Shop() {
 
   const onSale = useMemo(() => products.filter((p) => p.in_stock && discount(p) > 0).sort((a, b) => discount(b) - discount(a)), [products]);
   const bestPct = onSale.length ? discount(onSale[0]) : 0;
-  const hero = useMemo(() => onSale.find((p) => p.image_url) || products.find((p) => p.image_url && p.in_stock) || onSale[0] || products[0], [onSale, products]);
+  // The hero always shows a supplement (the shop's main line); accessories and clothing only if there is none.
+  const hero = useMemo(() => {
+    const isSupplement = (p) => p.category === 'supplements';
+    return onSale.find((p) => isSupplement(p) && p.image_url)
+      || products.find((p) => isSupplement(p) && p.image_url && p.in_stock)
+      || onSale.find((p) => p.image_url) || products.find((p) => p.image_url && p.in_stock) || onSale[0] || products[0];
+  }, [onSale, products]);
   // Hero product: an in-stock product with a real photo, biggest discount first (old seed paths /assets/... have no file).
   const showcase = useMemo(() => products
     .filter((p) => p.in_stock && p.image_url && !p.image_url.startsWith('/assets/'))
