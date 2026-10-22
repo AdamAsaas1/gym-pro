@@ -45,7 +45,8 @@
     "settings": "Settings",
     "notifications": "Notifications",
     "store": "Boutique",
-    "live": "Live & Occupancy"
+    "live": "Live & Occupancy",
+    "surveillance": "Surveillance"
   },
   "sidebar": {
     "collapse": "Collapse",
