@@ -5,8 +5,7 @@ import {
   ChevronRight, SearchX, CornerDownLeft,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import QRCode from 'qrcode';
-import { getShopInfo, getShopProducts, getShopProduct, createShopOrder } from '../api/client';
+import { getShopInfo, getShopProducts, getShopProduct, createShopOrder, trackShopOrder, shopShareLink } from '../api/client';
 import { createSearch, fold, highlight } from './shopSearch';
 import './Shop.css';
 
@@ -14,6 +13,10 @@ const CART_KEY = 'asaas_shop_cart_v1';
 const UTM_KEY = 'asaas_shop_utm_v1';
 const FAV_KEY = 'asaas_shop_favs_v1';
 const RECENT_KEY = 'asaas_shop_recent_v1';
+const LAST_ORDER_KEY = 'asaas_shop_last_order_v1';
+const SHOP_ORIGIN = 'https://asaaspro.com';
+// The shop's brand. The gym's own name (ASAAS GYM) comes from the settings, in `info.name`.
+const SHOP_NAME = 'ASAASpro';
 const LANG_KEY = 'asaas_shop_lang_v1';
 const SEARCHES_KEY = 'asaas_shop_searches_v1';
 // Search shortcuts by need; each one only shows when it finds products.
@@ -50,8 +53,10 @@ const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce
 const productLink = (id) => `${window.location.origin}/shop?p=${id}`;
 const cartKey = (productId, variantId) => (variantId ? `${productId}:${variantId}` : String(productId));
 const hasVariants = (p) => (p?.variants?.length || 0) > 0;
-// Clothing and accessories come in sizes; everything else (supplements) in flavours.
+// Clothing and accessories come in sizes, or colours when every option is named after one;
+// everything else (supplements) in flavours.
 const SIZED_CATEGORIES = ['clothing', 'accessories'];
+const COLOUR_NAME = /^(vert|verte|rouge|bleu|bleue|noir|noire|blanc|blanche|orange|rose|jaune|gris|grise|violet|violette|marron|beige|kaki|transparent|transparente|multicolore)(\s.*)?$/i;
 const VARIANT_TEXT = {
   flavour: {
     one: ['shop.flavour', 'Goût'],
@@ -65,9 +70,19 @@ const VARIANT_TEXT = {
     choose: ['shop.chooseSize', 'Choisir la taille'],
     required: ['shop.errSize', 'Choisissez une taille pour {{name}} : retirez-le du panier puis ajoutez-le depuis sa page.'],
   },
+  colour: {
+    one: ['shop.colour', 'Couleur'],
+    count: ['shop.nColours', '{{count}} couleurs'],
+    choose: ['shop.chooseColour', 'Choisir la couleur'],
+    required: ['shop.errColour', 'Choisissez une couleur pour {{name}} : retirez-le du panier puis ajoutez-le depuis sa page.'],
+  },
+};
+const variantKind = (p) => {
+  if (!SIZED_CATEGORIES.includes(p?.category)) return 'flavour';
+  return hasVariants(p) && p.variants.every((v) => COLOUR_NAME.test(v.name.trim())) ? 'colour' : 'size';
 };
 const variantText = (t, p, which, opts) => {
-  const [key, fallback] = VARIANT_TEXT[SIZED_CATEGORIES.includes(p?.category) ? 'size' : 'flavour'][which];
+  const [key, fallback] = VARIANT_TEXT[variantKind(p)][which];
   return t(key, fallback, opts);
 };
 
@@ -187,6 +202,7 @@ export default function Shop() {
   const [toast, setToast] = useState(null);
   const toastTimer = useRef(null);
   const cartBtn = useRef(null);
+  const defaultDescription = useRef('');
 
   const loadProducts = () => getShopProducts()
     .then(setProducts)
@@ -207,7 +223,21 @@ export default function Shop() {
   useEffect(() => { safeWrite(FAV_KEY, favs); }, [favs]);
   useEffect(() => { safeWrite(RECENT_KEY, recent); }, [recent]);
   useEffect(() => { safeWrite(SEARCHES_KEY, searches); }, [searches]);
-  useEffect(() => { if (info?.name) document.title = `${info.name.trim()} — ${t('shop.title', 'Boutique en ligne')}`; }, [info, t]);
+  // Title, description and canonical address, read by Google and shown in the browser tab.
+  useEffect(() => {
+    document.title = detail ? `${detail.name} — ${SHOP_NAME}` : `${SHOP_NAME} — ${t('shop.title', 'Boutique en ligne')}`;
+    const description = document.querySelector('meta[name="description"]');
+    if (!defaultDescription.current) defaultDescription.current = description?.content || '';
+    if (description) description.content = detail?.description || defaultDescription.current;
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.rel = 'canonical';
+      document.head.appendChild(canonical);
+    }
+    const linked = new URLSearchParams(window.location.search).get('p');
+    canonical.href = `${SHOP_ORIGIN}/shop${linked ? `?p=${encodeURIComponent(linked)}` : ''}`;
+  }, [detail, t]);
 
   // A shared link (/shop?p=12) opens that product directly.
   const deepLinked = useRef(false);
@@ -343,7 +373,7 @@ export default function Shop() {
     setRecent((r) => [p.id, ...r.filter((x) => x !== p.id)].slice(0, 10));
   };
   const share = async (p) => {
-    const url = productLink(p.id);
+    const url = shopShareLink(p.id);
     try {
       if (navigator.share) { await navigator.share({ title: p.name, text: `${p.name} — ${fmt(unitPrice(p))}`, url }); return; }
       await navigator.clipboard.writeText(url);
@@ -351,7 +381,7 @@ export default function Shop() {
     } catch { /* share sheet dismissed */ }
   };
 
-  const shopName = (info?.name || 'ASAAS Pro').trim();
+  const gymName = (info?.name || 'ASAAS GYM').trim();
   const wa = waNumber(info?.whatsapp);
   const city = info?.local_city || 'Tanger';
   const isAr = i18n.language === 'ar';
@@ -393,9 +423,9 @@ export default function Shop() {
 
       <header className="ps-header">
         <div className="ps-header__row">
-          <button className="ps-logo" onClick={() => window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' })} aria-label={shopName}>
+          <button className="ps-logo" onClick={() => window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' })} aria-label={SHOP_NAME}>
             <img src={info?.logo_base64 || '/logo_asaas.jpg'} alt="" />
-            <span>{shopName}</span>
+            <span>{SHOP_NAME}</span>
           </button>
           <nav className="ps-nav" aria-label={t('shop.menu', 'Menu')}>
             {navLinks.map(([id, label]) => <button key={id} onClick={() => goTo(id)}>{label}</button>)}
@@ -420,7 +450,7 @@ export default function Shop() {
         <section className="ps-hero">
           <div className="ps-hero__copy">
             <h1>{t('shop.heroTitle', 'La nutrition sportive choisie par nos coachs.')}</h1>
-            <p>{t('shop.heroSub', 'La boutique de la salle {{name}} à {{city}}. Commandez en deux minutes, sans compte, et payez à la livraison.', { name: shopName, city })}</p>
+            <p>{t('shop.heroSub', 'La boutique de la salle {{name}} à {{city}}. Commandez en deux minutes, sans compte, et payez à la livraison.', { name: gymName, city })}</p>
             <div className="ps-hero__ctas">
               <button className="ps-btn ps-btn--dark" onClick={() => goTo('catalogue')}>{t('shop.shopNow', 'Découvrir la boutique')} <ArrowRight size={17} className="flip-rtl" /></button>
               {onSale.length > 0 && <button className="ps-btn ps-btn--line" onClick={() => goTo('promos')}>{t('shop.seePromos', 'Voir les promotions')}</button>}
@@ -554,7 +584,7 @@ export default function Shop() {
         <section id="about" className="ps-section ps-about">
           <div className="ps-about__copy">
             <h2>{t('shop.aboutTitle', 'Une vraie salle derrière la boutique.')}</h2>
-            <p>{t('shop.aboutP1', '{{name}} est une salle de sport à {{city}}. Les compléments et accessoires de cette boutique sont choisis par les coachs de la salle.', { name: shopName, city })}</p>
+            <p>{t('shop.aboutP1', '{{name}} est une salle de sport à {{city}}. Les compléments et accessoires de cette boutique sont choisis par les coachs de la salle.', { name: gymName, city })}</p>
             <p>{t('shop.aboutP2', 'Vous vous entraînez chez nous ? Retirez votre commande gratuitement à l’accueil. Ailleurs au Maroc ? Nous livrons chez vous.')}</p>
             {wa && <a className="ps-btn ps-btn--wa" href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer"><MessageCircle size={18} /> {t('shop.aboutCtaWa', 'Nous écrire sur WhatsApp')}</a>}
           </div>
@@ -564,7 +594,7 @@ export default function Shop() {
       <footer id="contact" className="ps-footer">
         <div className="ps-footer__inner">
           <div className="ps-footer__brand">
-            <span className="ps-logo ps-logo--static"><img src={info?.logo_base64 || '/logo_asaas.jpg'} alt="" /><span>{shopName}</span></span>
+            <span className="ps-logo ps-logo--static"><img src={info?.logo_base64 || '/logo_asaas.jpg'} alt="" /><span>{SHOP_NAME}</span></span>
             <p>{t('shop.footerLine', 'Salle de sport et boutique de nutrition sportive à {{city}}.', { city })}</p>
             <button className="ps-lang ps-lang--wide" onClick={switchLang}>{isAr ? 'Français' : 'العربية'}</button>
           </div>
@@ -573,6 +603,7 @@ export default function Shop() {
             {categories.map((c) => <button key={c} onClick={() => openCategory(c)}>{catLabel(c)}</button>)}
             {onSale.length > 0 && <button onClick={() => goTo('promos')}>{t('shop.navPromos', 'Promotions')}</button>}
             <button onClick={showFavs}>{t('shop.favorites', 'Favoris')}</button>
+            <button onClick={() => setPanel('track')}>{t('shop.trackTitle', 'Suivre ma commande')}</button>
           </div>
           <div className="ps-footer__col">
             <h3>{t('shop.infoTitle', 'Livraison et paiement')}</h3>
@@ -585,10 +616,10 @@ export default function Shop() {
             <h3>{t('shop.navContact', 'Contact')}</h3>
             {wa && <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer"><MessageCircle size={17} /> <span dir="ltr">{info.whatsapp}</span></a>}
             {info?.instagram_url && <a href={info.instagram_url} target="_blank" rel="noreferrer"><Instagram size={17} /> Instagram</a>}
-            <p><MapPin size={17} /> {shopName}, {city}</p>
+            <p><MapPin size={17} /> {gymName}, {city}</p>
           </div>
         </div>
-        <p className="ps-footer__legal">© {new Date().getFullYear()} {shopName}</p>
+        <p className="ps-footer__legal">© {new Date().getFullYear()} {SHOP_NAME}</p>
       </footer>
 
       {wa && !overlayOpen && (
@@ -609,7 +640,7 @@ export default function Shop() {
         <div className="ps-overlay ps-overlay--left" onMouseDown={(e) => { if (e.target === e.currentTarget) setMenuOpen(false); }}>
           <nav className="ps-menu" aria-label={t('shop.menu', 'Menu')}>
             <div className="ps-menu__head">
-              <span className="ps-logo ps-logo--static"><img src={info?.logo_base64 || '/logo_asaas.jpg'} alt="" /><span>{shopName}</span></span>
+              <span className="ps-logo ps-logo--static"><img src={info?.logo_base64 || '/logo_asaas.jpg'} alt="" /><span>{SHOP_NAME}</span></span>
               <button className="ps-iconbtn" onClick={() => setMenuOpen(false)} aria-label={t('shop.close', 'Fermer')}><X size={22} /></button>
             </div>
             <button className="ps-menu__search" onClick={() => { setMenuOpen(false); setSearchOpen(true); }}><Search size={18} /> {t('shop.searchPh', 'Rechercher un produit')}</button>
@@ -619,9 +650,10 @@ export default function Shop() {
               return <button key={c} onClick={() => openCategory(c)}><Icon size={20} strokeWidth={1.6} /> {catLabel(c)}</button>;
             })}
             {onSale.length > 0 && <button className="is-promo" onClick={() => goTo('promos')}><span className="ps-badge ps-badge--inline">%</span> {t('shop.navPromos', 'Promotions')}</button>}
-            <p className="ps-menu__label">{shopName}</p>
+            <p className="ps-menu__label">{SHOP_NAME}</p>
             <button onClick={showFavs}><Heart size={20} strokeWidth={1.6} /> {t('shop.favorites', 'Favoris')} ({favs.length})</button>
             <button onClick={() => { setMenuOpen(false); setPanel('cart'); }}><ShoppingBag size={20} strokeWidth={1.6} /> {t('shop.cart', 'Panier')} ({count})</button>
+            <button onClick={() => { setMenuOpen(false); setPanel('track'); }}><Package size={20} strokeWidth={1.6} /> {t('shop.trackTitle', 'Suivre ma commande')}</button>
             <button onClick={() => goTo('about')}><Store size={20} strokeWidth={1.6} /> {t('shop.navAbout', 'La salle')}</button>
             <button onClick={() => goTo('contact')}><Phone size={20} strokeWidth={1.6} /> {t('shop.navContact', 'Contact')}</button>
             <div className="ps-menu__foot">
@@ -665,11 +697,12 @@ export default function Shop() {
               <CheckoutPanel
                 lines={lines} subtotal={subtotal} info={info}
                 onBack={() => setPanel('cart')}
-                onDone={(o) => { setOrder(o); setCart({}); setPanel('done'); loadProducts(); }}
+                onDone={(o, phone) => { safeWrite(LAST_ORDER_KEY, { reference: o.reference, phone }); setOrder(o); setCart({}); setPanel('done'); loadProducts(); }}
                 onStockChanged={loadProducts}
               />
             )}
-            {panel === 'done' && order && <DonePanel order={order} info={info} onClose={() => setPanel(null)} />}
+            {panel === 'done' && order && <DonePanel order={order} info={info} onClose={() => setPanel(null)} onTrack={() => setPanel('track')} />}
+            {panel === 'track' && <TrackPanel wa={wa} onClose={() => setPanel(null)} />}
           </aside>
         </div>
       )}
@@ -1210,7 +1243,7 @@ function CheckoutPanel({ lines, subtotal, info, onBack, onDone, onStockChanged }
         website: form.website,
         items: lines.map((l) => ({ product_id: l.product.id, quantity: l.qty, ...(l.variant ? { variant_id: l.variant.id } : {}) })),
       });
-      onDone(res);
+      onDone(res, form.phone);
     } catch (err) {
       const d = err.response?.data?.detail;
       if (d?.code === 'out_of_stock') {
@@ -1309,7 +1342,7 @@ function CheckoutPanel({ lines, subtotal, info, onBack, onDone, onStockChanged }
   );
 }
 
-function DonePanel({ order, info, onClose }) {
+function DonePanel({ order, info, onClose, onTrack }) {
   const { t } = useTranslation();
   const wa = waNumber(info?.whatsapp);
   const msg = t('shop.waMsg', 'Bonjour, je viens de passer la commande {{ref}} sur votre boutique.', { ref: order.reference });
@@ -1317,7 +1350,11 @@ function DonePanel({ order, info, onClose }) {
   const pickup = order.delivery === 'pickup';
   const [qr, setQr] = useState(null);
   useEffect(() => {
-    QRCode.toDataURL(order.reference, { margin: 1, width: 208, color: { dark: '#0e0f0c', light: '#ffffff' } }).then(setQr).catch(() => setQr(null));
+    // Only buyers need this library, so it isn't part of the shop's first download.
+    import('qrcode')
+      .then(({ default: QRCode }) => QRCode.toDataURL(order.reference, { margin: 1, width: 208, color: { dark: '#0e0f0c', light: '#ffffff' } }))
+      .then(setQr)
+      .catch(() => setQr(null));
   }, [order.reference]);
   return (
     <div className="ps-done">
@@ -1348,8 +1385,97 @@ function DonePanel({ order, info, onClose }) {
       </div>
       <div className="ps-drawer__foot">
         {wa && <a className="ps-btn ps-btn--wa ps-btn--block" href={waLink(wa, msg)} target="_blank" rel="noreferrer"><MessageCircle size={18} /> {t('shop.waContact', 'Nous écrire sur WhatsApp')}</a>}
+        <button className="ps-btn ps-btn--line ps-btn--block" onClick={onTrack}><Package size={18} /> {t('shop.trackTitle', 'Suivre ma commande')}</button>
         <button className="ps-btn ps-btn--line ps-btn--block" onClick={onClose}>{t('shop.continue', 'Continuer mes achats')}</button>
       </div>
     </div>
+  );
+}
+
+// The steps of an order, as the staff move it forward in OrdersPanel.
+const TRACK_STEPS = {
+  delivery: [
+    ['pending', 'shop.stampIssued', 'Commande reçue'],
+    ['confirmed', 'shop.trackConfirmed', 'Commande confirmée'],
+    ['shipped', 'shop.stampShipped', 'Expédiée'],
+    ['delivered', 'shop.trackDelivered', 'Livrée'],
+  ],
+  pickup: [
+    ['pending', 'shop.stampIssued', 'Commande reçue'],
+    ['confirmed', 'shop.trackConfirmed', 'Commande confirmée'],
+    ['collected', 'shop.trackCollected', 'Récupérée à la salle'],
+  ],
+};
+
+function TrackPanel({ wa, onClose }) {
+  const { t, i18n } = useTranslation();
+  const [form, setForm] = useState(() => {
+    const last = safeRead(LAST_ORDER_KEY, null);
+    return { reference: last?.reference || '', phone: last?.phone || '' };
+  });
+  const [order, setOrder] = useState(null);
+  const [error, setError] = useState('');
+  const [sending, setSending] = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (sending) return;
+    setError('');
+    setOrder(null);
+    if (!form.reference.trim() || form.phone.replace(/\D/g, '').length < 9) {
+      setError(t('shop.trackMissing', 'Entrez votre numéro de commande et votre téléphone.'));
+      return;
+    }
+    setSending(true);
+    try {
+      setOrder(await trackShopOrder({ reference: form.reference.trim(), phone: form.phone }));
+    } catch (err) {
+      if (err.response?.status === 404 || err.response?.status === 422) setError(t('shop.trackNotFound', 'Commande introuvable. Vérifiez le numéro de commande et le téléphone utilisé pour commander.'));
+      else if (err.response?.status === 429) setError(t('shop.trackTooMany', 'Trop d’essais. Réessayez dans quelques minutes.'));
+      else setError(t('shop.errNetworkShort', 'Impossible de joindre la boutique. Vérifiez votre connexion internet et réessayez.'));
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const steps = order ? TRACK_STEPS[order.delivery] : [];
+  const reached = order ? steps.findIndex(([status]) => status === order.status) : -1;
+
+  return (
+    <form onSubmit={submit} className="ps-checkout" noValidate>
+      <DrawerHead title={t('shop.trackTitle', 'Suivre ma commande')} onClose={onClose} />
+      <div className="ps-form">
+        <label className="ps-field">
+          <span>{t('shop.orderNumber', 'Numéro de commande')}</span>
+          <input dir="ltr" value={form.reference} onChange={(e) => setForm((f) => ({ ...f, reference: e.target.value }))} placeholder="CMD-00012" maxLength={20} autoCapitalize="characters" enterKeyHint="next" />
+        </label>
+        <label className="ps-field">
+          <span>{t('shop.phone', 'Téléphone')}</span>
+          <input type="tel" inputMode="tel" dir="ltr" value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} placeholder="06 12 34 56 78" maxLength={30} autoComplete="tel" enterKeyHint="search" />
+        </label>
+        {error && <p className="ps-err" role="alert">{error}</p>}
+        {order && (
+          <div className="ps-track" role="status">
+            <p className="ps-done__ref" dir="ltr">{order.reference}</p>
+            <p className="ps-muted">{new Date(order.created_at).toLocaleDateString(i18n.language === 'ar' ? 'ar-MA' : 'fr-FR', { dateStyle: 'long' })}</p>
+            {order.status === 'cancelled'
+              ? <p className="ps-track__cancelled">{t('shop.trackCancelled', 'Cette commande a été annulée.')}</p>
+              : (
+                <ol className="ps-steps">
+                  {steps.map(([status, key, fallback], i) => <li key={status} className={i <= reached ? 'is-done' : ''}><span>{t(key, fallback)}</span></li>)}
+                </ol>
+              )}
+            <div className="ps-done__lines">
+              {order.lines.map((l, i) => <div key={i} className="ps-sum"><span>{l.quantity} × {l.name}{l.variant ? ` — ${l.variant}` : ''}</span></div>)}
+              <div className="ps-sum ps-sum--total"><span>{t('shop.total', 'Total')}</span><strong>{fmt(order.total)}</strong></div>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="ps-drawer__foot">
+        <button type="submit" className="ps-btn ps-btn--dark ps-btn--block" disabled={sending}>{sending ? t('shop.trackLoading', 'Recherche…') : t('shop.trackAction', 'Voir ma commande')}</button>
+        {wa && <a className="ps-btn ps-btn--wa ps-btn--block" href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer"><MessageCircle size={18} /> {t('shop.waContact', 'Nous écrire sur WhatsApp')}</a>}
+      </div>
+    </form>
   );
 }

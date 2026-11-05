@@ -634,6 +634,8 @@
 .ps-steps li::before { content: ''; position: absolute; inset-inline-start: 0; top: 14px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #c4c7bf; background: #fff; }
 .ps-steps li.is-done { color: var(--ps-ink); font-weight: 600; }
 .ps-steps li.is-done::before { background: var(--ps-lime); border-color: var(--ps-ink); }
+.ps-track { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 18px 16px; border-radius: 20px; background: var(--ps-soft); text-align: center; }
+.ps-track__cancelled { align-self: stretch; padding: 12px; border-radius: 12px; background: #fff; color: var(--ps-red); font-weight: 600; }
 .ps-done__lines { align-self: stretch; display: flex; flex-direction: column; gap: 8px; margin-top: 6px; padding-top: 14px; border-top: 1px solid var(--ps-line); text-align: start; }
 
 @media (prefers-reduced-motion: reduce) {

@@ -191,6 +191,9 @@ export const getShopInfo = () => api.get('/shop/info').then(r => r.data)
 export const getShopProducts = () => api.get('/shop/products').then(r => r.data)
 export const getShopProduct = (id) => api.get(`/shop/products/${id}`).then(r => r.data)
 export const createShopOrder = (data) => api.post('/shop/orders', data).then(r => r.data)
+export const trackShopOrder = (data) => api.post('/shop/orders/track', data).then(r => r.data)
+// Share this link rather than /shop?p=ID: this page gives WhatsApp and Instagram the product's preview.
+export const shopShareLink = (id) => `${api.defaults.baseURL}/shop/share/${id}`
 export const updateCommande = (id, data) => api.patch(`/commandes/${id}/status`, data).then(r => r.data)
 
 // ─── Planning (weekly sessions) ───────────────────────────────────────────────
