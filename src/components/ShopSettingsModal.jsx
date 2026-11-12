@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Save, Truck, MessageCircle, Instagram } from 'lucide-react';
+import { Save, Truck, MessageCircle, Instagram, Gift } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import Modal from './Modal';
 import { useGym } from '../context/GymContext';
@@ -14,6 +14,7 @@ export default function ShopSettingsModal({ onClose }) {
     shipping_local_city: gymSettings?.shipping_local_city || 'Tanger',
     shipping_fee_local: gymSettings?.shipping_fee_local ?? 20,
     shipping_fee_other: gymSettings?.shipping_fee_other ?? 35,
+    free_shipping_from: gymSettings?.free_shipping_from ?? '',
   }));
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -24,6 +25,9 @@ export default function ShopSettingsModal({ onClose }) {
     const local = Number(form.shipping_fee_local);
     const other = Number(form.shipping_fee_other);
     if (!(local >= 0) || !(other >= 0)) { setError(t('orders.settings.errFee', 'Frais de livraison invalides')); return; }
+    const freeRaw = String(form.free_shipping_from).trim();
+    const freeFrom = freeRaw === '' ? null : Number(freeRaw);
+    if (freeFrom !== null && !(freeFrom > 0)) { setError(t('orders.settings.errFree', 'Le montant de livraison offerte doit être supérieur à 0, ou laissé vide.')); return; }
     if (form.instagram_url && !/^https?:\/\//.test(form.instagram_url.trim())) { setError(t('orders.settings.errUrl', 'Le lien Instagram doit commencer par https://')); return; }
     setSaving(true);
     setError('');
@@ -34,6 +38,7 @@ export default function ShopSettingsModal({ onClose }) {
         shipping_local_city: form.shipping_local_city.trim() || 'Tanger',
         shipping_fee_local: local,
         shipping_fee_other: other,
+        free_shipping_from: freeFrom,
       });
       onClose();
     } catch (err) {
@@ -71,6 +76,12 @@ export default function ShopSettingsModal({ onClose }) {
             <label>{t('orders.settings.feeOther', 'Frais autres villes (DH)')}</label>
             <input type="number" min="0" step="any" value={form.shipping_fee_other} onChange={(e) => set('shipping_fee_other', e.target.value)} />
           </div>
+        </div>
+
+        <div className="form-group">
+          <label><Gift size={12} /> {t('orders.settings.freeFrom', 'Livraison offerte à partir de (DH)')}</label>
+          <input type="number" min="1" step="any" value={form.free_shipping_from} onChange={(e) => set('free_shipping_from', e.target.value)} placeholder={t('orders.settings.freeFromPh', 'Ex : 500')} />
+          <span className="form-hint">{t('orders.settings.freeFromHint', "Dans toutes les villes, dès que le panier atteint ce montant. Laissez vide pour ne jamais l'offrir.")}</span>
         </div>
 
         {error && <div className="form-error form-error--block">{error}</div>}

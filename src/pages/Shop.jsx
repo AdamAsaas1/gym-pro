@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ShoppingBag, Plus, Minus, X, Search, Truck, Store, Phone, MessageCircle, Instagram, Trash2, ChevronLeft, ArrowRight,
   Menu, MapPin, Heart, Share2, Check, Wallet, Dumbbell, Shirt, FlaskConical, LayoutGrid, Package, SlidersHorizontal, Clock3,
-  ChevronRight, SearchX, CornerDownLeft,
+  ChevronRight, SearchX, CornerDownLeft, Gift,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getShopInfo, getShopProducts, getShopProduct, createShopOrder, trackShopOrder, shopShareLink } from '../api/client';
@@ -53,6 +53,9 @@ const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce
 const productLink = (id) => `${window.location.origin}/shop?p=${id}`;
 const cartKey = (productId, variantId) => (variantId ? `${productId}:${variantId}` : String(productId));
 const hasVariants = (p) => (p?.variants?.length || 0) > 0;
+// Cart amount from which delivery is free, set in the staff app ("Réglages boutique"). null: never.
+const freeShippingFrom = (info) => (info?.free_shipping_from > 0 ? info.free_shipping_from : null);
+const SHAKER = /shaker/i;
 // Clothing and accessories come in sizes, or colours when every option is named after one;
 // everything else (supplements) in flavours.
 const SIZED_CATEGORIES = ['clothing', 'accessories'];
@@ -382,6 +385,7 @@ export default function Shop() {
   };
 
   const gymName = (info?.name || 'ASAAS GYM').trim();
+  const freeFrom = freeShippingFrom(info);
   const wa = waNumber(info?.whatsapp);
   const city = info?.local_city || 'Tanger';
   const isAr = i18n.language === 'ar';
@@ -418,7 +422,9 @@ export default function Shop() {
   return (
     <div className="shop ps" dir={isAr ? 'rtl' : 'ltr'} lang={isAr ? 'ar' : 'fr'}>
       <p className="ps-note-bar">
-        <Truck size={15} /> {t('shop.barLine', 'Paiement à la livraison partout au Maroc · Retrait gratuit à la salle à {{city}}', { city })}
+        <Truck size={15} /> {freeFrom
+          ? t('shop.barFree', 'Livraison offerte dès {{amount}} · Paiement à la livraison partout au Maroc', { amount: fmt(freeFrom) })
+          : t('shop.barLine', 'Paiement à la livraison partout au Maroc · Retrait gratuit à la salle à {{city}}', { city })}
       </p>
 
       <header className="ps-header">
@@ -456,6 +462,7 @@ export default function Shop() {
               {onSale.length > 0 && <button className="ps-btn ps-btn--line" onClick={() => goTo('promos')}>{t('shop.seePromos', 'Voir les promotions')}</button>}
             </div>
             <ul className="ps-hero__facts">
+              {freeFrom && <li className="is-hl"><Gift size={18} /> {t('shop.freeFrom', 'Livraison offerte dès {{amount}}', { amount: fmt(freeFrom) })}</li>}
               <li><Wallet size={18} /> {t('shop.factCod', 'Paiement à la livraison')}</li>
               <li><Truck size={18} /> {info ? t('shop.factDelivery', '{{city}} {{local}} · Maroc {{other}}', { city, local: fmt(info.fee_local), other: fmt(info.fee_other) }) : t('shop.perkDelivery', 'Livraison partout au Maroc')}</li>
               <li><Store size={18} /> {t('shop.factPickup', 'Retrait gratuit à la salle')}</li>
@@ -609,6 +616,7 @@ export default function Shop() {
             <h3>{t('shop.infoTitle', 'Livraison et paiement')}</h3>
             {info && <p>{city} : {fmt(info.fee_local)}</p>}
             {info && <p>{t('shop.otherCities', 'Autres villes')} : {fmt(info.fee_other)}</p>}
+            {freeFrom && <p>{t('shop.freeFrom', 'Livraison offerte dès {{amount}}', { amount: fmt(freeFrom) })}</p>}
             <p>{t('shop.cod', 'Paiement à la livraison')}</p>
             <p>{t('shop.pickup', 'Retrait à la salle')} : {t('shop.free', 'Gratuit')}</p>
           </div>
@@ -625,7 +633,8 @@ export default function Shop() {
       {wa && !overlayOpen && (
         <a className={`ps-wafab${toast ? ' is-raised' : ''}`} href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer" aria-label="WhatsApp"><MessageCircle size={26} /></a>
       )}
-      {toast && (
+      {/* The cart drawer already shows what was added. */}
+      {toast && !panel && (
         <div className="ps-toast" role="status">
           {toast.kind === 'added' ? (
             <>
@@ -691,11 +700,16 @@ export default function Shop() {
         <div className="ps-overlay" onMouseDown={(e) => { if (e.target === e.currentTarget && panel !== 'done') setPanel(null); }}>
           <aside className="ps-drawer" role="dialog" aria-modal="true" aria-label={t('shop.cart', 'Panier')}>
             {panel === 'cart' && (
-              <CartPanel lines={lines} count={count} subtotal={subtotal} info={info} wa={wa} waText={cartWaText} setQty={setQty} onClose={() => setPanel(null)} onCheckout={() => setPanel('checkout')} />
+              <CartPanel
+                lines={lines} count={count} subtotal={subtotal} info={info} freeFrom={freeFrom} products={products} wa={wa} waText={cartWaText} setQty={setQty}
+                onUpsellAdd={(p) => { setQty(cartKey(p.id), (cart[cartKey(p.id)] || 0) + 1); navigator.vibrate?.(12); }}
+                onOpen={(p) => { setPanel(null); openProduct(p); }}
+                onClose={() => setPanel(null)} onCheckout={() => setPanel('checkout')}
+              />
             )}
             {panel === 'checkout' && (
               <CheckoutPanel
-                lines={lines} subtotal={subtotal} info={info}
+                lines={lines} subtotal={subtotal} info={info} freeFrom={freeFrom}
                 onBack={() => setPanel('cart')}
                 onDone={(o, phone) => { safeWrite(LAST_ORDER_KEY, { reference: o.reference, phone }); setOrder(o); setCart({}); setPanel('done'); loadProducts(); }}
                 onStockChanged={loadProducts}
@@ -1112,6 +1126,11 @@ function ProductDetail({ p, initialVariant, onPhotos, fav, onFav, onShare, wa, i
             <ul className="ps-detail__info">
               <li><Wallet size={17} /> {t('shop.cod', 'Paiement à la livraison')}</li>
               {info && <li><Truck size={17} /> {t('shop.feeLine', '{{city}} {{local}} · autres villes {{other}}', { city: info.local_city, local: fmt(info.fee_local), other: fmt(info.fee_other) })}</li>}
+              {freeShippingFrom(info) && (
+                <li className="is-hl"><Gift size={17} /> {unitPrice(p) * qty >= freeShippingFrom(info)
+                  ? t('shop.freeWithThis', 'Livraison offerte avec ce produit')
+                  : t('shop.freeFrom', 'Livraison offerte dès {{amount}}', { amount: fmt(freeShippingFrom(info)) })}</li>
+              )}
               <li><Store size={17} /> {t('shop.factPickup', 'Retrait gratuit à la salle')}</li>
             </ul>
           </div>
@@ -1150,7 +1169,54 @@ function DrawerHead({ title, onClose, onBack }) {
   );
 }
 
-function CartPanel({ lines, count, subtotal, info, wa, waText, setQty, onClose, onCheckout }) {
+// How far the cart is from free delivery, then a small celebration when it gets there.
+function FreeShippingMeter({ subtotal, freeFrom }) {
+  const { t } = useTranslation();
+  if (!freeFrom) return null;
+  const left = Math.max(0, freeFrom - subtotal);
+  const pct = Math.min(100, Math.round((subtotal / freeFrom) * 100));
+  return (
+    <div className={`ps-freeship${left ? '' : ' is-done'}`} role="status">
+      <p>
+        {left
+          ? <><Truck size={17} /><span>{t('shop.freeLeftA', 'Plus que')} <b>{fmt(left)}</b> {t('shop.freeLeftB', 'pour la livraison offerte')}</span></>
+          : <><span className="ps-freeship__check"><Check size={14} strokeWidth={3} /></span><span><b>{t('shop.freeDone', 'Livraison offerte !')}</b> {t('shop.freeDoneSub', 'Partout au Maroc')}</span></>}
+      </p>
+      <div className="ps-freeship__bar" aria-hidden="true"><i style={{ width: `${pct}%` }} /></div>
+    </div>
+  );
+}
+
+// A protein in the cart and no shaker yet: offer the shakers in stock, cheapest first.
+function CartUpsell({ products, lines, left, onAdd, onOpen }) {
+  const { t } = useTranslation();
+  if (!lines.some((l) => l.product.category === 'supplements') || lines.some((l) => SHAKER.test(l.product.name))) return null;
+  const picks = products.filter((p) => SHAKER.test(p.name) && p.in_stock).sort((a, b) => unitPrice(a) - unitPrice(b)).slice(0, 3);
+  if (!picks.length) return null;
+  return (
+    <section className="ps-upsell" aria-labelledby="ps-upsell-title">
+      <h3 id="ps-upsell-title">{t('shop.upsellTitle', 'Ajoutez un shaker')}</h3>
+      <p>{t('shop.upsellSub', 'Pour mélanger votre protéine sans grumeaux.')}</p>
+      <ul className="ps-upsell__list">
+        {picks.map((p) => (
+          <li key={p.id} className="ps-upsell__item">
+            <button className="ps-upsell__img" onClick={() => onOpen(p)} aria-label={`${t('shop.details', 'Détails')} : ${p.name}`}>
+              <ProductImage src={p.image_url} alt="" name="" category={p.category} />
+            </button>
+            <span className="ps-upsell__name">{p.name}</span>
+            <span className="ps-upsell__price">{fmt(unitPrice(p))}</span>
+            {left > 0 && unitPrice(p) >= left && <span className="ps-upsell__tag">{t('shop.upsellUnlock', 'Livraison offerte avec')}</span>}
+            <button className="ps-upsell__add" onClick={() => (hasVariants(p) ? onOpen(p) : onAdd(p))} aria-label={`${t('shop.upsellAdd', 'Ajouter')} : ${p.name}`}>
+              <Plus size={16} /> {t('shop.upsellAdd', 'Ajouter')}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+function CartPanel({ lines, count, subtotal, info, freeFrom, products, wa, waText, setQty, onUpsellAdd, onOpen, onClose, onCheckout }) {
   const { t } = useTranslation();
   useEscape(onClose);
   return (
@@ -1160,10 +1226,13 @@ function CartPanel({ lines, count, subtotal, info, wa, waText, setQty, onClose, 
         <div className="ps-drawer__empty">
           <ShoppingBag size={44} strokeWidth={1.2} />
           <p>{t('shop.emptyCart', 'Votre panier est vide.')}</p>
+          {freeFrom && <p className="ps-hint"><Gift size={15} /> {t('shop.freeFrom', 'Livraison offerte dès {{amount}}', { amount: fmt(freeFrom) })}</p>}
           <button className="ps-btn ps-btn--dark" onClick={onClose}>{t('shop.continue', 'Continuer mes achats')}</button>
         </div>
       ) : (
         <>
+          {freeFrom && <div className="ps-cart__top"><FreeShippingMeter subtotal={subtotal} freeFrom={freeFrom} /></div>}
+          <div className="ps-cart__body">
           <ul className="ps-lines">
             {lines.map(({ key, product: p, variant, qty, photo }) => (
               <li key={key} className="ps-line">
@@ -1181,9 +1250,13 @@ function CartPanel({ lines, count, subtotal, info, wa, waText, setQty, onClose, 
               </li>
             ))}
           </ul>
+          <CartUpsell products={products} lines={lines} left={freeFrom ? Math.max(0, freeFrom - subtotal) : 0} onAdd={onUpsellAdd} onOpen={onOpen} />
+          </div>
           <div className="ps-drawer__foot">
             <div className="ps-sum"><span>{t('shop.subtotal', 'Sous-total')}</span><strong>{fmt(subtotal)}</strong></div>
-            {info && <p className="ps-hint"><Truck size={15} /> {t('shop.shippingHint', 'Livraison : {{city}} {{local}}, autres villes {{other}}', { city: info.local_city, local: fmt(info.fee_local), other: fmt(info.fee_other) })}</p>}
+            {freeFrom && subtotal >= freeFrom
+              ? <p className="ps-hint"><Gift size={15} /> {t('shop.freeDoneHint', 'Livraison offerte partout au Maroc.')}</p>
+              : info && <p className="ps-hint"><Truck size={15} /> {t('shop.shippingHint', 'Livraison : {{city}} {{local}}, autres villes {{other}}', { city: info.local_city, local: fmt(info.fee_local), other: fmt(info.fee_other) })}</p>}
             <button className="ps-btn ps-btn--dark ps-btn--block" onClick={onCheckout}>{t('shop.checkout', 'Commander')} <ArrowRight size={17} className="flip-rtl" /></button>
             {wa && <a className="ps-btn ps-btn--wa-line ps-btn--block" href={waLink(wa, waText())} target="_blank" rel="noreferrer"><MessageCircle size={17} /> {t('shop.orderCartWa', 'Commander via WhatsApp')}</a>}
           </div>
@@ -1193,7 +1266,7 @@ function CartPanel({ lines, count, subtotal, info, wa, waText, setQty, onClose, 
   );
 }
 
-function CheckoutPanel({ lines, subtotal, info, onBack, onDone, onStockChanged }) {
+function CheckoutPanel({ lines, subtotal, info, freeFrom, onBack, onDone, onStockChanged }) {
   const { t } = useTranslation();
   const [form, setForm] = useState(() => ({
     name: '', phone: '', delivery: 'delivery', city: info?.local_city || 'Tanger', otherCity: '', address: '', notes: '', website: '',
@@ -1206,7 +1279,10 @@ function CheckoutPanel({ lines, subtotal, info, onBack, onDone, onStockChanged }
   const set = (k, v) => { setForm((f) => ({ ...f, [k]: v })); setErrors((e) => ({ ...e, [k]: '' })); };
   const city = form.city === '__other' ? form.otherCity.trim() : form.city;
   const isLocal = norm(city) === norm(info?.local_city || 'Tanger');
-  const fee = form.delivery === 'pickup' ? 0 : (isLocal ? info?.fee_local ?? 20 : info?.fee_other ?? 35);
+  const baseFee = form.delivery === 'pickup' ? 0 : (isLocal ? info?.fee_local ?? 20 : info?.fee_other ?? 35);
+  // Same rule as the server, which recomputes it when the order arrives.
+  const freeReached = form.delivery === 'delivery' && !!freeFrom && subtotal >= freeFrom;
+  const fee = freeReached ? 0 : baseFee;
   const total = subtotal + fee;
 
   const validate = () => {
@@ -1326,12 +1402,17 @@ function CheckoutPanel({ lines, subtotal, info, onBack, onDone, onStockChanged }
         <div className="ps-sum"><span>{t('shop.subtotal', 'Sous-total')}</span><span>{fmt(subtotal)}</span></div>
         <div className="ps-sum">
           <span>{t('shop.shipping', 'Livraison')}{form.delivery === 'delivery' && city ? ` · ${city}` : ''}</span>
-          <span key={`fee-${fee}`} className="is-live">{fee ? fmt(fee) : t('shop.free', 'Gratuit')}</span>
+          <span key={`fee-${fee}`} className="is-live">{freeReached
+            ? <span className="ps-freetag"><s>{fmt(baseFee)}</s> {t('shop.freeShipping', 'Offerte')}</span>
+            : (fee ? fmt(fee) : t('shop.free', 'Gratuit'))}</span>
         </div>
         <div className="ps-sum ps-sum--total">
           <span>{form.delivery === 'pickup' ? t('shop.totalPickup', 'Total à payer au retrait') : t('shop.totalCod', 'Total à payer à la réception')}</span>
           <strong key={`total-${total}`} className="is-live">{fmt(total)}</strong>
         </div>
+        {form.delivery === 'delivery' && freeFrom && !freeReached && (
+          <p className="ps-hint ps-hint--lime"><Gift size={15} /> {t('shop.checkoutLeft', 'Ajoutez {{amount}} au panier pour la livraison offerte.', { amount: fmt(freeFrom - subtotal) })}</p>
+        )}
         {submitError && <p className="ps-err ps-err--block" role="alert">{submitError}</p>}
         <button type="submit" className="ps-btn ps-btn--dark ps-btn--block" disabled={sending}>
           {sending ? t('shop.sending', 'Envoi…') : t('shop.confirmOrder', 'Confirmer la commande')}
@@ -1372,7 +1453,7 @@ function DonePanel({ order, info, onClose, onTrack }) {
           </ol>
           <div className="ps-done__lines">
             {order.lines.map((l, i) => <div key={i} className="ps-sum"><span>{l.quantity} × {l.name}{l.variant ? ` — ${l.variant}` : ''}</span><span>{fmt(l.price * l.quantity)}</span></div>)}
-            <div className="ps-sum"><span>{t('shop.shipping', 'Livraison')}</span><span>{order.shipping_fee ? fmt(order.shipping_fee) : t('shop.free', 'Gratuit')}</span></div>
+            <div className="ps-sum"><span>{t('shop.shipping', 'Livraison')}</span><span>{order.shipping_fee ? fmt(order.shipping_fee) : (order.delivery === 'delivery' ? t('shop.freeShipping', 'Offerte') : t('shop.free', 'Gratuit'))}</span></div>
             <div className="ps-sum ps-sum--total">
               <span>{pickup ? t('shop.totalPickup', 'Total à payer au retrait') : t('shop.totalCod', 'Total à payer à la réception')}</span>
               <strong>{fmt(order.total)}</strong>
