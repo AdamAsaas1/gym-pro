@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /shop
+Allow: /assets/
+Allow: /logo_asaas.jpg
+Disallow: /
+
+Sitemap: https://asaaspro.com/sitemap.xml

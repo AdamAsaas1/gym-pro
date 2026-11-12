@@ -3,6 +3,7 @@ import {
   Banknote, TrendingUp, Users, AlertCircle, CheckCircle2,
   Search, ReceiptText, Clock, X, Download, Calendar,
 } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { useGym } from '../context/GymContext';
 import { telechargerRecu } from '../api/client';
 import { useTranslation } from 'react-i18next';
@@ -31,11 +32,11 @@ function buildMonthValue(year, monthIndex) {
 
 function getAccess(m) {
   const days = Math.ceil((new Date(m.dateExpiration) - new Date()) / 86400000);
-  if (m.statut === 'inactif') return { key: 'inactif', label: 'Inactif',    color: '#64748b', bg: 'rgba(100,116,139,0.1)' };
-  if (days < 0)               return { key: 'expire',  label: 'Expiré',     color: '#ef4444', bg: 'rgba(239,68,68,0.1)'  };
-  if (days === 0)             return { key: 'expire',  label: "Expire aujourd'hui", color: '#ef4444', bg: 'rgba(239,68,68,0.1)' };
-  if (days <= 7)              return { key: 'bientot', label: `Expire dans ${days}j`, color: '#f97316', bg: 'rgba(249,115,22,0.1)' };
-  return                             { key: 'ok',      label: 'Autorisé',   color: '#22c55e', bg: 'rgba(34,197,94,0.1)'  };
+  if (m.statut === 'inactif') return { key: 'inactif', label: 'Inactif',    color: 'var(--w-ink-2)', bg: 'rgba(100,116,139,0.1)' };
+  if (days < 0)               return { key: 'expire',  label: 'Expiré',     color: 'var(--w-stamp)', bg: 'rgba(200,36,59,0.1)'  };
+  if (days === 0)             return { key: 'expire',  label: "Expire aujourd'hui", color: 'var(--w-stamp)', bg: 'rgba(200,36,59,0.1)' };
+  if (days <= 7)              return { key: 'bientot', label: `Expire dans ${days}j`, color: '#c2410c', bg: 'rgba(249,115,22,0.1)' };
+  return                             { key: 'ok',      label: 'Autorisé',   color: 'var(--w-green)', bg: 'rgba(34,197,94,0.1)'  };
 }
 
 function getPrix(activites, activite, abonnement) {
@@ -217,7 +218,9 @@ export default function Paiements() {
   const [search,     setSearch]     = useState('');
   const [filter,     setFilter]     = useState('tous');
   const [tab,        setTab]        = useState('membres');   // 'membres' | 'historique'
-  const [selected,   setSelected]   = useState(null);        // membre pour modal
+  const [searchParams] = useSearchParams();
+  // "/paiements?membre=12" opens the payment form for that member directly (used by Renouvellements).
+  const [selected,   setSelected]   = useState(() => membres.find((m) => m.id === Number(searchParams.get('membre'))) || null);
   const [moisHisto,  setMoisHisto]  = useState('');
   const [monthPickerOpen, setMonthPickerOpen] = useState(false);
   const [yearCursor, setYearCursor] = useState(() => new Date().getFullYear());

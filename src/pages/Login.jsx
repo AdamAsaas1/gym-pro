@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useTranslation } from 'react-i18next'
+import { Eye, EyeOff } from 'lucide-react'
 
 export default function Login() {
   const navigate = useNavigate()
@@ -9,6 +10,7 @@ export default function Login() {
   const { t } = useTranslation()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
 
@@ -23,7 +25,7 @@ export default function Login() {
       navigate('/', { replace: true })
     } catch (err) {
       const apiMessage = err?.response?.data?.detail?.message
-      setError(apiMessage || t('login.error.failed', 'Connexion impossible. Verifiez vos identifiants.'))
+      setError(apiMessage || t('login.error.failed', 'Connexion impossible. Vérifiez vos identifiants.'))
     } finally {
       setSubmitting(false)
     }
@@ -32,19 +34,22 @@ export default function Login() {
   return (
     <div className="login-page">
       <div className="login-shell">
-        <section className="login-showcase" aria-label="Presentation ASAAS Pro">
-          <div className="login-showcase__glow" aria-hidden="true" />
-          <img src="/logo_asaas.jpg" alt="ASAAS Pro" className="login-showcase__logo" />
-          <p className="login-showcase__eyebrow">{t('login.system', 'ASAAS PRO SYSTEM')}</p>
-          <h1 className="login-showcase__title">{t('login.title', 'Pilotez votre salle en toute simplicite.')}</h1>
-          <p className="login-showcase__text">{t('login.subtitle', 'Acces rapide, propre et securise.')}</p>
+        <section className="login-showcase" aria-label="ASAAS Pro">
+          <h1 className="login-showcase__title">{t('login.title', 'Pilotez votre salle en toute simplicité.')}</h1>
+          <p className="login-showcase__text">{t('login.subtitle', 'Accès rapide, propre et sécurisé.')}</p>
         </section>
 
-        <section className="login-card" aria-label="Formulaire de connexion">
+        <section className="login-card" aria-label={t('login.welcome', 'Bienvenue')}>
+          <div className="login-pass__strip">
+            <span>ASAAS Pro</span>
+            <span>{t('login.staffPass', 'Accès personnel')}</span>
+          </div>
           <div className="login-card__head">
-            <p className="login-card__tag">{t('login.secureConnection', 'Connexion securisee')}</p>
-            <h2>{t('login.welcome', 'Bienvenue')}</h2>
-            <p>{t('login.instruction', 'Connecte-toi pour acceder au tableau de bord.')}</p>
+            <img src="/logo_asaas.jpg" alt="" className="login-card__logo" />
+            <div>
+              <h2>{t('login.welcome', 'Bienvenue')}</h2>
+              <p>{t('login.instruction', 'Connectez-vous pour accéder au tableau de bord.')}</p>
+            </div>
           </div>
 
           <form onSubmit={onSubmit} className="login-form">
@@ -59,28 +64,45 @@ export default function Login() {
             />
 
             <label htmlFor="password">{t('login.password', 'Mot de passe')}</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
-              placeholder={t('login.placeholder.password', 'Entrez votre mot de passe')}
-              required
-            />
+            <div className="login-password-field">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                placeholder={t('login.placeholder.password', 'Entrez votre mot de passe')}
+                required
+              />
+              <button
+                type="button"
+                className="login-password-toggle"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={
+                  showPassword
+                    ? t('login.hidePassword', 'Masquer le mot de passe')
+                    : t('login.showPassword', 'Afficher le mot de passe')
+                }
+                aria-pressed={showPassword}
+                title={
+                  showPassword
+                    ? t('login.hidePassword', 'Masquer le mot de passe')
+                    : t('login.showPassword', 'Afficher le mot de passe')
+                }
+              >
+                {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+              </button>
+            </div>
 
-            <p className="login-footnote" style={{ marginTop: 4 }}>
-              {t('login.testAccounts', 'Comptes de test: superadmin / superadmin123 ou admin / admin123')}
-            </p>
+            {error && <div className="login-error" role="alert">{error}</div>}
 
-            {error && <div className="login-error">{error}</div>}
-
+            <div className="login-perf" aria-hidden="true" />
             <button type="submit" disabled={submitting}>
               {submitting ? t('login.submitting', 'Connexion...') : t('login.submit', 'Se connecter')}
             </button>
           </form>
 
-          <p className="login-footnote">{t('login.restrictedAccess', 'Acces reserve au personnel autorise.')}</p>
+          <p className="login-footnote">{t('login.restrictedAccess', 'Accès réservé au personnel autorisé.')}</p>
         </section>
       </div>
     </div>

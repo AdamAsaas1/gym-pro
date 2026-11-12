@@ -3,6 +3,8 @@ import { useGym } from '../context/GymContext';
 import { useTranslation } from 'react-i18next';
 import { Camera, Tv, Play, Save, X, Edit3, ShieldAlert, CheckCircle2, AlertTriangle, Users, Upload } from 'lucide-react';
 import './LiveShow.css';
+import ActivityIcon from '../components/ActivityIcon';
+import { getAccessToken } from '../api/client';
 
 export default function LiveShow() {
   const { activites, updateActivity } = useGym();
@@ -30,9 +32,9 @@ export default function LiveShow() {
     if (typeof window !== 'undefined') {
       const host = window.location.hostname;
       const apiHost = host === '127.0.0.1' ? 'localhost' : host;
-      return `http://${apiHost}:5000`;
+      return `http://${apiHost}:8007`;
     }
-    return 'http://localhost:5000';
+    return 'http://localhost:8007';
   };
 
   const apiBase = getApiUrl();
@@ -117,8 +119,11 @@ export default function LiveShow() {
     formData.append('file', file);
 
     try {
+      // fetch (not the axios client) for the multipart upload, so the staff token is added by hand.
+      const token = getAccessToken();
       const response = await fetch(`${apiBase}/live/upload-video`, {
         method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
         body: formData,
       });
 
@@ -158,16 +163,16 @@ export default function LiveShow() {
 
   // Determine status color/tag
   const getCapacityStatus = (current, max) => {
-    if (!max || max <= 0) return { label: t('live.status.unknown', 'Inconnu'), color: '#94a3b8', percentage: 0 };
+    if (!max || max <= 0) return { label: t('live.status.unknown', 'Inconnu'), color: 'var(--w-ink-3)', percentage: 0 };
     const ratio = current / max;
     const percentage = Math.round(ratio * 100);
     
     if (ratio >= 0.8) {
-      return { label: t('live.status.crowded', 'Surchargé'), color: '#ef4444', percentage };
+      return { label: t('live.status.crowded', 'Surchargé'), color: 'var(--w-stamp)', percentage };
     } else if (ratio >= 0.5) {
-      return { label: t('live.status.moderate', 'Modéré'), color: '#f97316', percentage };
+      return { label: t('live.status.moderate', 'Modéré'), color: '#c2410c', percentage };
     }
-    return { label: t('live.status.calm', 'Calme'), color: '#22c55e', percentage };
+    return { label: t('live.status.calm', 'Calme'), color: 'var(--w-green)', percentage };
   };
 
   return (
@@ -198,7 +203,7 @@ export default function LiveShow() {
                 <div key={act.id} className="live-act-card" style={{ '--accent-color': act.couleur }}>
                   <div className="card-header-row">
                     <div className="activity-info-group">
-                      <span className="activity-icon">{act.icon}</span>
+                      <span className="activity-icon"><ActivityIcon icon={act.icon} size={22} color={act.couleur} /></span>
                       <div>
                         <h3>{act.nom}</h3>
                         <p>{act.coachNom && act.coachNom !== 'À définir' ? `${t('live.coach', 'Coach')}: ${act.coachNom}` : t('live.noCoach', 'Sans Coach')}</p>

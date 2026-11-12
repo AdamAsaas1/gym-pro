@@ -1,9 +1,12 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { ShoppingBag, Search, Pencil, Trash2, Plus, Image as ImageIcon, ClipboardList } from 'lucide-react';
+import { ShoppingBag, Search, Pencil, Trash2, Plus, Image as ImageIcon, ClipboardList, AlertTriangle, Settings2, X, Check } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import ShopSettingsModal from '../components/ShopSettingsModal';
 import Modal from '../components/Modal';
-import { getProducts, createProduct, updateProduct, deleteProduct, getCommandes, updateCommandeStatus } from '../api/client';
+import { getProducts, createProduct, updateProduct, deleteProduct } from '../api/client';
 import { useTranslation } from 'react-i18next';
+import OrdersPanel from '../components/OrdersPanel';
 import { useGym } from '../context/GymContext';
 import './Boutique.css';
 
@@ -14,7 +17,8 @@ const EMPTY_PRODUCT = {
   stock: '',
   category: '',
   image_url: '',
-  promo: ''
+  promo: '',
+  variants: []
 };
 
 const getFirstImage = (url) => {
@@ -30,207 +34,312 @@ const getFirstImage = (url) => {
   }
 };
 
+// Categories the public shop knows (tab, icon, translation). Anything else is shown as typed.
+const SHOP_CATEGORIES = [
+  { value: 'supplements', label: 'Compléments' },
+  { value: 'accessories', label: 'Accessoires' },
+  { value: 'clothing', label: 'Vêtements' },
+];
+const DESCRIPTION_MAX = 255; // products.description is VARCHAR(255)
+// Clothing and accessories come in sizes; everything else (supplements) in flavours. Same rule as the public shop.
+const SIZED_CATEGORIES = ['clothing', 'accessories'];
+
+const parseImages = (url) => {
+  if (!url) return [];
+  try {
+    const parsed = JSON.parse(url);
+    return Array.isArray(parsed) ? parsed : [url];
+  } catch {
+    return [url];
+  }
+};
+
 function ProductForm({ initial, onSave, onClose }) {
   const { t } = useTranslation();
-  const [form, setForm] = useState(initial || EMPTY_PRODUCT);
+  const [form, setForm] = useState(() => ({ ...EMPTY_PRODUCT, ...(initial || {}) }));
   const [errors, setErrors] = useState({});
-  const [images, setImages] = useState(() => {
-    if (!form.image_url) return [];
-    try {
-      const parsed = JSON.parse(form.image_url);
-      if (Array.isArray(parsed)) return parsed;
-      return [form.image_url];
-    } catch (e) {
-      return [form.image_url];
-    }
-  });
+  const [saving, setSaving] = useState(false);
+  const [images, setImages] = useState(() => parseImages(initial?.image_url));
   const [urlInput, setUrlInput] = useState('');
+  // Flavours (same price as the product, each with its own stock and, optionally, the photo of its packaging).
+  // The photo is kept as the image itself so it follows the photo when photos are reordered or removed.
+  const [variants, setVariants] = useState(() => {
+    const photos = parseImages(initial?.image_url);
+    return (initial?.variants || []).map((v) => ({ id: v.id, name: v.name, stock: String(v.stock), photo: v.image_index != null ? photos[v.image_index] || null : null }));
+  });
+  const [photoPicker, setPhotoPicker] = useState(null); // index of the flavour whose photo is being chosen
+  const [stockMode, setStockMode] = useState(() => ((initial?.variants || []).length ? 'variants' : 'single'));
+  const knownCategory = SHOP_CATEGORIES.some((c) => c.value === form.category);
+  const [customCategory, setCustomCategory] = useState(() => !!initial?.category && !SHOP_CATEGORIES.some((c) => c.value === initial.category));
+
+  const useVariants = stockMode === 'variants';
+  const sized = SIZED_CATEGORIES.includes(form.category);
+  // Variant wording: "Goût" for flavours, "Taille" for sizes (the translation key gets a "Size" suffix).
+  const vt = (key, flavour, size, opts) => (sized ? t(`${key}Size`, size, opts) : t(key, flavour, opts));
+  const variantsTotal = variants.reduce((sum, v) => sum + (parseInt(v.stock, 10) || 0), 0);
+  const price = parseFloat(form.price);
+  const promo = parseFloat(form.promo);
+  const promoPct = price > 0 && promo > 0 && promo < price ? Math.round((1 - promo / price) * 100) : 0;
 
   const set = (key, val) => {
-    setForm(prev => ({ ...prev, [key]: val }));
-    setErrors(e => ({ ...e, [key]: '' }));
+    setForm((prev) => ({ ...prev, [key]: val }));
+    setErrors((e) => ({ ...e, [key]: '' }));
+  };
+  const setVariant = (i, key, val) => {
+    setVariants((list) => list.map((v, idx) => (idx === i ? { ...v, [key]: val } : v)));
+    setErrors((e) => ({ ...e, variants: '' }));
+  };
+  const addVariant = () => setVariants((list) => [...list, { name: '', stock: '0', photo: null }]);
+  const removeVariant = (i) => { setVariants((list) => list.filter((_, idx) => idx !== i)); setPhotoPicker(null); };
+  const pickPhoto = (i, photo) => { setVariant(i, 'photo', photo); setPhotoPicker(null); };
+  const chooseStockMode = (mode) => {
+    setStockMode(mode);
+    setErrors((e) => ({ ...e, stock: '', variants: '' }));
+    if (mode === 'variants' && variants.length === 0) setVariants([{ name: '', stock: form.stock || '0', photo: null }]);
   };
 
+  const addImages = (list) => setImages((prev) => [...prev, ...list]);
   const handleImageUpload = (e) => {
-    const files = Array.from(e.target.files);
-    files.forEach(file => {
+    Array.from(e.target.files || []).forEach((file) => {
       const reader = new FileReader();
-      reader.onloadend = () => {
-        setImages(prev => {
-          const updated = [...prev, reader.result];
-          set('image_url', JSON.stringify(updated));
-          return updated;
-        });
-      };
+      reader.onloadend = () => addImages([reader.result]);
       reader.readAsDataURL(file);
     });
+    e.target.value = '';
   };
-
-  const removeImage = (index) => {
-    setImages(prev => {
-      const updated = prev.filter((_, idx) => idx !== index);
-      set('image_url', updated.length > 0 ? JSON.stringify(updated) : '');
-      return updated;
-    });
-  };
-
   const addUrlImage = () => {
-    if (urlInput.trim()) {
-      setImages(prev => {
-        const updated = [...prev, urlInput.trim()];
-        set('image_url', JSON.stringify(updated));
-        return updated;
-      });
-      setUrlInput('');
+    const url = urlInput.trim();
+    if (!url) return;
+    if (!/^(https?:\/\/|data:image\/)/i.test(url)) {
+      setErrors((e) => ({ ...e, images: t('store.form.errImageUrl', 'Collez une adresse d’image qui commence par https://') }));
+      return;
     }
+    addImages([url]);
+    setUrlInput('');
+    setErrors((e) => ({ ...e, images: '' }));
   };
+  const removeImage = (index) => {
+    const removed = images[index];
+    setImages((prev) => prev.filter((_, idx) => idx !== index));
+    // A flavour linked to this photo goes back to the main photo.
+    setVariants((list) => list.map((v) => (v.photo === removed ? { ...v, photo: null } : v)));
+  };
+  const makeMain = (index) => setImages((prev) => [prev[index], ...prev.filter((_, idx) => idx !== index)]);
 
   const validate = () => {
     const e = {};
     if (!form.name.trim()) e.name = t('store.form.errName', 'Le nom est obligatoire');
-    if (form.price === '' || isNaN(form.price)) e.price = t('store.form.errPrice', 'Prix invalide');
-    if (form.stock === '' || isNaN(form.stock)) e.stock = t('store.form.errStock', 'Stock invalide');
-    
+    if (form.price === '' || isNaN(price) || price <= 0) e.price = t('store.form.errPrice', 'Indiquez un prix supérieur à 0');
     if (form.promo !== '' && form.promo !== null && form.promo !== undefined) {
-      if (isNaN(form.promo) || parseFloat(form.promo) < 0) {
-        e.promo = t('store.form.errPromo', 'Prix promo invalide');
-      } else if (parseFloat(form.promo) >= parseFloat(form.price)) {
-        e.promo = t('store.form.errPromoPrice', 'Le prix promo doit être inférieur au prix normal');
-      }
+      if (isNaN(promo) || promo < 0) e.promo = t('store.form.errPromo', 'Prix promo invalide');
+      else if (promo > 0 && promo >= price) e.promo = t('store.form.errPromoPrice', 'Le prix promo doit être inférieur au prix normal');
     }
+    if (!useVariants && (form.stock === '' || isNaN(form.stock) || parseInt(form.stock, 10) < 0)) e.stock = t('store.form.errStock', 'Indiquez un stock (0 ou plus)');
+    if (useVariants) {
+      const names = variants.map((v) => v.name.trim().toLowerCase());
+      if (!variants.length) e.variants = vt('store.form.errVariantNone', 'Ajoutez au moins un goût, ou choisissez « Un seul stock »', 'Ajoutez au moins une taille, ou choisissez « Un seul stock »');
+      else if (names.some((n) => !n)) e.variants = vt('store.form.errVariantName', 'Donnez un nom à chaque goût (ou supprimez la ligne vide)', 'Donnez un nom à chaque taille (ou supprimez la ligne vide)');
+      else if (new Set(names).size !== names.length) e.variants = vt('store.form.errVariantDup', 'Deux goûts ont le même nom', 'Deux tailles ont le même nom');
+      else if (variants.some((v) => v.stock === '' || isNaN(v.stock) || parseInt(v.stock, 10) < 0)) e.variants = vt('store.form.errVariantStock', 'Le stock de chaque goût doit être un nombre positif', 'Le stock de chaque taille doit être un nombre positif');
+    }
+    if ((form.description || '').length > DESCRIPTION_MAX) e.description = t('store.form.errDescription', 'Description trop longue');
     return e;
   };
 
-  const submit = (ev) => {
+  const submit = async (ev) => {
     ev.preventDefault();
     const e = validate();
-    if (Object.keys(e).length) { setErrors(e); return; }
-    
-    // Convert to proper types
+    if (Object.keys(e).length) {
+      setErrors(e);
+      requestAnimationFrame(() => document.querySelector('.pform [aria-invalid="true"], .pform .form-error')?.scrollIntoView({ block: 'center', behavior: 'smooth' }));
+      return;
+    }
     const data = {
-      ...form,
-      price: parseFloat(form.price),
-      stock: parseInt(form.stock, 10),
-      promo: form.promo !== '' && form.promo !== null && form.promo !== undefined ? parseFloat(form.promo) : null
+      ...(initial?.id ? { id: initial.id } : {}),
+      name: form.name.trim(),
+      description: (form.description || '').trim() || null,
+      category: (form.category || '').trim() || null,
+      image_url: images.length ? JSON.stringify(images) : '',
+      price,
+      promo: promo > 0 ? promo : null,
+      stock: useVariants ? variantsTotal : parseInt(form.stock, 10),
+      // Always sent: an empty list removes the flavours of a product that had some.
+      variants: useVariants ? variants.map((v) => {
+        const photoIndex = v.photo ? images.indexOf(v.photo) : -1;
+        return { ...(v.id ? { id: v.id } : {}), name: v.name.trim(), stock: parseInt(v.stock, 10) || 0, image_index: photoIndex >= 0 ? photoIndex : null };
+      }) : [],
     };
-    
-    onSave(data);
+    setSaving(true);
+    try {
+      await onSave(data);
+    } finally {
+      setSaving(false);
+    }
   };
 
+  const err = (key) => errors[key] && <span className="form-error" id={`pf-err-${key}`}>{errors[key]}</span>;
+
   return (
-    <form onSubmit={submit} className="store-form">
-      <div className="form-group">
-        <label>{t('store.form.name', 'Nom du produit')} *</label>
-        <input value={form.name} onChange={e => set('name', e.target.value)} placeholder="Ex: Whey Protein" />
-        {errors.name && <span className="form-error">{errors.name}</span>}
-      </div>
-
-      <div className="form-row">
-        <div className="form-group">
-          <label>{t('store.form.price', 'Prix')} *</label>
-          <input type="number" step="0.01" value={form.price} onChange={e => set('price', e.target.value)} placeholder="0.00" />
-          {errors.price && <span className="form-error">{errors.price}</span>}
-        </div>
-        <div className="form-group">
-          <label>{t('store.form.promo', 'Prix Promo (Optionnel)')}</label>
-          <input type="number" step="0.01" value={form.promo || ''} onChange={e => set('promo', e.target.value)} placeholder="0.00" />
-          {errors.promo && <span className="form-error">{errors.promo}</span>}
-        </div>
-      </div>
-
-      <div className="form-row">
-        <div className="form-group">
-          <label>{t('store.form.stock', 'Stock')} *</label>
-          <input type="number" value={form.stock} onChange={e => set('stock', e.target.value)} placeholder="0" />
-          {errors.stock && <span className="form-error">{errors.stock}</span>}
-        </div>
-        <div className="form-group">
-          <label>{t('store.form.category', 'Catégorie')}</label>
-          <input value={form.category || ''} onChange={e => set('category', e.target.value)} placeholder="Ex: Suppléments, Vêtements..." />
-        </div>
-      </div>
-
-      <div className="form-group">
-        <label>{t('store.form.description', 'Description')}</label>
-        <textarea rows={3} value={form.description || ''} onChange={e => set('description', e.target.value)} placeholder="Détails du produit..." />
-      </div>
-
-      <div className="form-group">
-        <label style={{ marginBottom: '0.5rem', display: 'block' }}>{t('store.form.images', 'Photos du produit (Multiple)')}</label>
-        
-        {/* Upload Buttons */}
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap' }}>
-          <label className="btn btn--secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', cursor: 'pointer', margin: 0, padding: '0.5rem 1rem' }}>
-            <ImageIcon size={16} />
-            {t('store.form.chooseFiles', 'Ajouter des photos')}
-            <input 
-              type="file" 
-              multiple 
-              hidden 
-              onChange={handleImageUpload} 
-              accept="image/*" 
-            />
+    <form onSubmit={submit} className="pform" noValidate>
+      {/* Photos */}
+      <section className="pform__section">
+        <h3 className="pform__title">{t('store.form.sectionPhotos', 'Photos')}</h3>
+        <div className="pform__photos">
+          {images.map((img, idx) => (
+            <div key={`${idx}-${img.slice(-24)}`} className={`pform__photo${idx === 0 ? ' is-main' : ''}`}>
+              <img src={img} alt="" onError={(e) => { e.currentTarget.style.opacity = '0.2'; }} />
+              {idx === 0
+                ? <span className="pform__photo-tag">{t('store.form.mainPhoto', 'Principale')}</span>
+                : <button type="button" className="pform__photo-main" onClick={() => makeMain(idx)}>{t('store.form.makeMain', 'Mettre en premier')}</button>}
+              <button type="button" className="pform__photo-remove" onClick={() => removeImage(idx)} aria-label={t('store.form.removePhoto', 'Retirer cette photo')}><X size={14} /></button>
+            </div>
+          ))}
+          <label className="pform__drop">
+            <ImageIcon size={22} />
+            <span>{t('store.form.chooseFiles', 'Ajouter des photos')}</span>
+            <input type="file" multiple hidden accept="image/*" onChange={handleImageUpload} />
           </label>
         </div>
-
-        {/* URL input */}
-        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-          <input 
-            value={urlInput} 
-            onChange={e => setUrlInput(e.target.value)} 
-            placeholder={t('store.form.pasteUrlPlaceholder', "Ou coller l'URL d'une image (ex: https://...)")} 
-            style={{ flex: 1 }}
+        <div className="pform__url">
+          <input
+            value={urlInput} onChange={(e) => setUrlInput(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addUrlImage(); } }}
+            placeholder={t('store.form.pasteUrlPlaceholder', 'Ou collez l’adresse d’une image (https://…)')}
+            aria-label={t('store.form.pasteUrl', 'Adresse d’une image')}
           />
-          <button 
-            type="button" 
-            className="btn btn--secondary" 
-            onClick={addUrlImage}
-            style={{ padding: '0 1rem' }}
+          <button type="button" className="btn btn--ghost" onClick={addUrlImage}>{t('store.form.add', 'Ajouter')}</button>
+        </div>
+        {err('images')}
+        <p className="pform__hint">{t('store.form.photosHint', 'La première photo est celle affichée dans la boutique. Fond blanc conseillé.')}</p>
+      </section>
+
+      {/* Information */}
+      <section className="pform__section">
+        <h3 className="pform__title">{t('store.form.sectionInfo', 'Informations')}</h3>
+        <div className="form-group">
+          <label htmlFor="pf-name">{t('store.form.name', 'Nom du produit')} *</label>
+          <input id="pf-name" value={form.name} maxLength={100} onChange={(e) => set('name', e.target.value)} placeholder="Ex : Whey Protein Gold Standard 2,27 kg" aria-invalid={!!errors.name} aria-describedby={errors.name ? 'pf-err-name' : undefined} />
+          {err('name')}
+        </div>
+        <div className="form-group">
+          <label htmlFor="pf-cat">{t('store.form.category', 'Catégorie')}</label>
+          <select
+            id="pf-cat"
+            value={customCategory ? '__other' : (knownCategory ? form.category : '')}
+            onChange={(e) => {
+              if (e.target.value === '__other') { setCustomCategory(true); set('category', knownCategory ? '' : form.category); return; }
+              setCustomCategory(false);
+              set('category', e.target.value);
+            }}
           >
-            {t('store.form.add', 'Ajouter')}
-          </button>
+            <option value="">{t('store.form.noCategory', '— Sans catégorie —')}</option>
+            {SHOP_CATEGORIES.map((c) => <option key={c.value} value={c.value}>{t(`shop.categories.${c.value}`, c.label)}</option>)}
+            <option value="__other">{t('store.form.otherCategory', 'Autre catégorie…')}</option>
+          </select>
+          {customCategory && (
+            <input className="pform__mt" value={form.category || ''} maxLength={50} onChange={(e) => set('category', e.target.value)} placeholder={t('store.form.otherCategoryPh', 'Nom de la catégorie')} aria-label={t('store.form.otherCategoryPh', 'Nom de la catégorie')} />
+          )}
+        </div>
+        <div className="form-group">
+          <label htmlFor="pf-desc">{t('store.form.description', 'Description')}</label>
+          <textarea id="pf-desc" rows={3} maxLength={DESCRIPTION_MAX} value={form.description || ''} onChange={(e) => set('description', e.target.value)} placeholder={t('store.form.descriptionPh', 'Ex : 24 g de protéines par dose, 74 doses, goût chocolat…')} />
+          <span className={`pform__count${(form.description || '').length > DESCRIPTION_MAX - 20 ? ' is-near' : ''}`}>{(form.description || '').length} / {DESCRIPTION_MAX}</span>
+          {err('description')}
+        </div>
+      </section>
+
+      {/* Price */}
+      <section className="pform__section">
+        <h3 className="pform__title">{t('store.form.sectionPrice', 'Prix')}</h3>
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="pf-price">{t('store.form.price', 'Prix')} *</label>
+            <div className="pform__money">
+              <input id="pf-price" type="number" inputMode="decimal" min="0" step="0.01" value={form.price} onChange={(e) => set('price', e.target.value)} placeholder="0" aria-invalid={!!errors.price} aria-describedby={errors.price ? 'pf-err-price' : undefined} />
+              <span>DH</span>
+            </div>
+            {err('price')}
+          </div>
+          <div className="form-group">
+            <label htmlFor="pf-promo">{t('store.form.promo', 'Prix promo (optionnel)')}</label>
+            <div className="pform__money">
+              <input id="pf-promo" type="number" inputMode="decimal" min="0" step="0.01" value={form.promo ?? ''} onChange={(e) => set('promo', e.target.value)} placeholder={t('store.form.promoPh', 'Vide = pas de promo')} aria-invalid={!!errors.promo} aria-describedby={errors.promo ? 'pf-err-promo' : undefined} />
+              <span>DH</span>
+            </div>
+            {err('promo')}
+          </div>
+        </div>
+        {promoPct > 0 && (
+          <p className="pform__promo">
+            <span className="pform__pct">-{promoPct}%</span>
+            {t('store.form.promoResult', 'Le client paie {{promo}} DH au lieu de {{price}} DH.', { promo, price })}
+          </p>
+        )}
+      </section>
+
+      {/* Stock and flavours */}
+      <section className="pform__section">
+        <h3 className="pform__title">{t('store.form.sectionStock', 'Stock')}</h3>
+        <div className="pform__seg" role="radiogroup" aria-label={t('store.form.sectionStock', 'Stock')}>
+          <button type="button" role="radio" aria-checked={!useVariants} onClick={() => chooseStockMode('single')}>{t('store.form.stockSingle', 'Un seul stock')}</button>
+          <button type="button" role="radio" aria-checked={useVariants} onClick={() => chooseStockMode('variants')}>{vt('store.form.stockVariants', 'Plusieurs goûts', 'Plusieurs tailles')}</button>
         </div>
 
-        {/* Images Preview Grid */}
-        {images.length > 0 && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(80px, 1fr))', gap: '10px', backgroundColor: 'rgba(0,0,0,0.1)', padding: '1rem', borderRadius: '8px', marginBottom: '1.5rem' }}>
-            {images.map((img, idx) => (
-              <div key={idx} style={{ position: 'relative', width: '80px', height: '80px', borderRadius: '6px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
-                <img src={img} alt={`Preview ${idx}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} onError={(e) => e.target.style.display = 'none'} />
+        {!useVariants ? (
+          <div className="form-group pform__stock">
+            <label htmlFor="pf-stock">{t('store.form.stock', 'Quantité en stock')} *</label>
+            <input id="pf-stock" type="number" inputMode="numeric" min="0" step="1" value={form.stock} onChange={(e) => set('stock', e.target.value)} placeholder="0" aria-invalid={!!errors.stock} aria-describedby={errors.stock ? 'pf-err-stock' : undefined} />
+            {err('stock')}
+          </div>
+        ) : (
+          <div className="pform__variants">
+            <p className="pform__hint">{vt('store.form.variantsHint', 'Même prix pour tous les goûts. Chaque goût a son propre stock, et le client choisit son goût sur le site et dans l’application.', 'Même prix pour toutes les tailles. Chaque taille a son propre stock, et le client choisit sa taille sur le site et dans l’application.')}</p>
+            {images.length > 1 && <p className="pform__hint pform__hint--photo">{vt('store.form.variantPhotoHint', 'Touchez le carré photo de chaque goût pour choisir la photo de son emballage : le client verra le bon paquet en choisissant son goût.', 'Touchez le carré photo de chaque taille pour choisir sa photo : le client verra la bonne photo en choisissant sa taille.')}</p>}
+            <div className="pform__vhead" aria-hidden="true"><span>{t('store.form.variantPhoto', 'Photo')}</span><span>{vt('store.form.variantName', 'Goût', 'Taille')}</span><span>{t('store.form.variantStock', 'Stock')}</span><span /></div>
+            {variants.map((v, i) => (
+              <div key={v.id || `new-${i}`} className="pform__vrow">
                 <button
                   type="button"
-                  onClick={() => removeImage(idx)}
-                  style={{
-                    position: 'absolute',
-                    top: '2px',
-                    right: '2px',
-                    backgroundColor: 'rgba(239, 68, 68, 0.9)',
-                    color: '#fff',
-                    border: 'none',
-                    borderRadius: '50%',
-                    width: '18px',
-                    height: '18px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    fontSize: '10px',
-                    fontWeight: 'bold',
-                    padding: 0
-                  }}
+                  className={`pform__vphoto${v.photo ? ' has-photo' : ''}${photoPicker === i ? ' is-open' : ''}`}
+                  onClick={() => setPhotoPicker(photoPicker === i ? null : i)}
+                  disabled={!images.length}
+                  aria-expanded={photoPicker === i}
+                  aria-label={`${t('store.form.variantPhoto', 'Photo')} : ${v.name || vt('store.form.variantName', 'Goût', 'Taille')}`}
+                  title={images.length ? t('store.form.variantPhotoChoose', 'Choisir la photo') : t('store.form.variantPhotoNone', 'Ajoutez d’abord des photos en haut')}
                 >
-                  ✕
+                  {v.photo ? <img src={v.photo} alt="" /> : (images[0] ? <img src={images[0]} alt="" className="is-default" /> : <ImageIcon size={18} />)}
                 </button>
+                <input value={v.name} onChange={(e) => setVariant(i, 'name', e.target.value)} placeholder={vt('store.form.variantNamePh', 'Ex : Chocolat', 'Ex : M')} aria-label={`${vt('store.form.variantName', 'Goût', 'Taille')} ${i + 1}`} maxLength={60} aria-invalid={!!errors.variants && !v.name.trim()} />
+                <input type="number" inputMode="numeric" min="0" step="1" value={v.stock} onChange={(e) => setVariant(i, 'stock', e.target.value)} aria-label={`${t('store.form.variantStock', 'Stock')} ${v.name || i + 1}`} />
+                {photoPicker === i && (
+                  <div className="pform__vpicker" role="group" aria-label={t('store.form.variantPhotoChoose', 'Choisir la photo')}>
+                    {images.map((img, idx) => (
+                      <button key={`${idx}-${img.slice(-24)}`} type="button" className={v.photo === img ? 'is-on' : ''} onClick={() => pickPhoto(i, img)} aria-pressed={v.photo === img}>
+                        <img src={img} alt="" />
+                        {v.photo === img && <span><Check size={14} /></span>}
+                      </button>
+                    ))}
+                    <button type="button" className={`pform__vpicker-none${!v.photo ? ' is-on' : ''}`} onClick={() => pickPhoto(i, null)} aria-pressed={!v.photo}>
+                      {t('store.form.variantPhotoMain', 'Photo principale')}
+                    </button>
+                  </div>
+                )}
+                <button type="button" className="pform__vremove" onClick={() => removeVariant(i)} aria-label={vt('store.form.removeVariant', 'Supprimer ce goût', 'Supprimer cette taille')}><Trash2 size={16} /></button>
               </div>
             ))}
+            {err('variants')}
+            <div className="pform__vfoot">
+              <button type="button" className="btn btn--ghost btn--sm" onClick={addVariant}><Plus size={16} /> {vt('store.form.addVariant', 'Ajouter un goût', 'Ajouter une taille')}</button>
+              <span className="pform__total">{t('store.form.stockTotalShort', 'Total : {{count}}', { count: variantsTotal })}</span>
+            </div>
           </div>
         )}
-      </div>
+      </section>
 
-      <div className="form-actions">
+      <div className="pform__actions">
         <button type="button" className="btn btn--ghost" onClick={onClose}>{t('store.form.cancel', 'Annuler')}</button>
-        <button type="submit" className="btn btn--primary">
-          {initial?.id ? t('store.form.save', 'Enregistrer') : t('store.form.add', 'Ajouter')}
+        <button type="submit" className="btn btn--primary" disabled={saving}>
+          {saving ? t('store.form.saving', 'Enregistrement…') : initial?.id ? t('store.form.save', 'Enregistrer') : t('store.form.create', 'Ajouter le produit')}
         </button>
       </div>
     </form>
@@ -256,7 +365,7 @@ function DeleteConfirm({ product, onConfirm, onClose }) {
 export default function Boutique() {
   const { t } = useTranslation();
   const location = useLocation();
-  const { commandes, setCommandes, fetchCommandes } = useGym();
+  const { commandes, setCommandes, fetchCommandes, gymSettings } = useGym();
   
   const [activeTab, setActiveTab] = useState(() => {
     if (location.state?.activeTab) return location.state.activeTab;
@@ -270,7 +379,6 @@ export default function Boutique() {
   const [query, setQuery] = useState('');
   const [modal, setModal] = useState(null); // 'add', 'edit', 'delete'
   const [selected, setSelected] = useState(null);
-  const [commandesLoading, setCommandesLoading] = useState(false);
 
   // Sync tab if location changes
   useEffect(() => {
@@ -296,11 +404,12 @@ export default function Boutique() {
     }
   };
 
-  const loadCommandes = async () => {
-    setCommandesLoading(true);
-    await fetchCommandes();
-    setCommandesLoading(false);
-  };
+  const loadCommandes = () => fetchCommandes();
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role === 'superadmin';
+  const [shopSettingsOpen, setShopSettingsOpen] = useState(false);
+  const pendingCount = commandes.filter((c) => c.status === 'pending').length;
+  const lowStock = products.filter((p) => p.stock <= 5);
 
   useEffect(() => {
     fetchProducts();
@@ -325,7 +434,9 @@ export default function Boutique() {
       setModal(null);
     } catch (err) {
       console.error('Failed to save product', err);
-      alert(t('store.form.errorSave', 'Erreur lors de la sauvegarde'));
+      const detail = err?.response?.data?.detail;
+      const message = typeof detail === 'string' ? detail : (Array.isArray(detail) ? detail.map((d) => d.msg).join(' · ') : detail?.message);
+      alert(message ? `${t('store.form.errorSave', 'Erreur lors de la sauvegarde')} : ${message}` : t('store.form.errorSave', 'Erreur lors de la sauvegarde'));
     }
   };
 
@@ -340,37 +451,9 @@ export default function Boutique() {
     }
   };
 
-  const handleStatusChange = async (orderId, newStatus) => {
-    try {
-      await updateCommandeStatus(orderId, newStatus);
-      setCommandes(prev => prev.map(cmd => cmd.id === orderId ? { ...cmd, status: newStatus } : cmd));
-    } catch (err) {
-      console.error('Failed to update order status', err);
-      alert(t('store.orders.errorStatus', 'Erreur lors de la mise à jour du statut'));
-    }
-  };
-
   const openAdd = () => { setSelected(null); setModal('add'); };
   const openEdit = (p) => { setSelected(p); setModal('edit'); };
   const openDelete = (p) => { setSelected(p); setModal('delete'); };
-
-  const getStatusLabel = (st) => {
-    const labels = {
-      pending: t('store.orders.status.pending', 'En attente'),
-      delivered: t('store.orders.status.delivered', 'Livré'),
-      collected: t('store.orders.status.collected', 'Récupéré'),
-      cancelled: t('store.orders.status.cancelled', 'Annulé')
-    };
-    return labels[st] || st;
-  };
-
-  const getPaymentMethodLabel = (pm) => {
-    const methods = {
-      cash_on_delivery: t('store.orders.payment.delivery', 'Paiement à la livraison'),
-      cash_at_gym: t('store.orders.payment.gym', 'Paiement au Club')
-    };
-    return methods[pm] || pm;
-  };
 
   return (
     <div className="page store-page fade-in">
@@ -383,6 +466,11 @@ export default function Boutique() {
           </p>
         </div>
         <div className="store-hero__actions">
+          {isSuperAdmin && (
+            <button className="btn btn--ghost" onClick={() => setShopSettingsOpen(true)}>
+              <Settings2 size={16} /> {t('orders.shopSettings', 'Réglages boutique')}
+            </button>
+          )}
           <button className="btn btn--primary" onClick={openAdd}>
             <Plus size={16} /> {t('store.newProduct', 'Nouveau Produit')}
           </button>
@@ -403,11 +491,18 @@ export default function Boutique() {
         >
           <ClipboardList size={16} style={{ display: 'inline', marginRight: '6px', verticalAlign: 'middle' }} />
           {t('store.tabs.orders', 'Commandes')}
+          {pendingCount > 0 && <span className="store-tab-badge">{pendingCount}</span>}
         </button>
       </div>
 
       {activeTab === 'products' ? (
         <>
+          {lowStock.length > 0 && (
+            <div className="coach-alert" style={{ marginBottom: 16 }}>
+              <AlertTriangle size={18} />
+              <span>{t('orders.lowStockAlert', 'Stock faible :')} {lowStock.map((p) => `${p.name} (${p.stock})`).join(' · ')}</span>
+            </div>
+          )}
           <div className="card store-filters">
             <div className="toolbar__search">
               <Search size={16} className="toolbar__search-icon" />
@@ -456,13 +551,18 @@ export default function Boutique() {
                             <span className="store-card__price-promo">{product.promo.toLocaleString('fr-FR')} DH</span>
                           </>
                         ) : (
-                          <span className="store-card__price" style={{ color: 'var(--primary)' }}>{product.price.toLocaleString('fr-FR')} DH</span>
+                          <span className="store-card__price" style={{ color: 'var(--clr-primary)' }}>{product.price.toLocaleString('fr-FR')} DH</span>
                         )}
                       </div>
                     </div>
                     <div className="store-card__meta">
                       {product.category && <span className="store-card__category">{product.category}</span>}
                       <span className="store-card__stock">{t('store.form.stock', 'Stock')}: {product.stock}</span>
+                      {product.variants?.length > 0 && (
+                        <span className="store-card__variants">
+                          {product.variants.map((v) => <span key={v.id} className={v.stock === 0 ? 'is-out' : v.stock <= 3 ? 'is-low' : ''}>{v.name} ({v.stock})</span>)}
+                        </span>
+                      )}
                     </div>
                     {product.description && (
                       <p className="store-card__description">{product.description}</p>
@@ -482,102 +582,14 @@ export default function Boutique() {
           </div>
         </>
       ) : (
-        /* Orders Management Panel */
-        commandesLoading ? (
-          <div className="store-loading">{t('store.orders.loading', 'Chargement des commandes...')}</div>
-        ) : commandes.length === 0 ? (
-          <div className="store-empty">{t('store.orders.empty', 'Aucune commande trouvée.')}</div>
-        ) : (
-          <div className="orders-container fade-in">
-            <table className="orders-table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>{t('store.orders.client', 'Client')}</th>
-                  <th>{t('store.orders.date', 'Date')}</th>
-                  <th>{t('store.orders.items', 'Articles')}</th>
-                  <th>{t('store.orders.paymentMethod', 'Paiement')}</th>
-                  <th>{t('store.orders.address', 'Adresse / Livraison')}</th>
-                  <th>{t('store.orders.table.total', 'Total')}</th>
-                  <th>{t('store.orders.table.status', 'Statut')}</th>
-                  <th>{t('store.orders.table.actions', 'Actions')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {commandes.map(cmd => (
-                  <tr key={cmd.id}>
-                    <td>#{cmd.id}</td>
-                    <td>
-                      <strong>{cmd.membre_prenom} {cmd.membre_nom}</strong>
-                    </td>
-                    <td>
-                      {new Date(cmd.created_at).toLocaleDateString('fr-FR', { 
-                        day: '2-digit', 
-                        month: '2-digit', 
-                        year: 'numeric', 
-                        hour: '2-digit', 
-                        minute: '2-digit' 
-                      })}
-                    </td>
-                    <td>
-                      <ul className="orders-items-list">
-                        {cmd.items?.map(it => (
-                          <li key={it.id}>
-                            {it.product?.name || `Produit #${it.product_id}`} x{it.quantity} 
-                            <span style={{ color: 'var(--text-secondary)', marginLeft: '4px' }}>
-                              ({it.price} DH)
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td>{getPaymentMethodLabel(cmd.payment_method)}</td>
-                    <td>
-                      {cmd.payment_method === 'cash_on_delivery' ? (
-                        <div>
-                          <div>{cmd.address}</div>
-                          <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-                            {cmd.postal_code} {cmd.city}
-                          </div>
-                        </div>
-                      ) : (
-                        <span style={{ fontStyle: 'italic', color: 'var(--text-secondary)' }}>
-                          {t('store.orders.pickupAtGym', 'Retrait au Club')}
-                        </span>
-                      )}
-                    </td>
-                    <td style={{ fontWeight: 'bold', color: 'var(--primary)' }}>
-                      {cmd.total_price.toLocaleString('fr-FR')} DH
-                    </td>
-                    <td>
-                      <span className={`order-status-badge order-status--${cmd.status}`}>
-                        {getStatusLabel(cmd.status)}
-                      </span>
-                    </td>
-                    <td>
-                      <select 
-                        className="order-select" 
-                        value={cmd.status} 
-                        onChange={(e) => handleStatusChange(cmd.id, e.target.value)}
-                      >
-                        <option value="pending">{t('store.orders.status.pending', 'En attente')}</option>
-                        <option value="delivered">{t('store.orders.status.delivered', 'Livré')}</option>
-                        <option value="collected">{t('store.orders.status.collected', 'Récupéré')}</option>
-                        <option value="cancelled">{t('store.orders.status.cancelled', 'Annulé')}</option>
-                      </select>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )
+        <OrdersPanel commandes={commandes} setCommandes={setCommandes} gymName={gymSettings?.name?.trim()} />
       )}
 
       {modal === 'add' || modal === 'edit' ? (
         <Modal
           title={modal === 'add' ? t('store.modals.addProduct', 'Ajouter un Produit') : t('store.modals.editProduct', 'Modifier le Produit')}
           onClose={() => setModal(null)}
+          size="lg"
         >
           <ProductForm
             initial={selected}
@@ -592,6 +604,7 @@ export default function Boutique() {
           <DeleteConfirm product={selected} onConfirm={handleDelete} onClose={() => setModal(null)} />
         </Modal>
       )}
+      {shopSettingsOpen && <ShopSettingsModal onClose={() => setShopSettingsOpen(false)} />}
     </div>
   );
 }
