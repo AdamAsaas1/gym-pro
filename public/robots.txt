@@ -4,4 +4,4 @@ Allow: /assets/
 Allow: /logo_asaas.jpg
 Disallow: /
 
-Sitemap: https://api.asaaspro.com/shop/sitemap.xml
+Sitemap: https://asaaspro.com/sitemap.xml

@@ -6,6 +6,16 @@ import { useTranslation } from 'react-i18next';
 const Shop = lazy(() => import('./pages/Shop'));
 const StaffApp = lazy(() => import('./StaffApp'));
 
+// The shop's pages arrive from the server with their content already in #root (for Google and
+// link previews). It stays on screen while the shop's code downloads, instead of a blank page.
+const serverContent = document.getElementById('root')?.innerHTML.trim() || '';
+const ShopLoading = () => (serverContent ? <div dangerouslySetInnerHTML={{ __html: serverContent }} /> : null);
+const shopPage = (
+  <Suspense fallback={<ShopLoading />}>
+    <Shop />
+  </Suspense>
+);
+
 export default function App() {
   const { i18n } = useTranslation();
 
@@ -19,7 +29,8 @@ export default function App() {
       <Suspense fallback={null}>
         <Routes>
           {/* Public online shop (linked from Instagram): no login required */}
-          <Route path="/shop" element={<Shop />} />
+          {/* One route for /shop and the product pages /shop/p/<id>-<slug>: the shop stays mounted. */}
+          <Route path="/shop/*" element={shopPage} />
           <Route path="*" element={<StaffApp />} />
         </Routes>
       </Suspense>

@@ -5,7 +5,8 @@ import {
   ChevronRight, SearchX, CornerDownLeft, Gift,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { getShopInfo, getShopProducts, getShopProduct, createShopOrder, trackShopOrder, shopShareLink } from '../api/client';
+import { getShopInfo, getShopProducts, getShopProduct, createShopOrder, trackShopOrder } from '../api/client';
+import { linkedProductId, productLink, productPath, queryWithoutProduct } from './shopUrls';
 import { createSearch, fold, highlight } from './shopSearch';
 import './Shop.css';
 
@@ -14,7 +15,6 @@ const UTM_KEY = 'asaas_shop_utm_v1';
 const FAV_KEY = 'asaas_shop_favs_v1';
 const RECENT_KEY = 'asaas_shop_recent_v1';
 const LAST_ORDER_KEY = 'asaas_shop_last_order_v1';
-const SHOP_ORIGIN = 'https://asaaspro.com';
 // The shop's brand. The gym's own name (ASAAS GYM) comes from the settings, in `info.name`.
 const SHOP_NAME = 'ASAASpro';
 const LANG_KEY = 'asaas_shop_lang_v1';
@@ -50,7 +50,6 @@ const discount = (p) => (p.promo > 0 && p.promo < p.price ? Math.round((1 - p.pr
 const safeRead = (key, fallback) => { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } };
 const safeWrite = (key, value) => { try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* private mode */ } };
 const reducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-const productLink = (id) => `${window.location.origin}/shop?p=${id}`;
 const cartKey = (productId, variantId) => (variantId ? `${productId}:${variantId}` : String(productId));
 const hasVariants = (p) => (p?.variants?.length || 0) > 0;
 // Cart amount from which delivery is free, set in the staff app ("Réglages boutique"). null: never.
@@ -205,7 +204,9 @@ export default function Shop() {
   const [toast, setToast] = useState(null);
   const toastTimer = useRef(null);
   const cartBtn = useRef(null);
-  const defaultDescription = useRef('');
+  // The shop's title, sent by the server with /shop ("Compléments alimentaires… | ASAASpro").
+  // Arriving on a product page, the server sent that product's title instead.
+  const pageTitle = useRef(linkedProductId(window.location) == null ? document.title : `${SHOP_NAME} — ${t('shop.title', 'Boutique en ligne')}`);
 
   const loadProducts = () => getShopProducts()
     .then(setProducts)
@@ -226,28 +227,21 @@ export default function Shop() {
   useEffect(() => { safeWrite(FAV_KEY, favs); }, [favs]);
   useEffect(() => { safeWrite(RECENT_KEY, recent); }, [recent]);
   useEffect(() => { safeWrite(SEARCHES_KEY, searches); }, [searches]);
-  // Title, description and canonical address, read by Google and shown in the browser tab.
+  // The browser tab names the open product. Title, description and canonical address for
+  // Google come with the page itself, from the server.
   useEffect(() => {
-    document.title = detail ? `${detail.name} — ${SHOP_NAME}` : `${SHOP_NAME} — ${t('shop.title', 'Boutique en ligne')}`;
-    const description = document.querySelector('meta[name="description"]');
-    if (!defaultDescription.current) defaultDescription.current = description?.content || '';
-    if (description) description.content = detail?.description || defaultDescription.current;
-    let canonical = document.querySelector('link[rel="canonical"]');
-    if (!canonical) {
-      canonical = document.createElement('link');
-      canonical.rel = 'canonical';
-      document.head.appendChild(canonical);
-    }
-    const linked = new URLSearchParams(window.location.search).get('p');
-    canonical.href = `${SHOP_ORIGIN}/shop${linked ? `?p=${encodeURIComponent(linked)}` : ''}`;
-  }, [detail, t]);
+    document.title = detail ? `${detail.name} | ${SHOP_NAME}` : pageTitle.current;
+  }, [detail]);
 
-  // A shared link (/shop?p=12) opens that product directly.
+  // A product's address (/shop/p/12-whey, or an old /shop?p=12) opens that product. The
+  // address under it becomes /shop, so closing the product shows the shop.
   const deepLinked = useRef(false);
   useEffect(() => {
     if (deepLinked.current || !products.length) return;
     deepLinked.current = true;
-    const id = Number(new URLSearchParams(window.location.search).get('p'));
+    const id = linkedProductId(window.location);
+    if (id == null) return;
+    window.history.replaceState(window.history.state, '', `/shop${queryWithoutProduct(window.location.search)}`);
     const p = products.find((x) => x.id === id);
     if (p) setDetail(p);
   }, [products]);
@@ -268,6 +262,12 @@ export default function Shop() {
       if (window.history.state?.shopOverlay) window.history.back();
     };
   }, [overlayOpen]);
+  // While a product is open the address is its own page, ready to copy or share.
+  useEffect(() => {
+    if (!window.history.state?.shopOverlay) return;
+    const path = detail ? productPath(detail) : '/shop';
+    if (window.location.pathname !== path) window.history.replaceState(window.history.state, '', `${path}${window.location.search}`);
+  }, [detail, overlayOpen]);
 
   const byId = useMemo(() => Object.fromEntries(products.map((p) => [p.id, p])), [products]);
   const categories = useMemo(() => [...new Set(products.map((p) => p.category).filter(Boolean))]
@@ -376,7 +376,7 @@ export default function Shop() {
     setRecent((r) => [p.id, ...r.filter((x) => x !== p.id)].slice(0, 10));
   };
   const share = async (p) => {
-    const url = shopShareLink(p.id);
+    const url = productLink(p);
     try {
       if (navigator.share) { await navigator.share({ title: p.name, text: `${p.name} — ${fmt(unitPrice(p))}`, url }); return; }
       await navigator.clipboard.writeText(url);
@@ -1054,7 +1054,7 @@ function ProductDetail({ p, initialVariant, onPhotos, fav, onFav, onShare, wa, i
   }, [variant, images]);
   const flavourPhotos = hasVariants(p) && p.variants.some((v) => photoOf(v));
 
-  const waText = t('shop.waProduct', 'Bonjour, je voudrais commander : {{qty}} × {{name}} ({{price}}). {{link}}', { qty, name: variant ? `${p.name} — ${variant.name}` : p.name, price: fmt(unitPrice(p) * qty), link: productLink(p.id) });
+  const waText = t('shop.waProduct', 'Bonjour, je voudrais commander : {{qty}} × {{name}} ({{price}}). {{link}}', { qty, name: variant ? `${p.name} — ${variant.name}` : p.name, price: fmt(unitPrice(p) * qty), link: productLink(p) });
 
   return (
     <div className="ps-overlay ps-overlay--center" onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
